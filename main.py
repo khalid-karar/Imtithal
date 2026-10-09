@@ -8,8 +8,10 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 import admin
+import alerts
 import db
 import engine
+import importer
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -252,3 +254,44 @@ def audit(org_id: int):
     rows = [dict(r) for r in c.execute("SELECT * FROM audit WHERE org_id=? ORDER BY id DESC LIMIT 50", (org_id,))]
     c.close()
     return dict(entries=rows)
+
+
+@app.get("/api/orgs/{org_id}/alerts")
+def org_alerts(org_id: int):
+    c = db.conn()
+    org = _org(c, org_id)
+    branches = [dict(r) for r in c.execute("SELECT * FROM branch WHERE org_id=? ORDER BY id", (org_id,))]
+    items = engine.load_items(c, org_id)
+    c.close()
+    return alerts.build(dict(org), branches, items)
+
+
+class ImportRow(BaseModel):
+    branch: str = ""
+    city: str = ""
+    employee: str = ""
+    role: str = ""
+    document: str = ""
+    date: str = ""
+
+
+class ImportReq(BaseModel):
+    org_name: str = ""
+    pack: str = ""
+    rows: list[ImportRow] = []
+
+
+@app.post("/api/import")
+def import_org(body: ImportReq):
+    c = db.conn()
+    try:
+        res = importer.run(c, body.model_dump())
+        if res["org_id"]:
+            n = sum(res["imported"].values())
+            _log(c, res["org_id"], "import", f"استيراد بيانات: {res['imported']['employee_docs']} وثيقة موظف و{res['imported']['obligations']} التزام")
+        c.commit()
+    except importer.ImportError_ as e:
+        c.close()
+        raise HTTPException(422, e.detail)
+    c.close()
+    return res

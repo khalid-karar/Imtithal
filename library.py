@@ -236,3 +236,23 @@ VIP_SERVICES = [
     dict(code="VIP-HEALTHLIC", name="تراخيص واعتماد المنشآت الصحية", description="تجهيز ملفات الترخيص والتصنيف والاعتماد ومتابعتها.",
          price_from=4000, price_unit="للملف", sla_days=20, packs=["hospital"]),
 ]
+
+
+# Names HR people actually use in exports, mapped to obligation codes (used by the CSV import; matched after
+# normalisation: lower-case, collapsed spaces, hamza/ta-marbuta/ya variants folded, diacritics removed).
+DOC_ALIASES = {
+    "EMP-IQAMA": ["iqama", "residence", "residency permit", "اقامة", "الاقامة", "هوية مقيم", "تجديد الاقامة"],
+    "EMP-WP": ["work permit", "workpermit", "رخصة عمل", "رخصة العمل", "تجديد رخصة العمل"],
+    "EMP-INS": ["insurance", "medical insurance", "health insurance", "تامين", "تامين طبي", "التامين الطبي", "التامين"],
+    "EMP-HEALTH": ["health certificate", "health card", "شهادة صحية", "الشهادة الصحية", "كرت صحي", "بطاقة صحية"],
+    "EMP-CONTRACT": ["contract", "employment contract", "عقد", "عقد العمل", "العقد"],
+    "EMP-SCFHS": ["scfhs", "professional classification", "تصنيف", "تصنيف مهني", "تصنيف الهيئة السعودية للتخصصات الصحية"],
+    "LIC-MOT": ["tourism licence", "tourism license", "ترخيص سياحي", "ترخيص وزارة السياحة", "رخصة سياحية"],
+    "LIC-MOH": ["moh licence", "moh license", "health facility licence", "ترخيص وزارة الصحة", "ترخيص المنشاة الصحية"],
+    "ACC-CBAHI": ["cbahi", "سباهي", "اعتماد سباهي"],
+    "LIC-WASTE": ["medical waste", "waste licence", "النفايات الطبية", "ترخيص النفايات"],
+    "LIC-BALADY": ["balady", "baladiya", "municipal licence", "municipality licence", "رخصة بلدية", "رخصة البلدية", "بلدي", "رخصة نشاط تجاري"],
+    "LIC-CD": ["civil defense", "civil defence", "salama", "الدفاع المدني", "شهادة السلامة", "سلامة"],
+    "LIC-CR": ["commercial registration", "cr", "سجل تجاري", "السجل التجاري"],
+    "TAX-ZAKAT": ["zakat", "zakat certificate", "الزكاة", "شهادة الزكاة"],
+}

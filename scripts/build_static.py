@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT))
 def snapshot(as_of: str, db_path: Path) -> dict:
     os.environ["AS_OF"] = as_of
     os.environ["IMTITHAL_DB"] = str(db_path)
+    import library
     import db  # imported after env is set so DB_PATH points at the temp file
 
     db.DB_PATH = db_path
@@ -48,7 +49,8 @@ def snapshot(as_of: str, db_path: Path) -> dict:
                     "FROM emp_doc d JOIN employee e ON e.id=d.employee_id ORDER BY d.id")
     snap = dict(as_of=as_of, orgs=rows("SELECT * FROM org ORDER BY id"), branches=rows("SELECT * FROM branch ORDER BY id"),
                 templates=templates, instances=rows("SELECT * FROM instance ORDER BY id"), emp_docs=emp_docs,
-                changes=changes, vip_services=vip)
+                changes=changes, vip_services=vip, doc_aliases=library.DOC_ALIASES,
+                max_eid=c.execute("SELECT COALESCE(MAX(id),0) FROM employee").fetchone()[0])
     c.close()
     snap["build_id"] = hashlib.sha256(json.dumps(snap, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12]
     return snap

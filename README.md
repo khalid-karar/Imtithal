@@ -32,6 +32,20 @@ over-long fields are dropped); any provider failure falls back to a keyword-rule
 only public regulatory text is sent to the model, never customer data; URL ingestion is https-only, allow-listed,
 re-validated on every redirect and blocked from private addresses; duplicate sources are rejected.
 
+## v0.3 — the "show me my own exposure" demo
+
+- **Import** (`POST /api/import`, UI tab «استيراد بياناتك»): CSV/Excel of employee documents and branch licences → a new organisation with scores in seconds.
+  Document names are matched in Arabic/English (`library.DOC_ALIASES`), Hijri dates are converted in the browser, rows that cannot be mapped are returned with a reason,
+  and obligations the customer gave no date for are listed as `missing` — **dates are never guessed**.
+- **Alerts** (`GET /api/orgs/{id}/alerts`): the WhatsApp-style messages and weekly owner digest the customer would receive, generated from live data (preview only; sending needs a messaging provider).
+- **Exposure hero, countdown, branch ranking vs the portfolio average, owner PDF report, Excel (CSV) export, VIP status tracker, 60-second guided tour.**
+- **Verification fields** (`verified_by`, `verified_on`) on every obligation: all items stay "under legal review" until a real reviewer signs them off.
+
+## Static demo (Netlify)
+    python scripts/build_static.py      # writes dist/ (browser-side engine, no server)
+    python scripts/parity_check.py      # replays 150+ requests against FastAPI and the JS engine; must report 0 mismatches
+`netlify.toml` builds and publishes `dist/`. The analyst console is not part of the static build.
+
 ## Tests
     pip install -r requirements-dev.txt
     pytest

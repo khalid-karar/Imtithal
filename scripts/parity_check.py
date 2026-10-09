@@ -57,6 +57,44 @@ def main():
              ("POST", f"/api/orgs/{orgs[0]}/vip/requests", {"service_code": code}),
              ("POST", "/api/vip/requests/1/advance", None), ("POST", "/api/vip/requests/1/advance", None),
              ("POST", "/api/vip/requests/1/advance", None), ("POST", "/api/vip/requests/2/advance", None)]
+    # alerts (before and after the mutations above)
+    reqs += [("GET", f"/api/orgs/{o}/alerts", None) for o in orgs]
+    # import: aliases (Arabic/English/hamza variants), duplicates, bad dates, unknown docs, sector mismatch, scope errors
+    rows = [
+        dict(branch="فرع الرياض", city="الرياض", employee="سعد القحطاني", role="نادل", document="Iqama", date="2026-10-20"),
+        dict(branch="فرع الرياض", employee="سعد القحطاني", document="الإقامة", date="2026-10-21"),
+        dict(branch="فرع الرياض", employee="سعد القحطاني", document="رخصة العمل", date="2026-12-01"),
+        dict(branch="فرع الرياض", employee="سعد القحطاني", document="تأمين طبي", date="2026-09-01"),
+        dict(branch="فرع الرياض", employee="منى الحربي", role="استقبال", document="شهادة صحية", date="2026-10-12"),
+        dict(branch="فرع الرياض", document="civil defense", date="2026-09-01"),
+        dict(branch="فرع الرياض", document="رخصة البلدية", date="2027-03-01"),
+        dict(branch="فرع الرياض", document="رخصة البلديّة", date="2027-03-05"),
+        dict(branch="فرع جدة", city="جدة", employee="علي", role="طاهٍ", document="  IQAMA ", date="2026-11-15"),
+        dict(branch="فرع جدة", employee="علي", document="عقد العمل", date="2027-01-01"),
+        dict(branch="فرع جدة", document="Commercial Registration", date="2026-10-30"),
+        dict(branch="فرع جدة", document="الدفاع المدني", date="2026-10-01"),
+        dict(branch="", document="Iqama", date="2026-10-20"),
+        dict(branch="فرع جدة", employee="x", document="???", date="2026-10-20"),
+        dict(branch="فرع جدة", employee="x", document="Iqama", date="20/10/2026"),
+        dict(branch="فرع جدة", employee="x", document="Iqama", date="2026-02-30"),
+        dict(branch="فرع جدة", document="Iqama", date="2026-10-20"),
+        dict(branch="فرع جدة", employee="y", document="سباهي", date="2026-10-20"),
+        dict(branch="فرع جدة", employee="y", document="شهادة السلامة", date="2026-10-20"),
+    ]
+    nb = max(b["id"] for b in snap["branches"])
+    reqs += [("POST", "/api/import", dict(org_name="منشأة تجريبية", pack="hotel", rows=rows))]
+    new_org = max(orgs) + 1
+    reqs += [("GET", f"/api/orgs/{new_org}/{p}", None) for p in ("overview", "alerts", "changes", "vip", "audit", "employee-docs")]
+    reqs += [("GET", "/api/orgs", None)] + [("GET", f"/api/branches/{nb + k}/items", None) for k in (1, 2)]
+    reqs += [("POST", f"/api/items/e-{max(docs) + 1}/complete", {"new_expiry": "2029-01-01"}),
+             ("POST", f"/api/orgs/{new_org}/vip/requests", {"service_code": code, "branch_id": nb + 1}),
+             ("GET", f"/api/orgs/{new_org}/vip", None), ("GET", f"/api/orgs/{new_org}/alerts", None)]
+    reqs += [("POST", "/api/import", dict(org_name="", pack="hotel", rows=rows)),
+             ("POST", "/api/import", dict(org_name="x", pack="bank", rows=rows)),
+             ("POST", "/api/import", dict(org_name="x", pack="hotel", rows=[])),
+             ("POST", "/api/import", dict(org_name="x", pack="company", rows=[dict(branch="ب", employee="e", document="سباهي", date="2026-10-20")])),
+             ("POST", "/api/import", dict(org_name="شركة", pack="company", rows=[dict(branch="ب", employee="e", document="iqama", date="2027-10-20")])),
+             ("GET", f"/api/orgs/{new_org + 1}/overview", None), ("GET", f"/api/orgs/{new_org + 1}/alerts", None)]
     # errors
     reqs += [("POST", "/api/items/x-1/complete", {}), ("POST", "/api/items/o-99999/complete", {}),
              ("POST", "/api/items/e-99999/complete", {}), ("POST", "/api/items/o-abc/complete", {}),

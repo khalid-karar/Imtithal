@@ -93,6 +93,99 @@ td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
 .toast{position:fixed;bottom:22px;inset-inline-start:22px;background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:4px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
 .toast.show{opacity:1}
 .foot{margin:56px 0 40px;border-top:1px solid var(--line);padding-top:16px;font-size:12.5px;color:var(--slate);line-height:1.9}
+
+.top-r .lnk{background:none;border:1px solid var(--line);border-radius:99px;padding:5px 13px;cursor:pointer;font-size:13px;color:var(--ink-2)}
+.top-r .lnk:hover{border-color:var(--brass);color:var(--ink)}
+.alarm{background:var(--ink);color:var(--paper);border-radius:6px;padding:26px 30px;margin:0 0 22px;display:grid;grid-template-columns:1.3fr 1fr;gap:28px;align-items:center;position:relative;overflow:hidden}
+.alarm::before{content:"";position:absolute;inset-inline-end:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(174,59,59,.55),transparent 70%)}
+.alarm .lbl{font-size:13.5px;color:#CBD3E3}
+.alarm .big{font-family:var(--display);font-size:58px;font-weight:700;line-height:1.1;color:#FFB4A8;margin:4px 0 2px;white-space:nowrap}
+.alarm .big small{font-size:20px;color:#F3D6D0;margin-inline-start:8px;font-weight:600}
+.alarm .next{font-size:14px;color:#E6D9B0}
+.alarm .side{position:relative;display:grid;gap:10px}
+.alarm .side .k{font-size:12.5px;color:#CBD3E3}
+.alarm .side .v{font-family:var(--display);font-size:20px;font-weight:600}
+.alarm .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.alarm .btn{background:var(--brass);color:#fff}
+.alarm .btn.alt{background:transparent;color:var(--paper);border:1px solid rgba(255,255,255,.4)}
+.why{display:none;background:#fff;border:1px solid var(--line);border-radius:4px;padding:6px 18px;margin:-8px 0 22px}
+.why.open{display:block}
+.why .r{display:grid;grid-template-columns:1fr auto auto;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;align-items:center}
+.why .r:last-child{border:none}
+.would{background:var(--warn-bg);border:1px solid #E3C99C;border-radius:4px;padding:12px 18px;margin:0 0 26px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:14px}
+.ticker{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
+.tk{flex:0 0 190px;background:#fff;border:1px solid var(--line);border-radius:4px;padding:12px 14px;cursor:pointer;border-top:3px solid var(--line)}
+.tk.overdue{border-top-color:var(--bad)} .tk.soon{border-top-color:var(--warn)}
+.tk .n{font-family:var(--display);font-size:30px;font-weight:700;line-height:1}
+.tk.overdue .n{color:var(--bad)} .tk.soon .n{color:var(--warn)}
+.tk .u{font-size:12px;color:var(--slate)}
+.tk .t{font-size:13px;font-weight:600;margin-top:6px;line-height:1.4;max-height:3em;overflow:hidden}
+.tk .b{font-size:12px;color:var(--slate);margin-top:2px}
+.rank{display:inline-block;min-width:24px;height:24px;border-radius:50%;background:var(--sand);text-align:center;line-height:24px;font-size:12px;font-weight:700;margin-inline-end:8px}
+.card.band-risk{border-inline-start:4px solid var(--bad)} .card.band-watch{border-inline-start:4px solid var(--warn)} .card.band-good{border-inline-start:4px solid var(--ok)}
+.delta{font-size:12.5px;margin-top:6px}
+.delta.neg{color:var(--bad)} .delta.pos{color:var(--ok)}
+.phone{max-width:380px;margin:0 auto;background:#0B141A;border-radius:28px;padding:14px 12px 18px;box-shadow:0 12px 34px rgba(22,35,63,.25)}
+.phone .hd{color:#E9EDEF;font-size:14px;padding:6px 10px 12px;display:flex;gap:10px;align-items:center;border-bottom:1px solid #1F2C34}
+.phone .av{width:30px;height:30px;border-radius:50%;background:var(--brass);display:inline-block}
+.phone .chat{padding:12px 4px;display:grid;gap:10px;max-height:560px;overflow-y:auto}
+.bub{background:#005C4B;color:#E9EDEF;border-radius:10px;border-start-start-radius:2px;padding:9px 12px;font-size:13px;line-height:1.7;white-space:pre-wrap}
+.bub .tm{display:block;text-align:end;font-size:11px;color:#9FB5AE;margin-top:3px}
+.mail{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.mail .mh{background:var(--sand);padding:12px 18px;font-size:13px;color:var(--slate)}
+.mail .mh b{color:var(--ink);display:block;font-size:14.5px;margin-top:3px}
+.mail pre{margin:0;padding:16px 18px;font-family:var(--sans);font-size:13.5px;line-height:1.9;white-space:pre-wrap}
+.note{background:var(--sand);border-radius:4px;padding:10px 14px;font-size:13px;color:var(--ink-2);margin:12px 0}
+.wiz{background:#fff;border:1px solid var(--line);border-radius:6px;padding:22px 24px;display:grid;gap:14px}
+.wiz label{font-size:13px;color:var(--slate);display:block;margin-bottom:4px}
+.wiz input[type=text],.wiz select,.wiz textarea{width:100%;border:1px solid var(--line);border-radius:4px;padding:8px 10px;background:#fff}
+.wiz textarea{min-height:110px;direction:ltr;text-align:left;font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+.drop{border:2px dashed var(--line);border-radius:6px;padding:22px;text-align:center;color:var(--slate);cursor:pointer}
+.drop.on{border-color:var(--brass);background:var(--sand)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:4px;padding:14px 16px}
+.kpi b{font-family:var(--display);font-size:26px;display:block}
+.steps3{display:flex;gap:0;margin:12px 0 4px;align-items:center}
+.steps3 span{flex:1;height:6px;background:var(--sand);position:relative}
+.steps3 span.on{background:var(--ok)}
+.steps3 span:first-child{border-radius:0 3px 3px 0} .steps3 span:last-child{border-radius:3px 0 0 3px}
+.req{background:#fff;border:1px solid var(--line);border-radius:4px;padding:14px 18px;margin-bottom:12px}
+.vf{font-size:13px;padding:8px 10px;border-radius:4px;margin:0 0 10px}
+.vf.no{background:var(--warn-bg);color:var(--warn)} .vf.yes{background:var(--ok-bg);color:var(--ok)}
+.ov{position:fixed;inset:0;background:rgba(22,35,63,.72);z-index:30;display:none;align-items:center;justify-content:center;padding:18px}
+.ov.show{display:flex}
+.modal{background:var(--paper);border-radius:8px;max-width:560px;width:100%;padding:30px 30px 24px;text-align:center}
+.modal h1{font-family:var(--display);font-size:26px;margin:10px 0 8px;line-height:1.35}
+.modal p{color:var(--ink-2);margin:0 0 18px}
+.modal .stack{display:grid;gap:10px}
+.modal .btn{padding:12px 16px;font-size:15px}
+.tour{position:fixed;bottom:16px;inset-inline:0;margin-inline:auto;width:min(640px,calc(100% - 24px));background:var(--ink);color:var(--paper);border-radius:8px;padding:16px 20px 12px;z-index:25;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
+.tour.show{display:block}
+.tour h4{margin:0 0 4px;font-family:var(--display);font-size:16px;color:var(--brass-l)}
+.tour p{margin:0 0 10px;font-size:14px;color:#E1E6F0}
+.tour .tb{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.tour .tb button{background:rgba(255,255,255,.12);color:var(--paper);border:none;border-radius:4px;padding:6px 12px;cursor:pointer;font-size:13px}
+.tour .prog{height:3px;background:rgba(255,255,255,.15);margin-top:10px;border-radius:2px;overflow:hidden}
+.tour .prog i{display:block;height:100%;background:var(--brass);width:0}
+.spot{outline:3px solid var(--brass);outline-offset:6px;border-radius:6px;transition:outline-color .3s}
+.report{display:none;position:fixed;inset:0;background:#fff;z-index:40;overflow:auto;padding:28px 18px}
+.report.show{display:block}
+.report .sheet{max-width:820px;margin:0 auto;font-size:13px}
+.report h1{font-family:var(--display);font-size:24px;margin:0}
+.report .bar2{display:flex;gap:10px;justify-content:flex-end;margin-bottom:14px}
+.report table td,.report table th{font-size:12.5px}
+@media print{
+  body>*:not(#report){display:none!important}
+  .report{display:block!important;position:static;padding:0}
+  .report .bar2{display:none}
+}
+@media (max-width:760px){
+  .top-r{flex-wrap:wrap;gap:8px} .top-r select{max-width:100%}
+  .alarm{grid-template-columns:1fr;padding:20px} .alarm .big{font-size:40px}
+  .kpis{grid-template-columns:1fr 1fr}
+  .why .r{grid-template-columns:1fr auto}
+  .tour{bottom:8px}
+}
 @media (max-width:760px){
   .hero,.two,.det .grid{grid-template-columns:1fr}
   .score-n{font-size:62px}
@@ -107,20 +200,31 @@ td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
 <div class="wrap">
   <div class="top">
     <div class="brand"><div class="mark"></div><b>امتثال</b></div>
-    <div class="top-r"><span id="asof"></span><select id="orgSel" aria-label="المنشأة"></select></div>
+    <div class="top-r"><button class="lnk" data-act="tour">▶ جولة سريعة</button><button class="lnk" data-act="report">تقرير للمالك</button><span id="asof"></span><select id="orgSel" aria-label="المنشأة"></select></div>
   </div>
   <nav id="nav"></nav>
   <main id="main"><div class="empty">جارٍ التحميل…</div></main>
   <div class="foot">
     الجداول والتواريخ تُدخل يدويًا أو تُستورد من ملفات الجهات الحكومية؛ لا يوجد ربط مباشر مع المنصات الحكومية في هذه النسخة.
-    المبالغ المعروضة تقديرات توضيحية للتعرض المالي وليست غرامات رسمية، والبنود المعلّمة "قيد المراجعة" لم يعتمدها مراجع قانوني بعد.
+    المبالغ المعروضة تقديرات توضيحية للتعرض المالي وليست غرامات رسمية، والبنود المعلّمة "قيد المراجعة" لم يعتمدها مراجع قانوني بعد؛ ويظهر اسم المراجع وتاريخ التحقق على كل بند فور اعتماده.
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<div class="ov" id="welcome"><div class="modal"><div class="brand" style="justify-content:center"><div class="mark"></div><b>امتثال</b></div>
+  <h1>اعرف موقف منشأتك من الامتثال وكم قد يكلّفك</h1>
+  <p>كل التراخيص ووثائق الموظفين ومواعيد الجهات الحكومية في مكان واحد، مع تنبيه قبل وقوع الغرامة وخدمة تنفيذ نيابةً عنك.</p>
+  <div class="stack"><button class="btn" data-act="tour">▶ شاهد جولة قصيرة (دقيقة)</button>
+    <button class="btn alt" data-act="welcome-import">ارفع بيانات منشأتك وشاهد تعرضك</button>
+    <button class="btn alt" data-act="welcome-close">استكشف بنفسك</button></div></div></div>
+<div class="tour" id="tour"><h4 id="tourT"></h4><p id="tourD"></p>
+  <div class="tb"><span id="tourN" style="font-size:12px;color:#9FB0CC"></span><span style="display:flex;gap:6px">
+    <button data-act="tour-prev">السابق</button><button id="tourP" data-act="tour-pause">إيقاف مؤقت</button><button data-act="tour-next">التالي</button><button data-act="tour-stop">إنهاء</button></span></div>
+  <div class="prog"><i id="tourBar"></i></div></div>
+<div class="report" id="report"></div>
 
 <script>
-const S = {orgs: [], org: null, asOf: '', view: 'overview', arg: null, filt: {status: '', kind: ''}, emp: {branch: '', code: '', status: ''}};
-const NAV = [['overview','نظرة عامة'],['branches','الفروع'],['employees','وثائق الموظفين'],['changes','التحديثات التنظيمية'],['vip','خدمات VIP'],['audit','سجل العمليات']];
+const S = {orgs: [], org: null, asOf: '', view: 'overview', arg: null, filt: {status: '', kind: ''}, emp: {branch: '', code: '', status: ''}, imp: null};
+const NAV = [['overview','نظرة عامة'],['branches','الفروع'],['employees','وثائق الموظفين'],['alerts','التنبيهات'],['changes','التحديثات التنظيمية'],['vip','خدمات VIP'],['import','استيراد بياناتك'],['audit','سجل العمليات']];
 const ST = {overdue: 'متأخر', soon: 'قريب', ok: 'سليم'};
 const BAND = {good: 'جاهزية جيدة', watch: 'يحتاج متابعة', risk: 'مخاطر مرتفعة'};
 const SRC = {'رسمي': 'مصدر رسمي', 'ثانوي': 'مصدر ثانوي', 'مثال': 'مثال توضيحي', 'نص ملصوق': 'نص أصلي مرفق'};
@@ -156,7 +260,7 @@ function sub(i) {
 /* ---------- item row (shared) ---------- */
 function itemRow(i) {
   const steps = i.fix_steps.map(s => `<li>${esc(s)}</li>`).join('');
-  const verif = i.verified ? '' : '<span class="flag rev">قيد المراجعة القانونية</span>';
+  const verif = i.verified ? '<span class="flag ok">معتمد قانونيًا</span>' : '<span class="flag rev">قيد المراجعة القانونية</span>';
   const src = i.source_url ? `<a href="${esc(i.source_url)}" target="_blank" rel="noopener">المصدر</a>` : '';
   let actions = '';
   if (i.kind === 'group') {
@@ -179,6 +283,7 @@ function itemRow(i) {
       <div class="grid">
         <div><h4>كيف أعالج هذا البند</h4><ol>${steps}</ol></div>
         <div>
+          <h4>حالة التحقق</h4>${verifLine(i)}
           <h4>الدليل المطلوب</h4><p style="margin:0 0 10px">${esc(i.evidence)}</p>
           <h4>التعرض المالي (تقدير تجريبي)</h4><p style="margin:0 0 6px">${sar(i.penalty_sar)}${i.kind === 'group' ? ' (للمجموعة)' : ''}</p>
           ${i.penalty_note ? `<p style="margin:0 0 8px;color:var(--slate)">${esc(i.penalty_note)}</p>` : ''}
@@ -191,42 +296,6 @@ function itemRow(i) {
 }
 function itemList(items, empty) {
   return items.length ? `<div class="list">${items.map(itemRow).join('')}</div>` : `<div class="empty">${empty}</div>`;
-}
-
-/* ---------- views ---------- */
-async function vOverview() {
-  const d = await api(`/api/orgs/${S.org}/overview`);
-  const c = d.counts;
-  const cards = d.branches.map(b => `
-    <div class="card" data-act="branch" data-id="${b.id}">
-      <h3>${esc(b.name)}</h3><div class="meta">${esc(b.city)} · ${fmt(b.headcount)} موظفًا</div>
-      <div class="bar"><i class="${b.band}" style="width:${b.score}%"></i></div>
-      <div class="cnt"><b>${ltr(b.score + ' / 100')}</b><span>${fmt(b.counts.overdue)} متأخر</span><span>${fmt(b.counts.soon)} قريب</span></div>
-      <ul class="issues">${b.top_issues.map(t => `<li><span class="dot ${t.status}"></span><span>${esc(t.title)}</span></li>`).join('') || '<li>لا توجد بنود عاجلة</li>'}</ul>
-    </div>`).join('');
-  const ledger = d.by_authority.map(a => `<tr><td>${esc(a.authority)}</td><td>${a.overdue || '—'}</td><td>${a.soon || '—'}</td><td>${a.ok}</td></tr>`).join('');
-  return `
-  <section class="hero">
-    <div>
-      <div class="sub" style="margin:0 0 6px">مؤشر الجاهزية — ${esc(d.org.name)}</div>
-      <div><span class="score-n">${d.score}</span><span class="score-of">/ 100</span></div>
-      <span class="tag ${d.band}">${BAND[d.band]}</span>
-      <p class="sub" style="margin-top:16px;max-width:52ch">${fmt(c.overdue)} بندًا متأخرًا و${fmt(c.soon)} بندًا يقترب موعده، من أصل ${fmt(c.total)} بندًا عبر ${d.branches.length} فروع.
-      المؤشر يزن البنود بحسب خطورتها: المتأخر يخصم كاملًا، والقريب يخصم جزئيًا.</p>
-    </div>
-    <div class="panel">
-      <div class="row"><span class="k">التعرض المالي للبنود المتأخرة</span><span class="v">${sar(d.money_at_risk)}</span></div>
-      <div class="row"><span class="k">تعرض محتمل خلال 30 يومًا</span><span class="v">${sar(d.exposure_30)}</span></div>
-      <div class="row"><span class="k">بنود متأخرة</span><span class="v">${fmt(c.overdue)}</span></div>
-      <div class="row"><span class="k">بنود تقترب</span><span class="v">${fmt(c.soon)}</span></div>
-    </div>
-  </section>
-  <div class="sec"><div><h2>الفروع</h2><div class="sub" style="margin:0">اضغط على فرع لعرض كل بنوده وكيفية معالجتها</div></div></div>
-  <div class="cards">${cards}</div>
-  <div class="sec"><div><h2>يحتاج إجراءً الآن</h2><div class="sub" style="margin:0">مرتبة بحسب الخطورة ثم الاستعجال — اضغط على أي بند لمعرفة طريقة المعالجة</div></div></div>
-  ${itemList(d.urgent, 'لا توجد بنود عاجلة')}
-  <div class="sec"><div><h2>حسب الجهة التنظيمية</h2></div></div>
-  <table><thead><tr><th>الجهة</th><th>متأخر</th><th>قريب</th><th>سليم</th></tr></thead><tbody>${ledger}</tbody></table>`;
 }
 
 async function vBranches() {
@@ -290,24 +359,6 @@ async function vChanges() {
     ${cards || '<div class="empty">لا توجد تحديثات تمس منشأتك</div>'}`;
 }
 
-async function vVip() {
-  const d = await api(`/api/orgs/${S.org}/vip`);
-  const cat = d.catalog.map(v => `<div class="vipc"><h3 style="margin:0 0 4px;font-size:15.5px">${esc(v.name)}</h3>
-    <div class="item-s" style="margin-bottom:10px">${esc(v.description)}</div>
-    <div class="price">${fmt(v.price_from)} ريال <span style="font-size:12.5px;color:var(--slate);font-family:var(--sans);font-weight:400">ابتداءً — ${esc(v.price_unit)}</span></div>
-    <div class="item-s">مدة التنفيذ المستهدفة: ${v.sla_days} أيام عمل</div>
-    <div class="acts"><button class="btn" data-act="vip" data-code="${esc(v.code)}" data-branch="" data-ref="">اطلب الخدمة</button></div></div>`).join('');
-  const SN = {new: 'جديد', in_progress: 'قيد التنفيذ', done: 'مكتمل'};
-  const rows = d.requests.map(r => `<tr><td>#${r.id}</td><td>${esc(r.service_name)}</td><td>${esc(r.branch_name || '—')}</td><td>${esc(r.item_ref || '—')}</td>
-    <td><span class="pill ${r.status === 'done' ? 'ok' : r.status === 'new' ? 'soon' : 'ok'}">${SN[r.status]}</span></td>
-    <td>${r.status === 'done' ? '' : `<button class="btn alt" data-act="adv" data-id="${r.id}">تقدّم (محاكاة فريق العمليات)</button>`}</td></tr>`).join('');
-  return `<div class="sec" style="margin-top:0"><div><h2>خدمات VIP — نعالجها عنك</h2>
-    <div class="sub" style="margin:0">كتالوج بأسعار ثابتة تُطلب مباشرة من البند المتأخر. الأسعار تجريبية، والرسوم الحكومية تُحتسب بالتكلفة.</div></div></div>
-    <div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">${cat}</div>
-    <div class="sec"><div><h2>طلباتك</h2></div></div>
-    ${rows ? `<table><thead><tr><th>الرقم</th><th>الخدمة</th><th>الفرع</th><th>البند</th><th>الحالة</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="empty">لم تطلب أي خدمة بعد</div>'}`;
-}
-
 async function vAudit() {
   const d = await api(`/api/orgs/${S.org}/audit`);
   const A = {complete: 'إنجاز بند', renew: 'تجديد وثيقة', ack_change: 'اطلاع على تحديث', vip_request: 'طلب VIP', vip_status: 'حالة طلب'};
@@ -316,14 +367,323 @@ async function vAudit() {
     ${rows ? `<table><thead><tr><th>الوقت</th><th>الإجراء</th><th>التفاصيل</th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="empty">لا توجد عمليات مسجلة بعد</div>'}`;
 }
 
-const VIEWS = {overview: vOverview, branches: vBranches, employees: vEmployees, changes: vChanges, vip: vVip, audit: vAudit};
+/* ---------- helpers for the new screens ---------- */
+const addDays = (iso, n) => { const d = new Date(iso + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const PACKS = {hotel: 'فنادق وضيافة', hospital: 'مستشفيات ومنشآت صحية', company: 'شركات ومقاولات'};
+function countUp(el) {
+  const to = +el.dataset.count, reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !to) { el.textContent = fmt(to); return; }
+  const t0 = performance.now(), dur = 1300;
+  const step = t => { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = fmt(Math.round(to * e)); if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function verifLine(i) {
+  return i.verified
+    ? `<div class="vf yes">✔ معتمد قانونيًا — المراجع: ${esc(i.verified_by || '—')} · بتاريخ ${ltr(i.verified_on || '—')}</div>`
+    : '<div class="vf no">قيد المراجعة القانونية — لم يعتمده مراجع قانوني بعد؛ سيظهر هنا اسم المراجع وتاريخ التحقق فور اعتماده.</div>';
+}
 
+/* ---------- overview ---------- */
+async function vOverview() {
+  const [d, al] = await Promise.all([api(`/api/orgs/${S.org}/overview`), api(`/api/orgs/${S.org}/alerts`)]);
+  const c = d.counts;
+  const avg = d.branches.length ? Math.round(d.branches.reduce((a, b) => a + b.score, 0) / d.branches.length) : 0;
+  const ranked = d.branches.slice().sort((a, b) => a.score - b.score || a.id - b.id);
+  const cards = ranked.map((b, n) => {
+    const diff = b.score - avg;
+    const dl = d.branches.length < 2 ? '' : diff === 0 ? '<div class="delta">بمستوى متوسط فروعك</div>'
+      : `<div class="delta ${diff < 0 ? 'neg' : 'pos'}">${fmt(Math.abs(diff))} نقطة ${diff < 0 ? 'أقل' : 'أعلى'} من متوسط فروعك</div>`;
+    return `<div class="card band-${b.band}" data-act="branch" data-id="${b.id}">
+      <h3><span class="rank">${n + 1}</span>${esc(b.name)}${n === 0 && b.band !== 'good' && d.branches.length > 1 ? '<span class="flag rev">الأضعف</span>' : ''}</h3>
+      <div class="meta">${esc(b.city)} · ${fmt(b.headcount)} موظفًا</div>
+      <div class="bar"><i class="${b.band}" style="width:${b.score}%"></i></div>
+      <div class="cnt"><b>${ltr(b.score + ' / 100')}</b><span>${fmt(b.counts.overdue)} متأخر</span><span>${fmt(b.counts.soon)} قريب</span><span>${sar(b.money_at_risk)}</span></div>
+      ${dl}
+      <ul class="issues">${b.top_issues.map(t => `<li><span class="dot ${t.status}"></span><span>${esc(t.title)}</span></li>`).join('') || '<li>لا توجد بنود عاجلة</li>'}</ul>
+    </div>`;
+  }).join('');
+  const ledger = d.by_authority.map(a => `<tr><td>${esc(a.authority)}</td><td>${a.overdue || '—'}</td><td>${a.soon || '—'}</td><td>${a.ok}</td></tr>`).join('');
+  const why = d.urgent.filter(i => i.status === 'overdue').sort((a, b) => b.penalty_sar - a.penalty_sar || a.days_left - b.days_left).slice(0, 6)
+    .map(i => `<div class="r"><div><b>${esc(title(i))}</b><div class="item-s">${esc(i.branch_name)} · ${esc(i.authority)} · ${when(i)}${i.verified ? '' : ' · قيد المراجعة'}</div></div><span>${sar(i.penalty_sar)}</span><button class="btn alt" data-act="open-item" data-id="${esc(i.id)}">كيف أعالجه</button></div>`).join('');
+  const tick = d.urgent.slice().sort((a, b) => a.days_left - b.days_left || b.severity - a.severity).slice(0, 10).map(i => `
+    <div class="tk ${i.status}" data-act="open-item" data-id="${esc(i.id)}"><div class="n">${ltr(i.days_left < 0 ? '−' + fmt(-i.days_left) : fmt(i.days_left))}</div>
+      <div class="u">${i.days_left < 0 ? 'يومًا من التأخر' : 'يومًا متبقيًا'}</div><div class="t">${esc(title(i))}</div><div class="b">${esc(i.branch_name)}</div></div>`).join('');
+  const first = d.org.name;
+  return `
+  <section class="alarm" id="hero-money">
+    <div style="position:relative">
+      <div class="lbl">تعرّض مالي تقديري لبنود تجاوزت موعدها اليوم — ${esc(first)}</div>
+      <div class="big"><span data-count="${d.money_at_risk}">0</span><small>ريال</small></div>
+      <div class="next">وخلال الـ 30 يومًا القادمة: ${sar(d.exposure_30)} إن لم تُعالج البنود التي تقترب</div>
+      <div class="btns">
+        <button class="btn" data-act="why">من أين جاء هذا الرقم؟</button>
+        <button class="btn alt" data-act="report">تقرير للمالك (PDF)</button>
+        <button class="btn alt" data-act="csv">تصدير Excel</button>
+      </div>
+    </div>
+    <div class="side">
+      <div><div class="k">مؤشر الجاهزية</div><div class="v">${ltr(d.score + ' / 100')} — ${BAND[d.band]}</div></div>
+      <div><div class="k">بنود متأخرة / تقترب / سليمة</div><div class="v">${fmt(c.overdue)} / ${fmt(c.soon)} / ${fmt(c.ok)}</div></div>
+      <div class="k">الأرقام تقديرات توضيحية مبنية على بنود المكتبة، وليست غرامات رسمية.</div>
+    </div>
+  </section>
+  <div class="why" id="why">${why || '<div class="empty">لا توجد بنود متأخرة</div>'}</div>
+  <div class="would"><span>🔔 لو كان امتثال مفعّلًا لديك: <b>${fmt(al.summary.overdue_items)}</b> بندًا متأخرًا الآن كان سيصلك تنبيه به قبل موعده.</span>
+    <button class="btn alt" data-act="nav" data-v="alerts">شاهد التنبيهات التي كانت ستصلك</button></div>
+  <div class="sec" style="margin-top:6px"><div><h2>العدّاد — أقرب المواعيد والتأخرات</h2><div class="sub" style="margin:0">اضغط على أي بطاقة لمعرفة طريقة المعالجة</div></div></div>
+  <div class="ticker">${tick || '<div class="empty">لا توجد مواعيد قريبة</div>'}</div>
+  <div class="sec" id="leader"><div><h2>ترتيب الفروع — من الأضعف إلى الأقوى</h2><div class="sub" style="margin:0">معيار المقارنة هو متوسط فروعك أنت (${ltr(avg + ' / 100')})؛ مقارنة السوق تتطلب بيانات عملاء حقيقية وسنضيفها لاحقًا</div></div></div>
+  <div class="cards">${cards}</div>
+  <div class="sec"><div><h2>يحتاج إجراءً الآن</h2><div class="sub" style="margin:0">مرتبة بحسب الخطورة ثم الاستعجال — اضغط على أي بند لمعرفة طريقة المعالجة</div></div></div>
+  ${itemList(d.urgent, 'لا توجد بنود عاجلة')}
+  <div class="sec"><div><h2>حسب الجهة التنظيمية</h2></div></div>
+  <table><thead><tr><th>الجهة</th><th>متأخر</th><th>قريب</th><th>سليم</th></tr></thead><tbody>${ledger}</tbody></table>`;
+}
+
+/* ---------- alerts ---------- */
+async function vAlerts() {
+  const d = await api(`/api/orgs/${S.org}/alerts`);
+  const bubbles = d.messages.map(m => `<div class="bub">${esc(m.text)}<span class="tm">${ltr('08:00')}</span></div>`).join('');
+  return `<div class="sec" style="margin-top:0"><div><h2>التنبيهات — ما كان سيصلك</h2>
+    <div class="sub" style="margin:0">رسائل مولَّدة الآن من بيانات ${esc(S.orgs.find(o => o.id === S.org)?.name || '')}: واتساب لمدير الفرع، وملخص أسبوعي للمالك.</div></div></div>
+  <div class="would"><span>لديك الآن <b>${fmt(d.summary.overdue_items)}</b> بندًا متأخرًا بتعرض تقديري <b>${sar(d.summary.penalty_sar)}</b>. كل بند منها كان سيُنبَّه عنه قبل موعده بالمدة المحددة في المكتبة.</span></div>
+  <div class="two" style="align-items:start">
+    <div><div class="phone"><div class="hd"><span class="av"></span><span>امتثال</span></div><div class="chat">${bubbles || '<div class="empty" style="color:#9FB5AE">لا توجد تنبيهات</div>'}</div></div></div>
+    <div>
+      <div class="mail"><div class="mh">إلى: ${esc(d.digest.to)}<b>${esc(d.digest.subject)}</b></div><pre>${esc(d.digest.body)}</pre></div>
+      <div class="note">هذه معاينة لما سيُرسل. الإرسال الفعلي عبر واتساب والبريد والرسائل القصيرة يحتاج ربط مزوّد خدمة وقالب رسائل معتمد، وهو أول ما نفعّله مع العملاء التجريبيين.</div>
+    </div>
+  </div>`;
+}
+
+/* ---------- VIP ---------- */
+async function vVip() {
+  const d = await api(`/api/orgs/${S.org}/vip`);
+  const cat = d.catalog.map(v => `<div class="vipc"><h3 style="margin:0 0 4px;font-size:15.5px">${esc(v.name)}</h3>
+    <div class="item-s" style="margin-bottom:10px">${esc(v.description)}</div>
+    <div class="price">${fmt(v.price_from)} ريال <span style="font-size:12.5px;color:var(--slate);font-family:var(--sans);font-weight:400">ابتداءً — ${esc(v.price_unit)}</span></div>
+    <div class="item-s">مدة التنفيذ المستهدفة: ${fmt(v.sla_days)} أيام عمل</div>
+    <div class="acts"><button class="btn" data-act="vip" data-code="${esc(v.code)}" data-branch="" data-ref="">اطلب الخدمة</button></div></div>`).join('');
+  const SN = {new: 'تم استلام الطلب', in_progress: 'قيد التنفيذ', done: 'مكتمل'};
+  const lvl = {new: 1, in_progress: 2, done: 3};
+  const reqs = d.requests.map(r => {
+    const sla = (d.catalog.find(v => v.code === r.service_code) || {}).sla_days;
+    return `<div class="req"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div><b>#${r.id} — ${esc(r.service_name)}</b><div class="item-s">${esc(r.branch_name || 'كل الفروع')}${r.item_ref ? ' · ' + esc(r.item_ref) : ''}</div></div>
+      <div><span class="pill ${r.status === 'done' ? 'ok' : 'soon'}">${SN[r.status]}</span></div></div>
+      <div class="steps3">${[1, 2, 3].map(k => `<span class="${lvl[r.status] >= k ? 'on' : ''}"></span>`).join('')}</div>
+      <div class="cnt" style="justify-content:space-between"><span>استلام</span><span>تنفيذ</span><span>تسليم${sla ? ' — المتوقع ' + ltr(addDays(S.asOf, sla)) : ''}</span></div>
+      ${r.status === 'done' ? '' : `<div class="acts"><button class="btn alt" data-act="adv" data-id="${r.id}">تقدّم (محاكاة فريق العمليات)</button></div>`}</div>`;
+  }).join('');
+  return `<div class="sec" style="margin-top:0"><div><h2>خدمات VIP — نعالجها عنك</h2>
+    <div class="sub" style="margin:0">كتالوج بأسعار ثابتة تُطلب مباشرة من البند المتأخر، مع متابعة الحالة حتى التسليم. الأسعار ومدد التنفيذ تجريبية، والرسوم الحكومية تُحتسب بالتكلفة.</div></div></div>
+    <div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">${cat}</div>
+    <div class="sec"><div><h2>طلباتك</h2></div></div>
+    ${reqs || '<div class="empty">لم تطلب أي خدمة بعد</div>'}`;
+}
+
+/* ---------- import ---------- */
+const HDR = {
+  branch: ['فرع', 'الفرع', 'اسم الفرع', 'branch', 'branch name', 'location', 'site'],
+  city: ['مدينة', 'المدينة', 'city'],
+  employee: ['موظف', 'الموظف', 'اسم الموظف', 'الاسم', 'employee', 'employee name', 'name', 'full name'],
+  role: ['وظيفة', 'الوظيفة', 'المهنة', 'المسمى الوظيفي', 'role', 'job title', 'position', 'profession'],
+  document: ['وثيقة', 'الوثيقة', 'نوع الوثيقة', 'البند', 'document', 'document type', 'doc', 'type', 'item'],
+  date: ['تاريخ الانتهاء', 'تاريخ الاستحقاق', 'الانتهاء', 'الاستحقاق', 'expiry', 'expiry date', 'expires', 'due date', 'due', 'date', 'expiration'],
+};
+const nk = x => String(x ?? '').trim().toLowerCase().replace(/\s+/g, ' ').replace(/[ً-ٰٟـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي');
+function parseDelimited(text) {
+  text = text.replace(/^﻿/, '');
+  const first = text.split(/\r?\n/, 1)[0];
+  const delim = [',', ';', '\t'].map(d => [d, first.split(d).length]).sort((a, b) => b[1] - a[1])[0][0];
+  const rows = []; let row = [], cur = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) { if (ch === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === delim) { row.push(cur); cur = ''; }
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cur); cur = ''; if (row.some(x => x.trim() !== '')) rows.push(row); row = []; }
+    else cur += ch;
+  }
+  row.push(cur); if (row.some(x => x.trim() !== '')) rows.push(row);
+  return rows;
+}
+const hijriFmt = (() => { try { return new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {year: 'numeric', month: 'numeric', day: 'numeric', timeZone: 'UTC'}); } catch (e) { return null; } })();
+const hCache = new Map();
+function hijriToIso(y, m, d) {
+  if (!hijriFmt) return '';
+  const key = y + '-' + m + '-' + d; if (hCache.has(key)) return hCache.get(key);
+  const part = t => { const o = {}; hijriFmt.formatToParts(new Date(t)).forEach(p => { if (p.type !== 'literal') o[p.type] = +p.value; }); return o; };
+  let t = Date.UTC(622, 6, 16) + ((y - 1) * 354.36707 + (m - 1) * 29.530589 + (d - 1)) * 86400000, res = '';
+  for (let k = 0; k < 12; k++) {
+    const p = part(t), diff = (y - p.year) * 354.36707 + (m - p.month) * 29.530589 + (d - p.day);
+    if (p.year === y && p.month === m && p.day === d) { res = new Date(t).toISOString().slice(0, 10); break; }
+    t += (Math.abs(diff) < 1 ? Math.sign(diff) : Math.round(diff)) * 86400000;
+  }
+  hCache.set(key, res); return res;
+}
+function toIso(v) {
+  if (v instanceof Date) return isNaN(v) ? '' : v.toISOString().slice(0, 10);
+  if (typeof v === 'number' && v > 20000 && v < 80000) return new Date(Math.round((v - 25569) * 86400000)).toISOString().slice(0, 10);
+  let s = String(v ?? '').trim().replace(/[٠-٩]/g, c => '٠١٢٣٤٥٦٧٨٩'.indexOf(c)).replace(/[۰-۹]/g, c => '۰۱۲۳۴۵۶۷۸۹'.indexOf(c));
+  let m = /^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/.exec(s), y, mo, d;
+  if (m) { y = +m[1]; mo = +m[2]; d = +m[3]; }
+  else if ((m = /^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/.exec(s))) { d = +m[1]; mo = +m[2]; y = +m[3]; }
+  else return s;
+  if (y >= 1300 && y <= 1600) return hijriToIso(y, mo, d) || s;           // Hijri dates (Muqeem/Qiwa exports)
+  const iso = `${String(y).padStart(4, '0')}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  return isNaN(new Date(iso + 'T00:00:00Z')) || new Date(iso + 'T00:00:00Z').toISOString().slice(0, 10) !== iso ? s : iso;
+}
+function rowsFromTable(table) {
+  if (!table.length) throw new Error('الملف فارغ');
+  const head = table[0].map(nk), idx = {};
+  for (const [f, names] of Object.entries(HDR)) { const j = head.findIndex(h => names.map(nk).includes(h)); if (j >= 0) idx[f] = j; }
+  const need = ['branch', 'document', 'date'].filter(f => idx[f] === undefined);
+  if (need.length) throw new Error('لم نجد الأعمدة: ' + need.map(f => HDR[f][0]).join('، ') + ' — الأعمدة الموجودة: ' + table[0].join(' | '));
+  return table.slice(1).map(r => {
+    const g = f => idx[f] === undefined ? '' : r[idx[f]];
+    return {branch: String(g('branch') ?? '').trim(), city: String(g('city') ?? '').trim(), employee: String(g('employee') ?? '').trim(),
+      role: String(g('role') ?? '').trim(), document: String(g('document') ?? '').trim(), date: toIso(g('date'))};
+  }).filter(r => r.branch || r.document || r.date);
+}
+async function readFile(file) {
+  if (/\.xlsx?$/i.test(file.name)) {
+    if (!window.XLSX) await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = ok; s.onerror = () => no(new Error('تعذر تحميل قارئ Excel — احفظ الملف بصيغة CSV وأعد المحاولة')); document.head.appendChild(s); });
+    const wb = XLSX.read(await file.arrayBuffer(), {type: 'array', cellDates: true});
+    return rowsFromTable(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1, raw: true, defval: ''}));
+  }
+  return rowsFromTable(parseDelimited(await file.text()));
+}
+function sampleRows() {
+  const A = S.asOf, R = [];
+  const people = [['سعد القحطاني', 'مشرف تدبير منزلي'], ['منى الحربي', 'موظفة استقبال'], ['رحمن إسلام', 'طاهٍ'], ['كومار سانتوس', 'فني صيانة'], ['علي الشمري', 'نادل'], ['هند العتيبي', 'محاسبة']];
+  const plan = {'فرع الرياض — العليا': {off: [-12, 9, 40, 120, 220, 300], lic: [['civil defense', -20], ['رخصة البلدية', 70], ['Tourism Licence', 200], ['السجل التجاري', 150]], city: 'الرياض'},
+                'فرع جدة — الكورنيش': {off: [5, -3, 25, 90, 180, 260], lic: [['civil defense', 12], ['رخصة البلدية', 110], ['Tourism Licence', -8], ['السجل التجاري', 300]], city: 'جدة'},
+                'فرع الدمام': {off: [60, 150, 33, 200, 310, 18], lic: [['civil defense', 190], ['رخصة البلدية', 25], ['Tourism Licence', 260], ['السجل التجاري', 90]], city: 'الدمام'}};
+  for (const [br, p] of Object.entries(plan)) {
+    people.forEach(([n, role], k) => {
+      const nm = n + (br.includes('جدة') ? ' ' : '');
+      R.push({branch: br, city: p.city, employee: nm, role, document: 'Iqama', date: addDays(A, p.off[k])});
+      R.push({branch: br, city: p.city, employee: nm, role, document: 'رخصة العمل', date: addDays(A, p.off[(k + 2) % 6] + 15)});
+      R.push({branch: br, city: p.city, employee: nm, role, document: 'تأمين طبي', date: addDays(A, p.off[(k + 4) % 6] - 5)});
+    });
+    p.lic.forEach(([doc, o]) => R.push({branch: br, city: p.city, employee: '', role: '', document: doc, date: addDays(A, o)}));
+  }
+  return R;
+}
+const TEMPLATE_CSV = 'الفرع,المدينة,الموظف,الوظيفة,الوثيقة,تاريخ الانتهاء\nفرع الرياض,الرياض,أحمد العتيبي,موظف استقبال,الإقامة,2026-11-20\nفرع الرياض,الرياض,أحمد العتيبي,موظف استقبال,رخصة العمل,2026-12-05\nفرع الرياض,الرياض,,,الدفاع المدني,2026-10-01\nفرع جدة,جدة,,,رخصة البلدية,1448/03/15\n';
+function download(name, text, type) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + text], {type: (type || 'text/csv') + ';charset=utf-8'})); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+async function runImport(rows) {
+  const name = $('#impName').value.trim(), pack = $('#impPack').value;
+  if (!name) { toast('اكتب اسم المنشأة أولًا'); return; }
+  if (!rows.length) { toast('لا توجد صفوف في الملف'); return; }
+  const res = await api('/api/import', {body: {org_name: name, pack, rows}});
+  if (!res.org_id) { S.imp = res; render(); toast('لم يُستورد أي صف — راجع أسباب التخطي'); return; }
+  const o = await api('/api/orgs'); S.orgs = o.orgs; fillOrgs();
+  S.imp = res; S.org = res.org_id; $('#orgSel').value = String(res.org_id); render(); window.scrollTo(0, 0);
+}
+async function vImport() {
+  if (S.imp) {
+    const r = S.imp, im = r.imported;
+    const miss = r.missing.map(m => `<tr><td>${esc(m.branch)}</td><td>${fmt(m.count)}</td><td>${esc(m.titles.join('، '))}${m.count > m.titles.length ? '…' : ''}</td></tr>`).join('');
+    const skip = r.skipped.map(k => `<tr><td>${fmt(k.row)}</td><td>${esc(k.reason)}</td></tr>`).join('');
+    return `<div class="sec" style="margin-top:0"><div><h2>تم الاستيراد</h2><div class="sub" style="margin:0">أُنشئت المنشأة وحُسبت جاهزيتها من بياناتك فقط.</div></div></div>
+    <div class="kpis"><div class="kpi"><b>${fmt(im.branches)}</b>فروع</div><div class="kpi"><b>${fmt(im.employees)}</b>موظفون</div><div class="kpi"><b>${fmt(im.employee_docs)}</b>وثائق موظفين</div><div class="kpi"><b>${fmt(im.obligations)}</b>تراخيص والتزامات</div></div>
+    <div class="acts"><button class="btn" data-act="after-import">عرض لوحة التحكم ومعرفة التعرض المالي</button><button class="btn alt" data-act="imp-again">استيراد ملف آخر</button></div>
+    ${r.missing.length ? `<div class="sec"><div><h2>بنود ننتظر تواريخها منك</h2><div class="sub" style="margin:0">لم نُنشئ لها مواعيد لأننا لا نخمّن التواريخ. أضف تاريخ آخر تجديد لكل بند ليدخل في حساب الجاهزية.</div></div></div>
+      <table><thead><tr><th>الفرع</th><th>عدد البنود</th><th>أمثلة</th></tr></thead><tbody>${miss}</tbody></table>` : ''}
+    ${r.skipped_total ? `<div class="sec"><div><h2>صفوف لم تُستورد (${fmt(r.skipped_total)})</h2></div></div><table><thead><tr><th>رقم الصف</th><th>السبب</th></tr></thead><tbody>${skip}</tbody></table>${r.skipped_total > r.skipped.length ? '<div class="sub">يظهر أول 50 فقط.</div>' : ''}` : ''}`;
+  }
+  return `<div class="sec" style="margin-top:0"><div><h2>استورد بيانات منشأتك — اعرف تعرّضك في دقيقة</h2>
+    <div class="sub" style="margin:0">ارفع ملف الموظفين والتراخيص الذي تستخرجه أصلًا (CSV أو Excel). نتعرف على أسماء الوثائق بالعربية والإنجليزية ونحوّل التواريخ الهجرية تلقائيًا.</div></div></div>
+  <div class="wiz" id="imp-form">
+    <div class="two"><div><label>اسم المنشأة</label><input type="text" id="impName" placeholder="مثال: مجموعة النخيل للفنادق" maxlength="80"></div>
+      <div><label>القطاع</label><select id="impPack">${Object.entries(PACKS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></div></div>
+    <div class="drop" id="drop"><b>اسحب الملف هنا أو اضغط للاختيار</b><div class="item-s">الأعمدة: الفرع، الموظف، الوظيفة، الوثيقة، تاريخ الانتهاء — الصف بلا اسم موظف يُعامل كترخيص للفرع</div>
+      <input type="file" id="impFile" accept=".csv,.xlsx,.xls,.txt" style="display:none"></div>
+    <div><label>أو الصق المحتوى هنا</label><textarea id="impText" placeholder="الفرع,الموظف,الوظيفة,الوثيقة,تاريخ الانتهاء"></textarea></div>
+    <div class="acts" style="margin:0"><button class="btn" data-act="imp-paste">استورد المحتوى الملصوق</button>
+      <button class="btn alt" data-act="imp-sample">جرّب بملف نموذجي (3 فروع)</button>
+      <button class="btn alt" data-act="imp-template">حمّل قالب الملف</button></div>
+    <div class="note" style="margin:0">لا نخمّن أي تاريخ: ما لم يرد في ملفك يظهر لك كبند ننتظر تاريخه. في النسخة التجريبية المنشورة تُحفظ بياناتك في متصفحك فقط ولا تُرسل إلى أي خادم.</div>
+  </div>`;
+}
+
+/* ---------- export / report ---------- */
+async function allItems() {
+  const ov = await api(`/api/orgs/${S.org}/overview`), out = [];
+  for (const b of ov.branches) out.push(...(await api(`/api/branches/${b.id}/items`)).items);
+  return {ov, items: out};
+}
+const KIND = {obligation: 'التزام / ترخيص', employee_doc: 'وثيقة موظف'};
+async function exportCsv() {
+  const {ov, items} = await allItems();
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const head = ['الفرع', 'النوع', 'البند', 'الجهة', 'الموظف', 'تاريخ الاستحقاق', 'الأيام المتبقية', 'الحالة', 'التعرض المالي التقديري (ريال)', 'أول خطوة للمعالجة', 'حالة التحقق القانوني'];
+  const rows = items.map(i => [i.branch_name, KIND[i.kind], i.title, i.authority, i.employee ? i.employee.name : '', i.due_date, i.days_left, ST[i.status], i.penalty_sar, i.fix_steps[0] || '', i.verified ? 'معتمد' : 'قيد المراجعة']);
+  download(`امتثال-${ov.org.name}-${S.asOf}.csv`, [head, ...rows].map(r => r.map(q).join(',')).join('\r\n'));
+  toast('تم تنزيل ملف Excel (CSV)');
+}
+async function openReport() {
+  const [ov, al] = await Promise.all([api(`/api/orgs/${S.org}/overview`), api(`/api/orgs/${S.org}/alerts`)]);
+  const top = ov.urgent.slice(0, 12).map(i => `<tr><td>${esc(i.branch_name)}</td><td>${esc(title(i))}</td><td>${ltr(i.due_date)}</td><td>${when(i)}</td><td>${fmt(i.penalty_sar)}</td><td>${esc(i.fix_steps[0] || '')}</td></tr>`).join('');
+  const br = ov.branches.slice().sort((a, b) => a.score - b.score).map(b => `<tr><td>${esc(b.name)}</td><td>${ltr(b.score + ' / 100')}</td><td>${fmt(b.counts.overdue)}</td><td>${fmt(b.counts.soon)}</td><td>${fmt(b.money_at_risk)}</td></tr>`).join('');
+  $('#report').innerHTML = `<div class="sheet"><div class="bar2"><button class="btn" onclick="window.print()">طباعة / حفظ PDF</button><button class="btn alt" onclick="document.getElementById('report').classList.remove('show')">إغلاق</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--brass);padding-bottom:10px"><div><h1>تقرير التعرض والامتثال</h1><div>${esc(ov.org.name)}</div></div><div style="text-align:end"><b>امتثال</b><div>بتاريخ ${ltr(ov.as_of)}</div></div></div>
+    <div class="kpis" style="margin:16px 0"><div class="kpi"><b>${ltr(ov.score + ' / 100')}</b>مؤشر الجاهزية</div><div class="kpi"><b>${fmt(ov.money_at_risk)}</b>ريال — تعرض تقديري الآن</div><div class="kpi"><b>${fmt(ov.exposure_30)}</b>ريال — خلال 30 يومًا</div><div class="kpi"><b>${fmt(ov.counts.overdue)} / ${fmt(ov.counts.soon)}</b>متأخر / يقترب</div></div>
+    <h3>الفروع (من الأضعف)</h3><table><thead><tr><th>الفرع</th><th>الجاهزية</th><th>متأخر</th><th>قريب</th><th>تعرض (ريال)</th></tr></thead><tbody>${br}</tbody></table>
+    <h3>أهم الإجراءات المطلوبة</h3><table><thead><tr><th>الفرع</th><th>البند</th><th>الاستحقاق</th><th>الحالة</th><th>تعرض (ريال)</th><th>أول خطوة</th></tr></thead><tbody>${top}</tbody></table>
+    <p style="color:var(--slate);font-size:12px;margin-top:18px">تنبيه: المبالغ تقديرات توضيحية للتعرض المالي وليست غرامات رسمية، والبنود المعلّمة «قيد المراجعة» لم يعتمدها مراجع قانوني بعد. يُراجع هذا التقرير مع مستشار قانوني قبل الاعتماد عليه.</p></div>`;
+  $('#report').classList.add('show');
+}
+
+/* ---------- guided tour ---------- */
+const TOUR = [
+  {v: 'overview', sel: '#hero-money', t: 'ابدأ بالرقم الذي يهمّ المالك', d: 'مجموع التعرض المالي لكل بند تجاوز موعده اليوم، محسوبًا من بيانات المنشأة. وكل رقم يمكن تتبّعه إلى بند وفرع وجهة.'},
+  {v: 'overview', sel: '#leader', t: 'أي فرع هو المشكلة؟', d: 'الفروع مرتبة من الأضعف إلى الأقوى مع الفارق عن متوسط فروعك، فتعرف أين تبدأ.'},
+  {v: 'branches', sel: '.item', open: true, t: 'وكيف أعالجها؟', d: 'كل بند يشرح خطوات المعالجة والدليل المطلوب والجهة، ويمكنك إنجازه أو طلب تنفيذه نيابةً عنك.'},
+  {v: 'alerts', sel: '.phone', t: 'تنبيه قبل أن تقع الغرامة', d: 'هذه الرسائل تُبنى من بياناتك: واتساب لمدير الفرع وملخص أسبوعي للمالك.'},
+  {v: 'vip', sel: '.vipc', t: 'ولا تريد أن تتابع بنفسك؟', d: 'خدمات VIP بسعر ومدة معلنة، تُطلب من البند نفسه وتتابع حالتها حتى التسليم.'},
+  {v: 'import', sel: '#imp-form, .kpis', t: 'والآن بياناتك أنت', d: 'ارفع ملف الموظفين والتراخيص وسترى تعرّض منشأتك الحقيقي في دقيقة.'},
+];
+const T = {i: -1, timer: null, paused: false, dur: 9000};
+async function tourGo(i) {
+  clearTimeout(T.timer); document.querySelectorAll('.spot').forEach(e => e.classList.remove('spot'));
+  if (i < 0) i = 0;
+  if (i >= TOUR.length) return tourStop();
+  T.i = i; const st = TOUR[i];
+  if (st.v === 'branches' && S.view !== 'branches') { const ov = await api(`/api/orgs/${S.org}/overview`); S.arg = ov.branches.slice().sort((a, b) => a.score - b.score)[0].id; }
+  S.view = st.v; if (st.v !== 'branches') S.arg = null; await render();
+  const el = document.querySelector(st.sel);
+  if (el) { if (st.open) el.classList.add('open'); el.classList.add('spot'); el.scrollIntoView({behavior: 'smooth', block: 'center'}); }
+  $('#tour').classList.add('show'); $('#tourT').textContent = st.t; $('#tourD').textContent = st.d;
+  $('#tourN').textContent = `${i + 1} / ${TOUR.length}`;
+  const bar = $('#tourBar'); bar.style.transition = 'none'; bar.style.width = '0'; void bar.offsetWidth;
+  if (!T.paused) { bar.style.transition = `width ${T.dur}ms linear`; bar.style.width = '100%'; T.timer = setTimeout(() => tourGo(T.i + 1), T.dur); }
+}
+function tourStop() { clearTimeout(T.timer); T.i = -1; $('#tour').classList.remove('show'); document.querySelectorAll('.spot').forEach(e => e.classList.remove('spot')); }
+function tourPause() { T.paused = !T.paused; $('#tourP').textContent = T.paused ? 'تشغيل' : 'إيقاف مؤقت'; tourGo(T.i); }
+function tourStart() { $('#welcome').classList.remove('show'); T.paused = false; $('#tourP').textContent = 'إيقاف مؤقت'; tourGo(0); }
+function fillOrgs() { $('#orgSel').innerHTML = S.orgs.map(o => `<option value="${o.id}" ${o.id === S.org ? 'selected' : ''}>${esc(o.name)}</option>`).join(''); }
+
+const VIEWS = {overview: vOverview, branches: vBranches, employees: vEmployees, alerts: vAlerts, changes: vChanges, vip: vVip, import: vImport, audit: vAudit};
+
+function wireDrop() {
+  const d = $('#drop'), f = $('#impFile'); if (!d || !f) return;
+  d.onclick = () => f.click();
+  d.ondragover = e => { e.preventDefault(); d.classList.add('on'); };
+  d.ondragleave = () => d.classList.remove('on');
+  d.ondrop = async e => { e.preventDefault(); d.classList.remove('on'); if (e.dataTransfer.files[0]) { try { await runImport(await readFile(e.dataTransfer.files[0])); } catch (x) { toast(x.message); } } };
+}
 async function render() {
   $('#nav').innerHTML = NAV.map(([k, l]) => `<button class="${S.view === k ? 'on' : ''}" data-act="nav" data-v="${k}">${l}</button>`).join('');
-  try { $('#main').innerHTML = await VIEWS[S.view](); }
+  try { $('#main').innerHTML = await VIEWS[S.view](); document.querySelectorAll('[data-count]').forEach(countUp); wireDrop(); }
   catch (e) { $('#main').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
 }
-function go(v, arg) { S.view = v; S.arg = arg ?? null; render(); window.scrollTo(0, 0); }
+function go(v, arg) { S.view = v; S.arg = arg ?? null; const p = render(); window.scrollTo(0, 0); return p; }
 
 /* ---------- events ---------- */
 document.addEventListener('click', async ev => {
@@ -349,25 +709,47 @@ document.addEventListener('click', async ev => {
       toast('تم إرسال طلب VIP — ستجده في تبويب خدمات VIP');
     }
     else if (a === 'ack') { await api(`/api/orgs/${S.org}/changes/${el.dataset.id}/acknowledge`, {body: {}}); toast('تم تسجيل الاطلاع'); render(); }
+    else if (a === 'why') $('#why').classList.toggle('open');
+    else if (a === 'report') await openReport();
+    else if (a === 'csv') await exportCsv();
+    else if (a === 'tour') { S.view = 'overview'; tourStart(); }
+    else if (a === 'tour-next') { T.paused = false; tourGo(T.i + 1); }
+    else if (a === 'tour-prev') tourGo(T.i - 1);
+    else if (a === 'tour-pause') tourPause();
+    else if (a === 'tour-stop') tourStop();
+    else if (a === 'welcome-close') $('#welcome').classList.remove('show');
+    else if (a === 'welcome-import') { $('#welcome').classList.remove('show'); S.imp = null; go('import'); }
+    else if (a === 'open-item') {
+      const id = el.dataset.id;
+      if (id.startsWith('g-')) { const m = /^g-(\d+)-(.+)-(overdue|soon)$/.exec(id); S.emp = {branch: m[1], code: m[2], status: m[3]}; go('employees'); }
+      else { const it = (await api(`/api/orgs/${S.org}/overview`)).urgent.find(x => x.id === id); await go('branches', it ? it.branch_id : null); const n = document.getElementById('it-' + id); if (n) { n.classList.add('open'); n.scrollIntoView({block: 'center'}); } }
+    }
+    else if (a === 'imp-sample') { $('#impName').value = $('#impName').value.trim() || 'منشأة نموذجية'; await runImport(sampleRows()); }
+    else if (a === 'imp-paste') { const t = $('#impText').value.trim(); if (!t) { toast('الصق محتوى الملف أولًا'); return; } await runImport(rowsFromTable(parseDelimited(t))); }
+    else if (a === 'imp-template') download('قالب-امتثال.csv', TEMPLATE_CSV);
+    else if (a === 'imp-again') { S.imp = null; render(); }
+    else if (a === 'after-import') { S.imp = null; go('overview'); }
     else if (a === 'adv') { await api(`/api/vip/requests/${el.dataset.id}/advance`, {body: {}}); render(); }
   } catch (e) { toast(e.message); }
 });
-document.addEventListener('change', ev => {
+document.addEventListener('change', async ev => {
   const t = ev.target;
+  if (t.id === 'impFile' && t.files[0]) { try { await runImport(await readFile(t.files[0])); } catch (e) { toast(e.message); } return; }
   if (t.id === 'brSel') { S.arg = +t.value; render(); }
   else if (t.id === 'eBr') { S.emp.branch = t.value; render(); }
   else if (t.id === 'eCode') { S.emp.code = t.value; render(); }
   else if (t.id === 'eSt') { S.emp.status = t.value; render(); }
 });
-$('#orgSel').addEventListener('change', e => { S.org = +e.target.value; S.arg = null; S.emp = {branch: '', code: '', status: ''}; S.filt = {status: '', kind: ''}; render(); });
+$('#orgSel').addEventListener('change', e => { S.imp = null; S.org = +e.target.value; S.arg = null; S.emp = {branch: '', code: '', status: ''}; S.filt = {status: '', kind: ''}; render(); });
 
 (async () => {
   try {
     const d = await api('/api/orgs');
     S.orgs = d.orgs; S.asOf = d.as_of; S.org = d.orgs[0].id;
-    $('#orgSel').innerHTML = d.orgs.map(o => `<option value="${o.id}">${esc(o.name)}</option>`).join('');
+    fillOrgs();
     $('#asof').innerHTML = 'بتاريخ ' + ltr(d.as_of);
     render();
+    try { if (!sessionStorage.getItem('imt-welcomed')) { $('#welcome').classList.add('show'); sessionStorage.setItem('imt-welcomed', '1'); } } catch (e) { $('#welcome').classList.add('show'); }
   } catch (e) { $('#main').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
 })();
 </script>

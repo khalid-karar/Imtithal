@@ -23,7 +23,8 @@ def _tpl(row) -> dict:
         code=row["code"], title=row["title"], authority=row["authority"], category=row["category"],
         severity=row["severity"], penalty_sar=row["penalty_sar"], penalty_note=row["penalty_note"],
         fix_steps=json.loads(row["fix_steps"]), evidence=row["evidence"], vip_code=row["vip_code"],
-        source_url=row["source_url"], verified=bool(row["verified"]), lead_days=row["lead_days"],
+        source_url=row["source_url"], verified=bool(row["verified"]), verified_by=row["verified_by"],
+        verified_on=row["verified_on"], lead_days=row["lead_days"],
         recurrence_months=row["recurrence_months"], scope=row["scope"])
 
 
@@ -60,7 +61,8 @@ def _public(t: dict) -> dict:
     return dict(code=t["code"], title=t["title"], authority=t["authority"], category=t["category"],
                 severity=t["severity"], penalty_sar=t["penalty_sar"], penalty_note=t["penalty_note"],
                 fix_steps=t["fix_steps"], evidence=t["evidence"], vip_code=t["vip_code"],
-                source_url=t["source_url"], verified=t["verified"], lead_days=t["lead_days"],
+                source_url=t["source_url"], verified=t["verified"], verified_by=t["verified_by"],
+                verified_on=t["verified_on"], lead_days=t["lead_days"],
                 recurrence_months=t["recurrence_months"])
 
 

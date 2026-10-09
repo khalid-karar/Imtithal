@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS template(
   code TEXT PRIMARY KEY, title TEXT, authority TEXT, category TEXT, scope TEXT, packs TEXT,
   min_headcount INTEGER DEFAULT 0, recurrence_months INTEGER, lead_days INTEGER, severity INTEGER,
   penalty_sar INTEGER, penalty_note TEXT, fix_steps TEXT, evidence TEXT, vip_code TEXT,
-  source_url TEXT, verified INTEGER DEFAULT 0);
+  source_url TEXT, verified INTEGER DEFAULT 0, verified_by TEXT, verified_on TEXT);
 CREATE TABLE IF NOT EXISTS instance(
   id INTEGER PRIMARY KEY, org_id INTEGER, branch_id INTEGER, template_code TEXT,
   due_date TEXT, last_done TEXT, evidence_note TEXT);
@@ -178,6 +178,10 @@ def _migrate(c: sqlite3.Connection) -> None:
     for col, decl in _CHANGE_COLS.items():
         if col not in have:
             c.execute(f"ALTER TABLE change ADD COLUMN {col} {decl}")
+    have_t = {r["name"] for r in c.execute("PRAGMA table_info(template)")}
+    for col in ("verified_by", "verified_on"):          # who legally verified an obligation, and when (null = not verified)
+        if col not in have_t:
+            c.execute(f"ALTER TABLE template ADD COLUMN {col} TEXT")
     c.commit()
 
 

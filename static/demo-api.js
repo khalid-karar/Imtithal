@@ -38,15 +38,20 @@
     const fresh = () => ({
       instances: JSON.parse(JSON.stringify(snapshot.instances)),
       emp_docs: JSON.parse(JSON.stringify(snapshot.emp_docs)),
-      acks: {}, vip_requests: [], audit: [], next_vip: 1, next_audit: 1,
+      acks: {}, vip_requests: [], audit: [], next_vip: 1, next_audit: 1, orgs_x: [], branches_x: [],
     });
     let S = (store && store.get()) || fresh();
     const save = () => { if (store) store.set(S); };
 
     // ---------- static lookups ----------
     const tpl = Object.fromEntries(snapshot.templates.map(t => [t.code, t]));
-    const orgs = snapshot.orgs, branchesAll = snapshot.branches;
-    const branchById = Object.fromEntries(branchesAll.map(b => [b.id, b]));
+    let orgs, branchesAll, branchById;                // snapshot + organisations imported in this browser
+    const rebuild = () => {
+      S.orgs_x = S.orgs_x || []; S.branches_x = S.branches_x || [];
+      orgs = snapshot.orgs.concat(S.orgs_x); branchesAll = snapshot.branches.concat(S.branches_x);
+      branchById = Object.fromEntries(branchesAll.map(b => [b.id, b]));
+    };
+    rebuild();
     const vipName = Object.fromEntries(snapshot.vip_services.map(v => [v.code, v.name]));
     const orgById = id => orgs.find(o => o.id === id);
 
@@ -58,7 +63,8 @@
     const pub = t => ({
       code: t.code, title: t.title, authority: t.authority, category: t.category, severity: t.severity,
       penalty_sar: t.penalty_sar, penalty_note: t.penalty_note, fix_steps: t.fix_steps, evidence: t.evidence,
-      vip_code: t.vip_code, source_url: t.source_url, verified: !!t.verified, lead_days: t.lead_days,
+      vip_code: t.vip_code, source_url: t.source_url, verified: !!t.verified, verified_by: t.verified_by ?? null,
+      verified_on: t.verified_on ?? null, lead_days: t.lead_days,
       recurrence_months: t.recurrence_months,
     });
 
@@ -270,6 +276,108 @@
       return { entries: S.audit.filter(e => e.org_id === orgId).slice().sort((a, b) => b.id - a.id).slice(0, 50) };
     }
 
+
+    // ---------- alerts (mirror of alerts.py) ----------
+    const arDays = n => n === 1 ? 'يوم واحد' : n === 2 ? 'يومين' : (n >= 3 && n <= 10) ? `${n} أيام` : `${n} يومًا`;
+    const alertWhat = i => i.kind === 'group' ? `${i.count} × ${i.title}`
+      : i.kind === 'employee_doc' ? `${i.title} — ${i.employee.name} (${i.employee.role})` : i.title;
+    const alertWhen = i => i.days_left < 0 ? `متأخر منذ ${arDays(-i.days_left)} (الاستحقاق ${i.due_date})`
+      : i.days_left === 0 ? `يستحق اليوم (${i.due_date})` : `يستحق خلال ${arDays(i.days_left)} (${i.due_date})`;
+    function alertText(i) {
+      const lines = [`${i.status === 'overdue' ? '🔴' : '🟠'} تنبيه امتثال — ${i.branch_name}`, alertWhat(i), alertWhen(i),
+        `التعرض المالي التقديري: ${i.penalty_sar} ريال`, `الإجراء: ${i.fix_steps[0]}`];
+      if (i.vip_name) lines.push(`للتنفيذ نيابةً عنك: ${i.vip_name} (VIP)`);
+      return lines.join('\n');
+    }
+    function alerts(orgId) {
+      const org = needOrg(orgId), items = loadItems(orgId), branches = branchesAll.filter(b => b.org_id === orgId);
+      const picks = urgent(items, 4).concat(
+        items.filter(i => i.kind === 'employee_doc' && i.status === 'soon')
+          .sort((a, b) => (a.days_left - b.days_left) || (Number(a.id.slice(2)) - Number(b.id.slice(2)))).slice(0, 2));
+      const messages = picks.map(i => ({ id: i.id, channel: 'whatsapp', to: `مدير ${i.branch_name}`, status: i.status, days_left: i.days_left, text: alertText(i) }));
+      const cnt = counts(items);
+      let worst = null;
+      for (const b of branches) { const sc = score(items.filter(i => i.branch_id === b.id)); if (!worst || sc < worst[1]) worst = [b.name, sc]; }
+      const top = urgent(items, 3);
+      const body = [`مؤشر الجاهزية: ${score(items)} / 100`, `التعرض المالي للبنود المتأخرة: ${moneyAtRisk(items)} ريال`,
+        `بنود متأخرة: ${cnt.overdue} — بنود تقترب: ${cnt.soon}`];
+      if (worst) body.push(`أضعف فرع: ${worst[0]} (${worst[1]} / 100)`);
+      if (top.length) { body.push('أهم ما يحتاج إجراءً هذا الأسبوع:'); top.forEach((i, n) => body.push(`${n + 1}. ${alertWhat(i)} — ${i.branch_name}`)); }
+      return {
+        summary: { overdue_items: cnt.overdue, penalty_sar: moneyAtRisk(items) }, messages,
+        digest: { channel: 'email', to: 'مالك المنشأة / مدير الموارد البشرية', subject: `ملخص امتثال الأسبوعي — ${org.name}`, body: body.join('\n') },
+      };
+    }
+
+    // ---------- import (mirror of importer.py) ----------
+    const normKey = x => {
+      let t = String(x ?? '').trim().toLowerCase().replace(/\s+/g, ' ').replace(/[ً-ٰٟـ]/g, '');
+      for (const [a, b] of [['أ', 'ا'], ['إ', 'ا'], ['آ', 'ا'], ['ة', 'ه'], ['ى', 'ي']]) t = t.split(a).join(b);
+      return t;
+    };
+    const aliasTable = (() => {
+      const out = new Map();
+      for (const t of snapshot.templates.slice().sort((a, b) => a.code < b.code ? -1 : a.code > b.code ? 1 : 0))
+        for (const n of [t.code, t.title, ...((snapshot.doc_aliases || {})[t.code] || [])]) { const k = normKey(n); if (!out.has(k)) out.set(k, t.code); }
+      return out;
+    })();
+    const nextId = (arr, key) => arr.reduce((m, x) => Math.max(m, x[key]), 0) + 1;
+
+    function importOrg(body) {
+      const name = String(body.org_name ?? '').trim(), pack = body.pack, rows = body.rows || [];
+      if (!name || name.length > 80) throw new HttpError(422, 'اسم المنشأة مطلوب (حتى 80 حرفًا)');
+      if (!['hotel', 'hospital', 'company'].includes(pack)) throw new HttpError(422, 'القطاع غير صالح');
+      if (!rows.length) throw new HttpError(422, 'لا توجد صفوف للاستيراد');
+      if (rows.length > 5000) throw new HttpError(422, 'الحد الأقصى 5000 صف');
+      const byCode = Object.fromEntries(snapshot.templates.map(t => [t.code, t]));
+      const skipped = [], branches = new Map(), seen = new Set();
+      let nEmp = 0, nDocs = 0, nObl = 0, org = null;
+      let eidMax = Math.max(snapshot.max_eid || 0, S.emp_docs.reduce((m, d) => Math.max(m, d.eid), 0));
+      for (let idx = 1; idx <= rows.length; idx++) {
+        const r = rows[idx - 1] || {}, g = k => String(r[k] ?? '').trim();
+        const branch = g('branch'), city = g('city'), emp = g('employee'), role = g('role'), doc = g('document'), due = g('date');
+        const skip = reason => skipped.push({ row: idx, reason });
+        if (!branch) { skip('الفرع مطلوب'); continue; }
+        const code = aliasTable.get(normKey(doc));
+        if (!code) { skip('نوع الوثيقة غير معروف'); continue; }
+        const t = byCode[code];
+        if (!t.packs.includes(pack)) { skip('غير منطبقة على هذا القطاع'); continue; }
+        if (!validDate(due)) { skip('التاريخ غير صالح (YYYY-MM-DD)'); continue; }
+        if (t.scope === 'employee' && !emp) { skip('اسم الموظف مطلوب لهذه الوثيقة'); continue; }
+        if (t.scope === 'branch' && emp) { skip('هذا البند يخص الفرع وليس موظفًا'); continue; }
+        const key = JSON.stringify([branch, emp, code]);
+        if (seen.has(key)) { skip('مكرر'); continue; }
+        seen.add(key);
+        if (!org) { org = { id: nextId(orgs, 'id'), name, pack, city }; S.orgs_x.push(org); rebuild(); }
+        let b = branches.get(branch);
+        if (!b) {
+          const row = { id: nextId(branchesAll, 'id'), org_id: org.id, name: branch, city, pack, headcount: 0 };
+          S.branches_x.push(row); rebuild();
+          b = { row, employees: new Map(), codes: new Set() }; branches.set(branch, b);
+        }
+        if (t.scope === 'branch') {
+          S.instances.push({ id: nextId(S.instances, 'id'), org_id: org.id, branch_id: b.row.id, template_code: code, due_date: due, last_done: null, evidence_note: '' });
+          b.codes.add(code); nObl++;
+        } else {
+          let e = b.employees.get(emp);                      // the employee keeps the role from the first row that mentions them
+          if (!e) { e = { eid: ++eidMax, role }; b.employees.set(emp, e); nEmp++; }
+          S.emp_docs.push({ id: nextId(S.emp_docs, 'id'), org_id: org.id, template_code: code, expiry: due, eid: e.eid, name: emp, role: e.role, branch_id: b.row.id });
+          nDocs++;
+        }
+      }
+      const imported = { branches: branches.size, employees: nEmp, employee_docs: nDocs, obligations: nObl };
+      if (!org) return { org_id: null, imported, skipped: skipped.slice(0, 50), skipped_total: skipped.length, missing: [] };
+      const missing = [];
+      for (const [bname, b] of branches) {
+        const heads = b.employees.size; b.row.headcount = heads;
+        const miss = snapshot.templates.filter(t => t.scope === 'branch' && t.packs.includes(pack) && heads >= (t.min_headcount || 0) && !b.codes.has(t.code)).map(t => t.title);
+        if (miss.length) missing.push({ branch: bname, branch_id: b.row.id, count: miss.length, titles: miss.slice(0, 5) });
+      }
+      log(org.id, 'import', `استيراد بيانات: ${nDocs} وثيقة موظف و${nObl} التزام`);
+      save();
+      return { org_id: org.id, imported, skipped: skipped.slice(0, 50), skipped_total: skipped.length, missing };
+    }
+
     // ---------- router ----------
     function handle(method, url, body) {
       const u = new URL(url, 'http://demo.local');
@@ -285,11 +393,13 @@
           if ((m = /^\/api\/orgs\/(\d+)\/changes$/.exec(path))) return ok(changes(+m[1]));
           if ((m = /^\/api\/orgs\/(\d+)\/vip$/.exec(path))) return ok(vip(+m[1]));
           if ((m = /^\/api\/orgs\/(\d+)\/audit$/.exec(path))) return ok(audit(+m[1]));
+          if ((m = /^\/api\/orgs\/(\d+)\/alerts$/.exec(path))) return ok(alerts(+m[1]));
         } else if (method === 'POST') {
           if ((m = /^\/api\/items\/([^/]+)\/complete$/.exec(path))) return ok(complete(decodeURIComponent(m[1]), b));
           if ((m = /^\/api\/orgs\/(\d+)\/changes\/(\d+)\/acknowledge$/.exec(path))) return ok(acknowledge(+m[1], +m[2]));
           if ((m = /^\/api\/orgs\/(\d+)\/vip\/requests$/.exec(path))) return ok(vipRequest(+m[1], b));
           if ((m = /^\/api\/vip\/requests\/(\d+)\/advance$/.exec(path))) return ok(vipAdvance(+m[1]));
+          if (path === '/api/import') return ok(importOrg(b));
         }
         return { status: 404, body: { detail: 'Not Found' } };
       } catch (e) {
@@ -299,7 +409,7 @@
     }
     const ok = body => ({ status: 200, body });
 
-    return { handle, reset: () => { S = fresh(); save(); } };
+    return { handle, reset: () => { S = fresh(); rebuild(); save(); } };
   }
 
   // ---------- browser glue ----------
