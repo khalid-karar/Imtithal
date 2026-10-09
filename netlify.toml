@@ -1,3 +1,6 @@
 [build]
   publish = "dist"
   command = "python scripts/build_static.py --as-of 2026-10-09"
+
+[build.environment]
+  PYTHON_VERSION = "3.12"
