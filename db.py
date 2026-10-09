@@ -37,7 +37,10 @@ CREATE TABLE IF NOT EXISTS employee(id INTEGER PRIMARY KEY, org_id INTEGER, bran
 CREATE TABLE IF NOT EXISTS emp_doc(id INTEGER PRIMARY KEY, org_id INTEGER, employee_id INTEGER, template_code TEXT, expiry TEXT);
 CREATE TABLE IF NOT EXISTS change(
   id INTEGER PRIMARY KEY, title TEXT, authority TEXT, published TEXT, effective TEXT, summary TEXT,
-  action_required TEXT, affects TEXT, source_url TEXT, source_quality TEXT, is_demo INTEGER, packs TEXT);
+  action_required TEXT, affects TEXT, source_url TEXT, source_quality TEXT, is_demo INTEGER, packs TEXT,
+  status TEXT DEFAULT 'published', provenance TEXT DEFAULT 'manual', ai_provider TEXT, ai_confidence REAL,
+  ai_notes TEXT DEFAULT '[]', evidence TEXT DEFAULT '[]', source_hash TEXT, source_text TEXT,
+  created_at TEXT, reviewed_by TEXT, reviewed_at TEXT, reject_reason TEXT);
 CREATE TABLE IF NOT EXISTS change_ack(org_id INTEGER, change_id INTEGER, ts TEXT, PRIMARY KEY(org_id, change_id));
 CREATE TABLE IF NOT EXISTS vip_service(
   code TEXT PRIMARY KEY, name TEXT, description TEXT, price_from INTEGER, price_unit TEXT, sla_days INTEGER, packs TEXT);
@@ -105,6 +108,7 @@ def init(reset: bool = False) -> None:
         DB_PATH.unlink()
     c = conn()
     c.executescript(SCHEMA)
+    _migrate(c)
     if c.execute("SELECT COUNT(*) FROM org").fetchone()[0]:
         c.close()
         return
@@ -118,7 +122,8 @@ def init(reset: bool = False) -> None:
              t["recurrence_months"], t["lead_days"], t["severity"], t["penalty_sar"], t["penalty_note"],
              json.dumps(t["fix_steps"], ensure_ascii=False), t["evidence"], t["vip_code"], t["source_url"]))
     for ch in CHANGES:
-        c.execute("INSERT INTO change VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+        c.execute("INSERT INTO change(id,title,authority,published,effective,summary,action_required,affects,source_url,"
+                  "source_quality,is_demo,packs,status,provenance) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,'published','manual')",
                   (ch["id"], ch["title"], ch["authority"], ch["published"], ch["effective"], ch["summary"],
                    ch["action_required"], json.dumps(ch["affects"]), ch["source_url"], ch["source_quality"], ch["is_demo"], json.dumps(ch["packs"])))
     for v in VIP_SERVICES:
@@ -160,6 +165,20 @@ def init(reset: bool = False) -> None:
                               (oid, eid, code, exp.isoformat()))
     c.commit()
     c.close()
+
+
+_CHANGE_COLS = {"status": "TEXT DEFAULT 'published'", "provenance": "TEXT DEFAULT 'manual'", "ai_provider": "TEXT",
+                "ai_confidence": "REAL", "ai_notes": "TEXT DEFAULT '[]'", "evidence": "TEXT DEFAULT '[]'", "source_hash": "TEXT",
+                "source_text": "TEXT", "created_at": "TEXT", "reviewed_by": "TEXT", "reviewed_at": "TEXT", "reject_reason": "TEXT"}
+
+
+def _migrate(c: sqlite3.Connection) -> None:
+    """Bring a v1 database up to date (v1 -> v2 added the review-gate columns on `change`)."""
+    have = {r["name"] for r in c.execute("PRAGMA table_info(change)")}
+    for col, decl in _CHANGE_COLS.items():
+        if col not in have:
+            c.execute(f"ALTER TABLE change ADD COLUMN {col} {decl}")
+    c.commit()
 
 
 def _applies(t: dict, pack: str, headcount: int) -> bool:

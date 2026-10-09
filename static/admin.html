@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>امتثال — لوحة المحلل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#16233F;--ink-2:#2B3B5C;--paper:#FAF8F3;--sand:#EFE9DC;--line:#D8D0BE;--brass:#AD8A3B;--brass-l:#D9C486;--slate:#5B6478;
+  --ok:#2F6F52;--ok-bg:#E4EEE7;--warn:#B26B12;--warn-bg:#F6E9D4;--bad:#AE3B3B;--bad-bg:#F5E1DF;
+  --display:'Noto Kufi Arabic',system-ui,sans-serif;--sans:'IBM Plex Sans Arabic',system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+button,select,input,textarea{font-family:inherit;font-size:14px;color:inherit}
+.banner{background:var(--ink);color:var(--brass-l);font-size:12.5px;text-align:center;padding:7px 12px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px 60px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 0;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:10px}.brand b{font-family:var(--display);font-size:19px}
+.mark{width:26px;height:26px;border:1.5px solid var(--ink);border-radius:50%;position:relative}.mark::after{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--brass)}
+.tok{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--slate)}
+input[type=text],input[type=password],input[type=date],textarea,select{border:1px solid var(--line);border-radius:4px;padding:8px 10px;background:#fff;width:100%}
+textarea{resize:vertical;line-height:1.7}
+label.f{display:block;font-size:12.5px;color:var(--slate);font-weight:600;margin:12px 0 4px}
+h2{font-family:var(--display);font-size:19px;margin:0 0 4px}
+.sub{color:var(--slate);font-size:13px;margin-bottom:12px}
+.box{background:#fff;border:1px solid var(--line);border-radius:4px;padding:18px 20px;margin-bottom:18px}
+.btn{background:var(--ink);color:var(--paper);border:none;border-radius:4px;padding:9px 16px;cursor:pointer;font-weight:600}
+.btn.alt{background:#fff;color:var(--ink);border:1px solid var(--ink)}.btn.bad{background:#fff;color:var(--bad);border:1px solid var(--bad)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:340px 1fr;gap:22px;align-items:start}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 13px;cursor:pointer;font-size:13px}.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.li{border:1px solid var(--line);background:#fff;border-radius:4px;padding:11px 13px;margin-bottom:8px;cursor:pointer}
+.li:hover,.li.on{border-color:var(--brass)}.li.on{background:var(--sand)}
+.li b{font-size:14px;display:block}.li small{color:var(--slate);font-size:12px}
+.flag{font-size:11.5px;padding:2px 7px;border-radius:2px;background:var(--sand);color:var(--slate);margin-inline-end:6px;white-space:nowrap;display:inline-block}
+.flag.ai{background:#E6E9F5;color:#2B3B8C}.flag.ok{background:var(--ok-bg);color:var(--ok)}.flag.warn{background:var(--warn-bg);color:var(--warn)}.flag.bad{background:var(--bad-bg);color:var(--bad)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.codes{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:4px 14px;max-height:250px;overflow:auto;border:1px solid var(--line);border-radius:4px;padding:10px;background:#fff}
+.codes label{font-size:13px;display:flex;gap:7px;align-items:baseline;cursor:pointer}.codes code{font-size:11.5px;color:var(--slate)}
+.ai{background:var(--sand);border-radius:4px;padding:14px 16px;font-size:13px;margin-bottom:6px}
+.ai ul{margin:6px 0 0;padding-inline-start:18px}.ai li{margin:2px 0}
+.meter{height:6px;background:#fff;border-radius:3px;overflow:hidden;margin:4px 0 8px}.meter i{display:block;height:100%;background:var(--brass)}
+.imp{background:var(--warn-bg);border-radius:4px;padding:11px 14px;font-size:13.5px;margin-top:12px}
+details{margin-top:10px}summary{cursor:pointer;color:var(--ink-2);font-weight:600;font-size:13px}
+pre{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:4px;padding:10px;font-family:var(--sans);font-size:12.5px;max-height:260px;overflow:auto}
+.empty{color:var(--slate);text-align:center;padding:26px 0}
+.toast{position:fixed;bottom:22px;inset-inline-start:22px;background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:4px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9;max-width:80vw}.toast.show{opacity:1}
+@media(max-width:860px){.grid,.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="banner">المسودات لا تصل إلى العملاء إلا بعد أن يعتمدها محلل بالاسم ويؤكد مطابقتها للمصدر الأصلي</div>
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><div class="mark"></div><b>امتثال — لوحة المحلل</b></div>
+    <div class="tok"><span id="prov"></span>
+      <input type="password" id="tok" placeholder="رمز المحلل" style="width:170px" autocomplete="off">
+      <button class="btn alt" id="tokBtn">دخول</button></div>
+  </div>
+
+  <div class="box">
+    <h2>مصدر جديد</h2>
+    <div class="sub">الصق نص القرار أو التعميم، أو أدخل رابطًا من موقع جهة حكومية معتمدة. يُصاغ منه مسودة تُراجعها قبل أي نشر. لا تُرسل بيانات العملاء إلى النموذج، فقط نص المصدر.</div>
+    <div class="two">
+      <div><label class="f">اسم المصدر (اختياري)</label><input type="text" id="srcLabel" placeholder="مثال: تعميم وزارة السياحة"></div>
+      <div><label class="f">رابط حكومي (اختياري)</label><input type="text" id="srcUrl" placeholder="https://…gov.sa/…" dir="ltr"></div>
+    </div>
+    <label class="f">نص المصدر</label>
+    <textarea id="srcText" rows="6" placeholder="الصق النص الكامل هنا…"></textarea>
+    <div class="row" style="margin-top:12px"><button class="btn" id="mkDraft">صِغ مسودة</button><span class="sub" style="margin:0" id="mkNote"></span></div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="tabs" id="tabs"></div>
+      <div id="list"></div>
+    </div>
+    <div id="ed"><div class="box empty">اختر تحديثًا من القائمة أو أنشئ مسودة جديدة</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const S = {tok: sessionStorage.getItem('admTok') || '', status: 'draft', sel: null, all: [], catalog: [], packs: []};
+const PACK = {hotel: 'فنادق', hospital: 'مستشفيات', company: 'شركات'};
+const STAT = {draft: 'مسودة', published: 'منشور', rejected: 'مرفوض'};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 3800); }
+async function api(path, method = 'GET', body) {
+  const r = await fetch(path, {method, headers: {'X-Admin-Token': S.tok, 'Content-Type': 'application/json'}, body: body ? JSON.stringify(body) : undefined});
+  let data = null; try { data = await r.json(); } catch (e) {}
+  if (!r.ok) throw new Error((data && data.detail) || 'تعذر تنفيذ الطلب');
+  return data;
+}
+const pl = (n, one, two, few, many) => n === 1 ? one : n === 2 ? two : n <= 10 ? `${n} ${few}` : `${n} ${many}`;
+const provLabel = p => p === 'anthropic' ? '<span class="flag ai">صياغة بنموذج ذكاء اصطناعي</span>' : '<span class="flag warn">قواعد بسيطة — ليست ذكاءً اصطناعيًا</span>';
+
+async function boot() {
+  $('#tok').value = S.tok;
+  if (!S.tok) { $('#list').innerHTML = '<div class="box empty">أدخل رمز المحلل للمتابعة</div>'; return; }
+  try {
+    const c = await api('/api/admin/catalog');
+    S.catalog = c.catalog; S.packs = c.packs;
+    $('#prov').innerHTML = 'المزوّد الحالي: ' + provLabel(c.provider);
+    await loadList();
+  } catch (e) { toast(e.message); $('#list').innerHTML = `<div class="box empty">${esc(e.message)}</div>`; }
+}
+async function loadList() {
+  S.all = (await api('/api/admin/changes')).changes;
+  const n = s => S.all.filter(c => c.status === s).length;
+  const TAB = {draft: 'مسودات', published: 'منشورة', rejected: 'مرفوضة'};
+  $('#tabs').innerHTML = ['draft', 'published', 'rejected'].map(s => `<button class="chip ${S.status === s ? 'on' : ''}" data-tab="${s}">${TAB[s]} (${n(s)})</button>`).join('');
+  const rows = S.all.filter(c => c.status === S.status);
+  $('#list').innerHTML = rows.length ? rows.map(c => `<div class="li ${S.sel === c.id ? 'on' : ''}" data-id="${c.id}">
+      <b>${esc(c.title)}</b><small>${esc(c.authority || 'جهة غير محددة')}</small><div style="margin-top:5px">
+      ${c.provenance === 'ai' ? '<span class="flag ai">ذكاء اصطناعي</span>' : c.provenance === 'rules' ? '<span class="flag warn">قواعد</span>' : '<span class="flag">يدوي</span>'}
+      ${c.status === 'draft' && c.ai_confidence != null ? `<span class="flag">ثقة ${Math.round(c.ai_confidence * 100)}%</span>` : ''}
+      ${c.reviewed_by ? `<span class="flag ok">راجعه ${esc(c.reviewed_by)}</span>` : ''}</div></div>`).join('')
+    : '<div class="box empty">لا توجد عناصر</div>';
+  if (S.sel) openChange(S.sel, true);
+}
+
+async function openChange(id, keep) {
+  S.sel = id;
+  if (!keep) document.querySelectorAll('.li').forEach(e => e.classList.toggle('on', +e.dataset.id === id));
+  const ch = await api('/api/admin/changes/' + id);
+  let imp = null; try { imp = await api(`/api/admin/changes/${id}/impact`); } catch (e) {}
+  $('#ed').innerHTML = editor(ch, imp);
+}
+
+function impactBox(imp) {
+  if (!imp) return '';
+  if (!imp.total_branches) return '<div class="imp">بحالتها الحالية لن تظهر لأي فرع. اختر الالتزامات والقطاعات المتأثرة.</div>';
+  return `<div class="imp"><b>أثر النشر:</b> سيظهر لـ ${pl(imp.total_branches, 'فرع واحد', 'فرعين', 'فروع', 'فرعًا')} في ${pl(imp.orgs.length, 'منشأة واحدة', 'منشأتين', 'منشآت', 'منشأة')} (${pl(imp.total_items, 'بند مرتبط واحد', 'بندان مرتبطان', 'بنود مرتبطة', 'بندًا مرتبطًا')}).
+    <div style="margin-top:4px;color:var(--ink-2)">${imp.orgs.map(o => `${esc(o.org_name)}: ${o.branches.map(b => esc(b.branch_name)).join('، ')}`).join('<br>')}</div></div>`;
+}
+
+function editor(ch, imp) {
+  const ro = ch.status !== 'draft';
+  const dis = ro ? 'disabled' : '';
+  const byCat = ch.affects || [];
+  const codes = S.catalog.map(t => `<label><input type="checkbox" name="aff" value="${esc(t.code)}" ${byCat.includes(t.code) ? 'checked' : ''} ${dis}>
+      <span>${esc(t.title)} <code>${esc(t.code)}</code></span></label>`).join('');
+  const packs = S.packs.map(p => `<label style="margin-inline-end:16px"><input type="checkbox" name="pk" value="${p}" ${ch.packs.includes(p) ? 'checked' : ''} ${dis}> ${PACK[p]}</label>`).join('');
+  const conf = ch.ai_confidence != null ? Math.round(ch.ai_confidence * 100) : null;
+  const notes = (ch.ai_notes || []).map(n => `<li>${esc(n)}</li>`).join('');
+  const quotes = (ch.evidence || []).map(q => `<li>${esc(q)}</li>`).join('');
+  const aiBox = ch.provenance === 'manual' ? '' : `<div class="ai"><div>${provLabel(ch.ai_provider)}
+      ${conf != null ? `<div class="meter" title="ثقة المزوّد"><i style="width:${conf}%"></i></div><b>الثقة المعلنة: ${conf}%</b> — تقدير من المزوّد وليس ضمانًا` : ''}</div>
+      ${notes ? `<div style="margin-top:8px"><b>نقاط تحتاج تحققك</b><ul>${notes}</ul></div>` : ''}
+      ${quotes ? `<div style="margin-top:8px"><b>مقتطفات من المصدر تدعم الربط</b><ul>${quotes}</ul></div>` : ''}</div>`;
+  const status = `<span class="flag ${ch.status === 'published' ? 'ok' : ch.status === 'rejected' ? 'bad' : 'warn'}">${STAT[ch.status]}</span>`;
+  const actions = ch.status === 'draft' ? `
+    <div class="box" style="background:var(--sand)"><h2 style="font-size:16px">اعتماد ونشر</h2>
+      <div class="sub">بعد النشر يظهر التحديث لعملاء القطاعات المحددة مع اسمك كمراجع.</div>
+      <div class="two"><div><label class="f">اسم المراجع</label><input type="text" id="rev" placeholder="اسمك"></div><div></div></div>
+      <label style="display:flex;gap:8px;margin:12px 0;font-size:13.5px;cursor:pointer"><input type="checkbox" id="conf"> قارنت المسودة بالمصدر الأصلي وأتحمل مسؤولية دقتها</label>
+      <div class="row"><button class="btn" data-act="save">حفظ التعديلات</button><button class="btn" data-act="publish">نشر للعملاء</button>
+        <input type="text" id="why" placeholder="سبب الرفض (اختياري)" style="max-width:220px"><button class="btn bad" data-act="reject">رفض المسودة</button></div></div>`
+    : ch.status === 'published' ? `<div class="row"><button class="btn alt" data-act="unpublish">إعادة إلى مسودة (يختفي عن العملاء)</button></div>`
+    : `<div class="sub">سبب الرفض: ${esc(ch.reject_reason || '—')}</div>`;
+  return `<div class="box">
+    <div class="row" style="justify-content:space-between"><h2>${esc(ch.title)}</h2>${status}</div>
+    ${aiBox}
+    <label class="f">العنوان</label><input type="text" id="f_title" value="${esc(ch.title)}" ${dis}>
+    <div class="two"><div><label class="f">الجهة</label><input type="text" id="f_authority" value="${esc(ch.authority)}" ${dis}></div>
+      <div class="two"><div><label class="f">تاريخ الصدور</label><input type="date" id="f_published" value="${esc(ch.published)}" ${dis}></div>
+      <div><label class="f">تاريخ السريان *</label><input type="date" id="f_effective" value="${esc(ch.effective)}" ${dis}></div></div></div>
+    <label class="f">الملخص *</label><textarea id="f_summary" rows="3" ${dis}>${esc(ch.summary)}</textarea>
+    <label class="f">الإجراء المطلوب من المنشأة *</label><textarea id="f_action" rows="3" ${dis}>${esc(ch.action_required)}</textarea>
+    <label class="f">القطاعات المتأثرة *</label><div>${packs}</div>
+    <label class="f">الالتزامات المتأثرة *</label><div class="codes">${codes}</div>
+    ${impactBox(imp)}
+    <details><summary>نص المصدر${ch.source_url ? '' : ' (ملصوق)'}</summary>
+      ${ch.source_url ? `<div class="sub"><a href="${esc(ch.source_url)}" target="_blank" rel="noopener">${esc(ch.source_url)}</a></div>` : ''}
+      <pre>${esc(ch.source_text)}</pre></details>
+  </div>${actions}`;
+}
+
+function collect() {
+  return {title: $('#f_title').value, authority: $('#f_authority').value, published: $('#f_published').value, effective: $('#f_effective').value,
+    summary: $('#f_summary').value, action_required: $('#f_action').value,
+    affects: [...document.querySelectorAll('input[name=aff]:checked')].map(e => e.value),
+    packs: [...document.querySelectorAll('input[name=pk]:checked')].map(e => e.value)};
+}
+
+document.addEventListener('click', async ev => {
+  const el = ev.target.closest('[data-act],[data-tab],.li'); if (!el) return;
+  try {
+    if (el.dataset.tab) { S.status = el.dataset.tab; S.sel = null; $('#ed').innerHTML = '<div class="box empty">اختر تحديثًا من القائمة</div>'; await loadList(); }
+    else if (el.classList.contains('li')) await openChange(+el.dataset.id);
+    else if (el.dataset.act === 'save') { await api('/api/admin/changes/' + S.sel, 'PATCH', collect()); toast('تم حفظ التعديلات'); await loadList(); }
+    else if (el.dataset.act === 'publish') {
+      await api('/api/admin/changes/' + S.sel, 'PATCH', collect());
+      await api(`/api/admin/changes/${S.sel}/publish`, 'POST', {reviewer: $('#rev').value, confirmed_against_source: $('#conf').checked});
+      toast('نُشر التحديث وأصبح ظاهرًا للعملاء'); S.status = 'published'; await loadList();
+    }
+    else if (el.dataset.act === 'reject') { await api(`/api/admin/changes/${S.sel}/reject`, 'POST', {reason: $('#why').value}); toast('رُفضت المسودة'); S.sel = null; $('#ed').innerHTML = ''; await loadList(); }
+    else if (el.dataset.act === 'unpublish') { await api(`/api/admin/changes/${S.sel}/unpublish`, 'POST'); toast('أُعيد إلى مسودة'); S.status = 'draft'; await loadList(); }
+  } catch (e) { toast(e.message); }
+});
+document.addEventListener('change', async ev => {
+  if (ev.target.name === 'aff' || ev.target.name === 'pk') {   // live blast-radius preview from the unsaved selection
+    try { await api('/api/admin/changes/' + S.sel, 'PATCH', {affects: collect().affects, packs: collect().packs});
+      const imp = await api(`/api/admin/changes/${S.sel}/impact`); const old = document.querySelector('.imp'); const html = impactBox(imp);
+      if (old) old.outerHTML = html; else document.querySelector('.codes').insertAdjacentHTML('afterend', html); } catch (e) { toast(e.message); }
+  }
+});
+$('#mkDraft').addEventListener('click', async () => {
+  const b = $('#mkDraft'); b.disabled = true; $('#mkNote').textContent = 'جارٍ الصياغة…';
+  try {
+    const d = await api('/api/admin/changes/draft', 'POST', {text: $('#srcText').value, url: $('#srcUrl').value, label: $('#srcLabel').value});
+    toast('أُنشئت مسودة — راجعها قبل النشر'); $('#srcText').value = ''; $('#srcUrl').value = ''; $('#srcLabel').value = '';
+    S.status = 'draft'; S.sel = d.id; await loadList();
+  } catch (e) { toast(e.message); }
+  b.disabled = false; $('#mkNote').textContent = '';
+});
+$('#tokBtn').addEventListener('click', () => { S.tok = $('#tok').value.trim(); sessionStorage.setItem('admTok', S.tok); boot(); });
+boot();
+</script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import json
+from contextlib import asynccontextmanager
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -6,16 +7,19 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
+import admin
 import db
 import engine
 
-app = FastAPI(title="امتثال API", version="0.1")
-STATIC = Path(__file__).parent / "static"
-
-
-@app.on_event("startup")
-def _startup() -> None:
+@asynccontextmanager
+async def lifespan(_: FastAPI):
     db.init()
+    yield
+
+
+app = FastAPI(title="امتثال API", version="0.2", lifespan=lifespan)
+app.include_router(admin.router)
+STATIC = Path(__file__).parent / "static"
 
 
 def _log(c, org_id: int, action: str, detail: str) -> None:
@@ -149,7 +153,7 @@ def changes(org_id: int):
     acked = {r["change_id"]: r["ts"] for r in c.execute("SELECT * FROM change_ack WHERE org_id=?", (org_id,))}
     today = db.as_of()
     out = []
-    for ch in c.execute("SELECT * FROM change ORDER BY effective DESC"):
+    for ch in c.execute("SELECT * FROM change WHERE status='published' ORDER BY effective DESC"):
         affects = json.loads(ch["affects"])
         ch_packs = json.loads(ch["packs"])
         hit = [i for i in items if i["code"] in affects and pack_of[i["branch_id"]] in ch_packs]
@@ -165,6 +169,7 @@ def changes(org_id: int):
             id=ch["id"], title=ch["title"], authority=ch["authority"], published=ch["published"], effective=ch["effective"],
             days_to_effective=(eff - today).days, summary=ch["summary"], action_required=ch["action_required"],
             affects=affects, source_url=ch["source_url"], source_quality=ch["source_quality"], is_demo=bool(ch["is_demo"]),
+            provenance=ch["provenance"], reviewed=bool(ch["reviewed_by"]),
             acknowledged_at=acked.get(ch["id"]), impact=sorted(per_branch.values(), key=lambda b: -b["attention"])))
     c.close()
     return dict(changes=out)
