@@ -1,4 +1,6 @@
-__pycache__/
 *.pyc
-imtithal.db
 .env
+.netlify
+__pycache__/
+dist/
+imtithal.db

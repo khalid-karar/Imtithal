@@ -34,7 +34,7 @@ def load_items(c, org_id: int, branch_id: int | None = None) -> list[dict]:
     branches = {r["id"]: r["name"] for r in c.execute("SELECT id,name FROM branch WHERE org_id=?", (org_id,))}
     items: list[dict] = []
 
-    q = "SELECT * FROM instance WHERE org_id=?" + (" AND branch_id=?" if branch_id else "")
+    q = "SELECT * FROM instance WHERE org_id=?" + (" AND branch_id=?" if branch_id else "") + " ORDER BY id"
     for r in c.execute(q, (org_id, branch_id) if branch_id else (org_id,)):
         t = tpl[r["template_code"]]
         left = (date.fromisoformat(r["due_date"]) - today).days
@@ -44,7 +44,7 @@ def load_items(c, org_id: int, branch_id: int | None = None) -> list[dict]:
             evidence_note=r["evidence_note"], vip_name=vip.get(t["vip_code"]), employee=None, **_public(t)))
 
     q = ("SELECT d.id, d.template_code, d.expiry, e.id AS eid, e.name, e.role, e.branch_id FROM emp_doc d "
-         "JOIN employee e ON e.id=d.employee_id WHERE d.org_id=?" + (" AND e.branch_id=?" if branch_id else ""))
+         "JOIN employee e ON e.id=d.employee_id WHERE d.org_id=?" + (" AND e.branch_id=?" if branch_id else "") + " ORDER BY d.id")
     for r in c.execute(q, (org_id, branch_id) if branch_id else (org_id,)):
         t = tpl[r["template_code"]]
         left = (date.fromisoformat(r["expiry"]) - today).days
