@@ -69,6 +69,7 @@ def main() -> None:
         snap = snapshot(a.as_of, Path(tmp) / "build.db")
     (out / "demo-data.json").write_text(json.dumps(snap, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     shutil.copy(ROOT / "static" / "demo-api.js", out / "demo-api.js")
+    shutil.copy(ROOT / "static" / "import-parse.js", out / "import-parse.js")
     html = (ROOT / "static" / "index.html").read_text(encoding="utf-8")
     marker = "<script>\nconst S = "
     assert html.count(marker) == 1, "index.html layout changed: cannot inject demo-api.js"

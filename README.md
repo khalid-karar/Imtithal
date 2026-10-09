@@ -41,6 +41,11 @@ re-validated on every redirect and blocked from private addresses; duplicate sou
 - **Exposure hero, countdown, branch ranking vs the portfolio average, owner PDF report, Excel (CSV) export, VIP status tracker, 60-second guided tour.**
 - **Verification fields** (`verified_by`, `verified_on`) on every obligation: all items stay "under legal review" until a real reviewer signs them off.
 
+**Import formats handled** (`static/import-parse.js`, shared by the browser and `tests/`): title rows above the header, one row per document *or* one column per document
+(the usual Muqeem/Qiwa layout), Hijri and Gregorian dates (`1448/05/12`, `20-Oct-2026`, Arabic-Indic digits, Excel serials), blank branch cells (filled down), ID-number columns
+(so two employees with the same name stay separate), and fuzzy document names — guesses are listed back to the customer. Fixtures live in `tests/fixtures/`;
+the xlsx case needs `npm i xlsx` and is skipped otherwise.
+
 ## Static demo (Netlify)
     python scripts/build_static.py      # writes dist/ (browser-side engine, no server)
     python scripts/parity_check.py      # replays 150+ requests against FastAPI and the JS engine; must report 0 mismatches

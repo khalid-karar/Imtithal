@@ -321,6 +321,12 @@
         for (const n of [t.code, t.title, ...((snapshot.doc_aliases || {})[t.code] || [])]) { const k = normKey(n); if (!out.has(k)) out.set(k, t.code); }
       return out;
     })();
+    const fuzzyCode = key => {
+      let best = null;
+      for (const [k, code] of aliasTable) if (k.length >= 4 && key.includes(k) && (!best || k.length > best[0].length || (k.length === best[0].length && k < best[0]))) best = [k, code];
+      return best ? best[1] : null;
+    };
+    const docTypes = () => ({ doc_types: snapshot.templates.map(t => ({ code: t.code, scope: t.scope, packs: t.packs, names: [t.title, ...((snapshot.doc_aliases || {})[t.code] || [])] })) });
     const nextId = (arr, key) => arr.reduce((m, x) => Math.max(m, x[key]), 0) + 1;
 
     function importOrg(body) {
@@ -330,24 +336,28 @@
       if (!rows.length) throw new HttpError(422, 'لا توجد صفوف للاستيراد');
       if (rows.length > 5000) throw new HttpError(422, 'الحد الأقصى 5000 صف');
       const byCode = Object.fromEntries(snapshot.templates.map(t => [t.code, t]));
-      const skipped = [], branches = new Map(), seen = new Set();
+      const skipped = [], fuzzy = [], branches = new Map(), seen = new Set();
       let nEmp = 0, nDocs = 0, nObl = 0, org = null;
       let eidMax = Math.max(snapshot.max_eid || 0, S.emp_docs.reduce((m, d) => Math.max(m, d.eid), 0));
       for (let idx = 1; idx <= rows.length; idx++) {
         const r = rows[idx - 1] || {}, g = k => String(r[k] ?? '').trim();
-        const branch = g('branch'), city = g('city'), emp = g('employee'), role = g('role'), doc = g('document'), due = g('date');
+        const branch = g('branch'), city = g('city'), emp = g('employee'), role = g('role'), doc = g('document'), due = g('date'), empId = g('emp_id');
         const skip = reason => skipped.push({ row: idx, reason });
         if (!branch) { skip('الفرع مطلوب'); continue; }
-        const code = aliasTable.get(normKey(doc));
+        const dkey = normKey(doc);
+        let code = aliasTable.get(dkey), guessed = false;
+        if (!code) { code = fuzzyCode(dkey); guessed = !!code; }
         if (!code) { skip('نوع الوثيقة غير معروف'); continue; }
         const t = byCode[code];
         if (!t.packs.includes(pack)) { skip('غير منطبقة على هذا القطاع'); continue; }
+        if (!due) { skip('التاريخ فارغ'); continue; }
         if (!validDate(due)) { skip('التاريخ غير صالح (YYYY-MM-DD)'); continue; }
         if (t.scope === 'employee' && !emp) { skip('اسم الموظف مطلوب لهذه الوثيقة'); continue; }
         if (t.scope === 'branch' && emp) { skip('هذا البند يخص الفرع وليس موظفًا'); continue; }
-        const key = JSON.stringify([branch, emp, code]);
+        const key = JSON.stringify([branch, emp, empId, code]);
         if (seen.has(key)) { skip('مكرر'); continue; }
         seen.add(key);
+        if (guessed) fuzzy.push({ row: idx, document: doc, matched: t.title });
         if (!org) { org = { id: nextId(orgs, 'id'), name, pack, city }; S.orgs_x.push(org); rebuild(); }
         let b = branches.get(branch);
         if (!b) {
@@ -359,14 +369,15 @@
           S.instances.push({ id: nextId(S.instances, 'id'), org_id: org.id, branch_id: b.row.id, template_code: code, due_date: due, last_done: null, evidence_note: '' });
           b.codes.add(code); nObl++;
         } else {
-          let e = b.employees.get(emp);                      // the employee keeps the role from the first row that mentions them
-          if (!e) { e = { eid: ++eidMax, role }; b.employees.set(emp, e); nEmp++; }
+          const ek = JSON.stringify([emp, empId]);
+          let e = b.employees.get(ek);                       // the employee keeps the role from the first row that mentions them
+          if (!e) { e = { eid: ++eidMax, role }; b.employees.set(ek, e); nEmp++; }
           S.emp_docs.push({ id: nextId(S.emp_docs, 'id'), org_id: org.id, template_code: code, expiry: due, eid: e.eid, name: emp, role: e.role, branch_id: b.row.id });
           nDocs++;
         }
       }
       const imported = { branches: branches.size, employees: nEmp, employee_docs: nDocs, obligations: nObl };
-      if (!org) return { org_id: null, imported, skipped: skipped.slice(0, 50), skipped_total: skipped.length, missing: [] };
+      if (!org) return { org_id: null, imported, skipped: skipped.slice(0, 50), skipped_total: skipped.length, fuzzy: [], fuzzy_total: 0, missing: [] };
       const missing = [];
       for (const [bname, b] of branches) {
         const heads = b.employees.size; b.row.headcount = heads;
@@ -375,7 +386,7 @@
       }
       log(org.id, 'import', `استيراد بيانات: ${nDocs} وثيقة موظف و${nObl} التزام`);
       save();
-      return { org_id: org.id, imported, skipped: skipped.slice(0, 50), skipped_total: skipped.length, missing };
+      return { org_id: org.id, imported, skipped: skipped.slice(0, 50), skipped_total: skipped.length, fuzzy: fuzzy.slice(0, 20), fuzzy_total: fuzzy.length, missing };
     }
 
     // ---------- router ----------
@@ -394,6 +405,7 @@
           if ((m = /^\/api\/orgs\/(\d+)\/vip$/.exec(path))) return ok(vip(+m[1]));
           if ((m = /^\/api\/orgs\/(\d+)\/audit$/.exec(path))) return ok(audit(+m[1]));
           if ((m = /^\/api\/orgs\/(\d+)\/alerts$/.exec(path))) return ok(alerts(+m[1]));
+          if (path === '/api/import/doc-types') return ok(docTypes());
         } else if (method === 'POST') {
           if ((m = /^\/api\/items\/([^/]+)\/complete$/.exec(path))) return ok(complete(decodeURIComponent(m[1]), b));
           if ((m = /^\/api\/orgs\/(\d+)\/changes\/(\d+)\/acknowledge$/.exec(path))) return ok(acknowledge(+m[1], +m[2]));

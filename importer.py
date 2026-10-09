@@ -37,6 +37,23 @@ def alias_table(templates: list[dict], aliases: dict) -> dict:
     return out
 
 
+def _fuzzy(table: dict, key: str):
+    """Longest known name contained in a messier cell (e.g. "تجديد الإقامة السارية"); short names never match this way."""
+    best = None
+    for k, code in table.items():
+        if len(k) >= 4 and k in key and (best is None or (-len(k), k) < (-len(best[0]), best[0])):
+            best = (k, code)
+    return best[1] if best else None
+
+
+def doc_types(c) -> dict:
+    out = []
+    for r in c.execute("SELECT code,title,scope,packs FROM template ORDER BY code"):
+        out.append(dict(code=r["code"], scope=r["scope"], packs=__import__("json").loads(r["packs"]),
+                        names=[r["title"], *library.DOC_ALIASES.get(r["code"], [])]))
+    return dict(doc_types=out)
+
+
 def _valid_date(s: str) -> bool:
     if not _DATE.match(s):
         return False
@@ -69,7 +86,8 @@ def run(c, payload: dict) -> dict:
     table = alias_table(templates, library.DOC_ALIASES)
 
     skipped: list[dict] = []
-    branches: dict[str, dict] = {}       # name -> {id, employees: {name: eid}, codes: set, city}
+    fuzzy: list[dict] = []
+    branches: dict[str, dict] = {}       # name -> {id, employees: {(name, id): eid}, codes: set, city}
     seen: set = set()
     n_emp = n_docs = n_obl = 0
     org_id = None
@@ -80,24 +98,34 @@ def run(c, payload: dict) -> dict:
     for idx, r in enumerate(rows, start=1):
         g = lambda k: str((r or {}).get(k) or "").strip()
         branch, city, emp, role, doc, due = g("branch"), g("city"), g("employee"), g("role"), g("document"), g("date")
+        emp_id = g("emp_id")
         if not branch:
             skip(idx, "الفرع مطلوب"); continue
-        code = table.get(norm_key(doc))
+        dkey = norm_key(doc)
+        code = table.get(dkey)
+        guessed = False
+        if not code:
+            code = _fuzzy(table, dkey)
+            guessed = bool(code)
         if not code:
             skip(idx, "نوع الوثيقة غير معروف"); continue
         t = by_code[code]
         if pack not in t["packs"]:
             skip(idx, "غير منطبقة على هذا القطاع"); continue
+        if not due:
+            skip(idx, "التاريخ فارغ"); continue
         if not _valid_date(due):
             skip(idx, "التاريخ غير صالح (YYYY-MM-DD)"); continue
         if t["scope"] == "employee" and not emp:
             skip(idx, "اسم الموظف مطلوب لهذه الوثيقة"); continue
         if t["scope"] == "branch" and emp:
             skip(idx, "هذا البند يخص الفرع وليس موظفًا"); continue
-        key = (branch, emp, code)
+        key = (branch, emp, emp_id, code)
         if key in seen:
             skip(idx, "مكرر"); continue
         seen.add(key)
+        if guessed:
+            fuzzy.append(dict(row=idx, document=doc, matched=t["title"]))
 
         if org_id is None:
             org_id = c.execute("INSERT INTO org(name,pack,city) VALUES(?,?,?)", (name, pack, city)).lastrowid
@@ -111,17 +139,17 @@ def run(c, payload: dict) -> dict:
             b["codes"].add(code)
             n_obl += 1
         else:
-            eid = b["employees"].get(emp)
+            eid = b["employees"].get((emp, emp_id))
             if eid is None:
                 eid = c.execute("INSERT INTO employee(org_id,branch_id,name,role,is_saudi) VALUES(?,?,?,?,0)", (org_id, b["id"], emp, role)).lastrowid
-                b["employees"][emp] = eid
+                b["employees"][(emp, emp_id)] = eid
                 n_emp += 1
             c.execute("INSERT INTO emp_doc(org_id,employee_id,template_code,expiry) VALUES(?,?,?,?)", (org_id, eid, code, due))
             n_docs += 1
 
     if org_id is None:
         return dict(org_id=None, imported=dict(branches=0, employees=0, employee_docs=0, obligations=0),
-                    skipped=skipped[:50], skipped_total=len(skipped), missing=[])
+                    skipped=skipped[:50], skipped_total=len(skipped), fuzzy=[], fuzzy_total=0, missing=[])
 
     missing = []
     for bname, b in branches.items():
@@ -132,4 +160,4 @@ def run(c, payload: dict) -> dict:
         if miss:
             missing.append(dict(branch=bname, branch_id=b["id"], count=len(miss), titles=miss[:5]))
     return dict(org_id=org_id, imported=dict(branches=len(branches), employees=n_emp, employee_docs=n_docs, obligations=n_obl),
-                skipped=skipped[:50], skipped_total=len(skipped), missing=missing)
+                skipped=skipped[:50], skipped_total=len(skipped), fuzzy=fuzzy[:20], fuzzy_total=len(fuzzy), missing=missing)

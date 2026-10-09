@@ -222,8 +222,9 @@ td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
   <div class="prog"><i id="tourBar"></i></div></div>
 <div class="report" id="report"></div>
 
+<script src="import-parse.js"></script>
 <script>
-const S = {orgs: [], org: null, asOf: '', view: 'overview', arg: null, filt: {status: '', kind: ''}, emp: {branch: '', code: '', status: ''}, imp: null};
+const S = {orgs: [], org: null, asOf: '', view: 'overview', arg: null, filt: {status: '', kind: ''}, emp: {branch: '', code: '', status: ''}, imp: null, pending: null};
 const NAV = [['overview','نظرة عامة'],['branches','الفروع'],['employees','وثائق الموظفين'],['alerts','التنبيهات'],['changes','التحديثات التنظيمية'],['vip','خدمات VIP'],['import','استيراد بياناتك'],['audit','سجل العمليات']];
 const ST = {overdue: 'متأخر', soon: 'قريب', ok: 'سليم'};
 const BAND = {good: 'جاهزية جيدة', watch: 'يحتاج متابعة', risk: 'مخاطر مرتفعة'};
@@ -483,76 +484,19 @@ async function vVip() {
 }
 
 /* ---------- import ---------- */
-const HDR = {
-  branch: ['فرع', 'الفرع', 'اسم الفرع', 'branch', 'branch name', 'location', 'site'],
-  city: ['مدينة', 'المدينة', 'city'],
-  employee: ['موظف', 'الموظف', 'اسم الموظف', 'الاسم', 'employee', 'employee name', 'name', 'full name'],
-  role: ['وظيفة', 'الوظيفة', 'المهنة', 'المسمى الوظيفي', 'role', 'job title', 'position', 'profession'],
-  document: ['وثيقة', 'الوثيقة', 'نوع الوثيقة', 'البند', 'document', 'document type', 'doc', 'type', 'item'],
-  date: ['تاريخ الانتهاء', 'تاريخ الاستحقاق', 'الانتهاء', 'الاستحقاق', 'expiry', 'expiry date', 'expires', 'due date', 'due', 'date', 'expiration'],
-};
-const nk = x => String(x ?? '').trim().toLowerCase().replace(/\s+/g, ' ').replace(/[ً-ٰٟـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي');
-function parseDelimited(text) {
-  text = text.replace(/^﻿/, '');
-  const first = text.split(/\r?\n/, 1)[0];
-  const delim = [',', ';', '\t'].map(d => [d, first.split(d).length]).sort((a, b) => b[1] - a[1])[0][0];
-  const rows = []; let row = [], cur = '', q = false;
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
-    if (q) { if (ch === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
-    else if (ch === '"') q = true;
-    else if (ch === delim) { row.push(cur); cur = ''; }
-    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cur); cur = ''; if (row.some(x => x.trim() !== '')) rows.push(row); row = []; }
-    else cur += ch;
-  }
-  row.push(cur); if (row.some(x => x.trim() !== '')) rows.push(row);
-  return rows;
-}
-const hijriFmt = (() => { try { return new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {year: 'numeric', month: 'numeric', day: 'numeric', timeZone: 'UTC'}); } catch (e) { return null; } })();
-const hCache = new Map();
-function hijriToIso(y, m, d) {
-  if (!hijriFmt) return '';
-  const key = y + '-' + m + '-' + d; if (hCache.has(key)) return hCache.get(key);
-  const part = t => { const o = {}; hijriFmt.formatToParts(new Date(t)).forEach(p => { if (p.type !== 'literal') o[p.type] = +p.value; }); return o; };
-  let t = Date.UTC(622, 6, 16) + ((y - 1) * 354.36707 + (m - 1) * 29.530589 + (d - 1)) * 86400000, res = '';
-  for (let k = 0; k < 12; k++) {
-    const p = part(t), diff = (y - p.year) * 354.36707 + (m - p.month) * 29.530589 + (d - p.day);
-    if (p.year === y && p.month === m && p.day === d) { res = new Date(t).toISOString().slice(0, 10); break; }
-    t += (Math.abs(diff) < 1 ? Math.sign(diff) : Math.round(diff)) * 86400000;
-  }
-  hCache.set(key, res); return res;
-}
-function toIso(v) {
-  if (v instanceof Date) return isNaN(v) ? '' : v.toISOString().slice(0, 10);
-  if (typeof v === 'number' && v > 20000 && v < 80000) return new Date(Math.round((v - 25569) * 86400000)).toISOString().slice(0, 10);
-  let s = String(v ?? '').trim().replace(/[٠-٩]/g, c => '٠١٢٣٤٥٦٧٨٩'.indexOf(c)).replace(/[۰-۹]/g, c => '۰۱۲۳۴۵۶۷۸۹'.indexOf(c));
-  let m = /^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/.exec(s), y, mo, d;
-  if (m) { y = +m[1]; mo = +m[2]; d = +m[3]; }
-  else if ((m = /^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/.exec(s))) { d = +m[1]; mo = +m[2]; y = +m[3]; }
-  else return s;
-  if (y >= 1300 && y <= 1600) return hijriToIso(y, mo, d) || s;           // Hijri dates (Muqeem/Qiwa exports)
-  const iso = `${String(y).padStart(4, '0')}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-  return isNaN(new Date(iso + 'T00:00:00Z')) || new Date(iso + 'T00:00:00Z').toISOString().slice(0, 10) !== iso ? s : iso;
-}
-function rowsFromTable(table) {
-  if (!table.length) throw new Error('الملف فارغ');
-  const head = table[0].map(nk), idx = {};
-  for (const [f, names] of Object.entries(HDR)) { const j = head.findIndex(h => names.map(nk).includes(h)); if (j >= 0) idx[f] = j; }
-  const need = ['branch', 'document', 'date'].filter(f => idx[f] === undefined);
-  if (need.length) throw new Error('لم نجد الأعمدة: ' + need.map(f => HDR[f][0]).join('، ') + ' — الأعمدة الموجودة: ' + table[0].join(' | '));
-  return table.slice(1).map(r => {
-    const g = f => idx[f] === undefined ? '' : r[idx[f]];
-    return {branch: String(g('branch') ?? '').trim(), city: String(g('city') ?? '').trim(), employee: String(g('employee') ?? '').trim(),
-      role: String(g('role') ?? '').trim(), document: String(g('document') ?? '').trim(), date: toIso(g('date'))};
-  }).filter(r => r.branch || r.document || r.date);
-}
-async function readFile(file) {
+S.form = {name: '', pack: 'hotel', defBranch: ''};
+async function getLookup() { if (!S.lookup) S.lookup = ImtParse.makeLookup(await api('/api/import/doc-types')); return S.lookup; }
+async function readTable(file) {
   if (/\.xlsx?$/i.test(file.name)) {
     if (!window.XLSX) await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = ok; s.onerror = () => no(new Error('تعذر تحميل قارئ Excel — احفظ الملف بصيغة CSV وأعد المحاولة')); document.head.appendChild(s); });
-    const wb = XLSX.read(await file.arrayBuffer(), {type: 'array', cellDates: true});
-    return rowsFromTable(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1, raw: true, defval: ''}));
+    const wb = XLSX.read(await file.arrayBuffer(), {type: 'array', cellDates: false});
+    return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1, raw: true, defval: ''});
   }
-  return rowsFromTable(parseDelimited(await file.text()));
+  return ImtParse.parseDelimited(await file.text());
+}
+async function stage(table, label) {                 // parse, then show a preview; nothing is imported until the user confirms
+  const {rows, info} = ImtParse.tableToRows(table, await getLookup(), {defaultBranch: S.form.defBranch.trim()});
+  S.pending = {rows, info, label}; render(); window.scrollTo(0, 0);
 }
 function sampleRows() {
   const A = S.asOf, R = [];
@@ -577,13 +521,13 @@ function download(name, text, type) {
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 async function runImport(rows) {
-  const name = $('#impName').value.trim(), pack = $('#impPack').value;
+  const name = S.form.name.trim(), pack = S.form.pack;
   if (!name) { toast('اكتب اسم المنشأة أولًا'); return; }
   if (!rows.length) { toast('لا توجد صفوف في الملف'); return; }
   const res = await api('/api/import', {body: {org_name: name, pack, rows}});
-  if (!res.org_id) { S.imp = res; render(); toast('لم يُستورد أي صف — راجع أسباب التخطي'); return; }
+  if (!res.org_id) { S.pending = null; S.imp = res; render(); toast('لم يُستورد أي صف — راجع أسباب التخطي'); return; }
   const o = await api('/api/orgs'); S.orgs = o.orgs; fillOrgs();
-  S.imp = res; S.org = res.org_id; $('#orgSel').value = String(res.org_id); render(); window.scrollTo(0, 0);
+  S.pending = null; S.imp = res; S.org = res.org_id; $('#orgSel').value = String(res.org_id); render(); window.scrollTo(0, 0);
 }
 async function vImport() {
   if (S.imp) {
@@ -595,17 +539,34 @@ async function vImport() {
     <div class="acts"><button class="btn" data-act="after-import">عرض لوحة التحكم ومعرفة التعرض المالي</button><button class="btn alt" data-act="imp-again">استيراد ملف آخر</button></div>
     ${r.missing.length ? `<div class="sec"><div><h2>بنود ننتظر تواريخها منك</h2><div class="sub" style="margin:0">لم نُنشئ لها مواعيد لأننا لا نخمّن التواريخ. أضف تاريخ آخر تجديد لكل بند ليدخل في حساب الجاهزية.</div></div></div>
       <table><thead><tr><th>الفرع</th><th>عدد البنود</th><th>أمثلة</th></tr></thead><tbody>${miss}</tbody></table>` : ''}
+    ${r.fuzzy_total ? `<div class="sec"><div><h2>افترضنا التالي — راجعه</h2><div class="sub" style="margin:0">لم نجد اسمًا مطابقًا تمامًا فاخترنا الأقرب. إن كان أي افتراض خاطئًا فعدّل الاسم في ملفك وأعد الاستيراد.</div></div></div>
+      <table><thead><tr><th>رقم الصف</th><th>كما ورد في ملفك</th><th>اعتبرناه</th></tr></thead><tbody>${r.fuzzy.map(f => `<tr><td>${fmt(f.row)}</td><td>${esc(f.document)}</td><td>${esc(f.matched)}</td></tr>`).join('')}</tbody></table>` : ''}
     ${r.skipped_total ? `<div class="sec"><div><h2>صفوف لم تُستورد (${fmt(r.skipped_total)})</h2></div></div><table><thead><tr><th>رقم الصف</th><th>السبب</th></tr></thead><tbody>${skip}</tbody></table>${r.skipped_total > r.skipped.length ? '<div class="sub">يظهر أول 50 فقط.</div>' : ''}` : ''}`;
   }
+  const f = S.form, pd = S.pending;
+  const preview = pd ? (() => {
+    const i = pd.info, cols = Object.entries(i.mapped).map(([k, h]) => `<span class="flag">${esc(({branch: 'الفرع', city: 'المدينة', employee: 'الموظف', role: 'الوظيفة', emp_id: 'رقم الهوية/الإقامة', document: 'الوثيقة', date: 'التاريخ'})[k] || k)} ← ${esc(h)}</span>`).join('');
+    const docs = i.doc_columns.map(c => `<span class="flag ok">${esc(c.header)} ← ${esc(c.title)}</span>`).join('');
+    const sample = i.sample.map(r => `<tr><td>${esc(r.branch || f.defBranch || '—')}</td><td>${esc(r.employee || '—')}</td><td>${esc(r.document)}</td><td>${ltr(r.date)}</td></tr>`).join('');
+    return `<div class="wiz" style="border-color:var(--brass);margin-bottom:18px"><h3 style="margin:0">راجع ما فهمناه قبل الاستيراد</h3>
+      <div class="item-s">${pd.label ? esc(pd.label) + ' — ' : ''}${i.format === 'wide' ? 'ملف بعمود لكل وثيقة' : 'ملف بصف لكل وثيقة'} · الصف ${fmt(i.header_row)} هو صف العناوين · ${fmt(i.rows)} قيمة وثيقة</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${cols}${docs}</div>
+      ${i.ignored.length ? `<div class="item-s">أعمدة تجاهلناها: ${esc(i.ignored.join('، '))}</div>` : ''}
+      <table><thead><tr><th>الفرع</th><th>الموظف</th><th>الوثيقة</th><th>التاريخ</th></tr></thead><tbody>${sample}</tbody></table>
+      <div class="note" style="margin:0">التواريخ بصيغة يوم/شهر/سنة، والتواريخ الهجرية (سنة 14xx) تُحوَّل إلى الميلادية تلقائيًا. ما لم نستطع قراءته سيظهر لك بعد الاستيراد مع السبب.</div>
+      <div class="acts" style="margin:0"><button class="btn" data-act="imp-go">استورد ${fmt(i.rows)} قيمة</button><button class="btn alt" data-act="imp-cancel">إلغاء</button></div></div>`;
+  })() : '';
   return `<div class="sec" style="margin-top:0"><div><h2>استورد بيانات منشأتك — اعرف تعرّضك في دقيقة</h2>
-    <div class="sub" style="margin:0">ارفع ملف الموظفين والتراخيص الذي تستخرجه أصلًا (CSV أو Excel). نتعرف على أسماء الوثائق بالعربية والإنجليزية ونحوّل التواريخ الهجرية تلقائيًا.</div></div></div>
+    <div class="sub" style="margin:0">ارفع ملف الموظفين والتراخيص الذي تستخرجه أصلًا (CSV أو Excel) — بصف لكل وثيقة أو بعمود لكل وثيقة. نتعرف على الأسماء بالعربية والإنجليزية ونحوّل التواريخ الهجرية تلقائيًا.</div></div></div>
+  ${preview}
   <div class="wiz" id="imp-form">
-    <div class="two"><div><label>اسم المنشأة</label><input type="text" id="impName" placeholder="مثال: مجموعة النخيل للفنادق" maxlength="80"></div>
-      <div><label>القطاع</label><select id="impPack">${Object.entries(PACKS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></div></div>
-    <div class="drop" id="drop"><b>اسحب الملف هنا أو اضغط للاختيار</b><div class="item-s">الأعمدة: الفرع، الموظف، الوظيفة، الوثيقة، تاريخ الانتهاء — الصف بلا اسم موظف يُعامل كترخيص للفرع</div>
+    <div class="two"><div><label>اسم المنشأة</label><input type="text" id="impName" value="${esc(f.name)}" placeholder="مثال: مجموعة النخيل للفنادق" maxlength="80"></div>
+      <div><label>القطاع</label><select id="impPack">${Object.entries(PACKS).map(([k, v]) => `<option value="${k}" ${f.pack === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>
+    <div><label>اسم الفرع الافتراضي (إن لم يكن في الملف عمود للفرع)</label><input type="text" id="impBranch" value="${esc(f.defBranch)}" placeholder="مثال: الفرع الرئيسي"></div>
+    <div class="drop" id="drop"><b>اسحب الملف هنا أو اضغط للاختيار</b><div class="item-s">CSV أو Excel — الصف الذي بلا اسم موظف يُعامل كترخيص للفرع</div>
       <input type="file" id="impFile" accept=".csv,.xlsx,.xls,.txt" style="display:none"></div>
-    <div><label>أو الصق المحتوى هنا</label><textarea id="impText" placeholder="الفرع,الموظف,الوظيفة,الوثيقة,تاريخ الانتهاء"></textarea></div>
-    <div class="acts" style="margin:0"><button class="btn" data-act="imp-paste">استورد المحتوى الملصوق</button>
+    <div><label>أو الصق المحتوى هنا</label><textarea id="impText" placeholder="Branch,Employee,Document,Expiry"></textarea></div>
+    <div class="acts" style="margin:0"><button class="btn" data-act="imp-paste">راجع المحتوى الملصوق</button>
       <button class="btn alt" data-act="imp-sample">جرّب بملف نموذجي (3 فروع)</button>
       <button class="btn alt" data-act="imp-template">حمّل قالب الملف</button></div>
     <div class="note" style="margin:0">لا نخمّن أي تاريخ: ما لم يرد في ملفك يظهر لك كبند ننتظر تاريخه. في النسخة التجريبية المنشورة تُحفظ بياناتك في متصفحك فقط ولا تُرسل إلى أي خادم.</div>
@@ -676,7 +637,7 @@ function wireDrop() {
   d.onclick = () => f.click();
   d.ondragover = e => { e.preventDefault(); d.classList.add('on'); };
   d.ondragleave = () => d.classList.remove('on');
-  d.ondrop = async e => { e.preventDefault(); d.classList.remove('on'); if (e.dataTransfer.files[0]) { try { await runImport(await readFile(e.dataTransfer.files[0])); } catch (x) { toast(x.message); } } };
+  d.ondrop = async e => { e.preventDefault(); d.classList.remove('on'); const fl = e.dataTransfer.files[0]; if (fl) { try { await stage(await readTable(fl), fl.name); } catch (x) { toast(x.message); } } };
 }
 async function render() {
   $('#nav').innerHTML = NAV.map(([k, l]) => `<button class="${S.view === k ? 'on' : ''}" data-act="nav" data-v="${k}">${l}</button>`).join('');
@@ -724,17 +685,21 @@ document.addEventListener('click', async ev => {
       if (id.startsWith('g-')) { const m = /^g-(\d+)-(.+)-(overdue|soon)$/.exec(id); S.emp = {branch: m[1], code: m[2], status: m[3]}; go('employees'); }
       else { const it = (await api(`/api/orgs/${S.org}/overview`)).urgent.find(x => x.id === id); await go('branches', it ? it.branch_id : null); const n = document.getElementById('it-' + id); if (n) { n.classList.add('open'); n.scrollIntoView({block: 'center'}); } }
     }
-    else if (a === 'imp-sample') { $('#impName').value = $('#impName').value.trim() || 'منشأة نموذجية'; await runImport(sampleRows()); }
-    else if (a === 'imp-paste') { const t = $('#impText').value.trim(); if (!t) { toast('الصق محتوى الملف أولًا'); return; } await runImport(rowsFromTable(parseDelimited(t))); }
+    else if (a === 'imp-sample') { S.form.name = S.form.name.trim() || 'منشأة نموذجية'; await runImport(sampleRows()); }
+    else if (a === 'imp-paste') { const t = $('#impText').value.trim(); if (!t) { toast('الصق محتوى الملف أولًا'); return; } await stage(ImtParse.parseDelimited(t), 'محتوى ملصوق'); }
+    else if (a === 'imp-go') await runImport(S.pending.rows);
+    else if (a === 'imp-cancel') { S.pending = null; render(); }
     else if (a === 'imp-template') download('قالب-امتثال.csv', TEMPLATE_CSV);
-    else if (a === 'imp-again') { S.imp = null; render(); }
+    else if (a === 'imp-again') { S.imp = null; S.pending = null; render(); }
     else if (a === 'after-import') { S.imp = null; go('overview'); }
     else if (a === 'adv') { await api(`/api/vip/requests/${el.dataset.id}/advance`, {body: {}}); render(); }
   } catch (e) { toast(e.message); }
 });
+document.addEventListener('input', ev => { const t = ev.target; if (t.id === 'impName') S.form.name = t.value; else if (t.id === 'impBranch') S.form.defBranch = t.value; });
 document.addEventListener('change', async ev => {
   const t = ev.target;
-  if (t.id === 'impFile' && t.files[0]) { try { await runImport(await readFile(t.files[0])); } catch (e) { toast(e.message); } return; }
+  if (t.id === 'impFile' && t.files[0]) { try { await stage(await readTable(t.files[0]), t.files[0].name); } catch (e) { toast(e.message); } return; }
+  if (t.id === 'impPack') S.form.pack = t.value;
   if (t.id === 'brSel') { S.arg = +t.value; render(); }
   else if (t.id === 'eBr') { S.emp.branch = t.value; render(); }
   else if (t.id === 'eCode') { S.emp.code = t.value; render(); }

@@ -273,12 +273,26 @@ class ImportRow(BaseModel):
     role: str = ""
     document: str = ""
     date: str = ""
+    emp_id: str = ""
 
 
 class ImportReq(BaseModel):
     org_name: str = ""
     pack: str = ""
     rows: list[ImportRow] = []
+
+
+@app.get("/api/import/doc-types")
+def import_doc_types():
+    c = db.conn()
+    out = importer.doc_types(c)
+    c.close()
+    return out
+
+
+@app.get("/import-parse.js")
+def import_parse_js():
+    return FileResponse(STATIC / "import-parse.js", media_type="application/javascript")
 
 
 @app.post("/api/import")

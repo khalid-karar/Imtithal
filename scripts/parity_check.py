@@ -29,7 +29,7 @@ def main():
     client = TestClient(app_main.app)
 
     orgs = [o["id"] for o in snap["orgs"]]
-    reqs = [("GET", "/api/health", None), ("GET", "/api/orgs", None)]
+    reqs = [("GET", "/api/health", None), ("GET", "/api/orgs", None), ("GET", "/api/import/doc-types", None)]
     for o in orgs:
         reqs += [("GET", f"/api/orgs/{o}/{p}", None) for p in ("overview", "changes", "vip", "audit", "employee-docs")]
         for q in ("status=overdue", "status=due_soon", "code=iqama", "status=overdue&code=iqama"):
@@ -80,6 +80,11 @@ def main():
         dict(branch="فرع جدة", document="Iqama", date="2026-10-20"),
         dict(branch="فرع جدة", employee="y", document="سباهي", date="2026-10-20"),
         dict(branch="فرع جدة", employee="y", document="شهادة السلامة", date="2026-10-20"),
+        dict(branch="فرع جدة", employee="ravi", emp_id="1", role="فني", document="تجديد الإقامة السارية", date="2026-11-20"),   # fuzzy
+        dict(branch="فرع جدة", employee="ravi", emp_id="2", role="فني", document="Iqama", date="2026-11-21"),     # same name, other id
+        dict(branch="فرع جدة", employee="ravi", emp_id="2", role="فني", document="iqama", date="2026-11-22"),     # duplicate of the above
+        dict(branch="فرع جدة", employee="ravi", emp_id="2", document="Work Permit (Qiwa)", date=""),               # empty date
+        dict(branch="فرع جدة", document="شهادة السلامة والصحة المهنية", date="2026-12-01"),                         # longest-name fuzzy
     ]
     nb = max(b["id"] for b in snap["branches"])
     reqs += [("POST", "/api/import", dict(org_name="منشأة تجريبية", pack="hotel", rows=rows))]
