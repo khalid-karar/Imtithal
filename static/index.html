@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>امتثال — منصة الامتثال التنظيمي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16233F; --ink-2:#2B3B5C; --paper:#FAF8F3; --sand:#EFE9DC; --line:#D8D0BE;
+  --brass:#AD8A3B; --brass-l:#D9C486; --slate:#5B6478;
+  --ok:#2F6F52; --ok-bg:#E4EEE7; --warn:#B26B12; --warn-bg:#F6E9D4; --bad:#AE3B3B; --bad-bg:#F5E1DF;
+  --display:'Noto Kufi Arabic',system-ui,sans-serif; --sans:'IBM Plex Sans Arabic',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sans);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6}
+button,select,input,textarea{font-family:inherit;font-size:14px;color:inherit}
+a{color:var(--ink-2)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.banner{background:var(--ink);color:var(--brass-l);font-size:12.5px;text-align:center;padding:7px 12px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:28px;height:28px;border:1.5px solid var(--ink);border-radius:50%;position:relative}
+.mark::after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--brass)}
+.brand b{font-family:var(--display);font-size:20px}
+.top-r{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--slate)}
+select{background:#fff;border:1px solid var(--line);border-radius:4px;padding:7px 10px}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:28px;overflow-x:auto}
+nav button{background:none;border:none;border-bottom:2px solid transparent;padding:11px 14px;cursor:pointer;color:var(--slate);font-weight:500;white-space:nowrap}
+nav button.on{color:var(--ink);border-bottom-color:var(--brass);font-weight:600}
+h2{font-family:var(--display);font-size:21px;margin:0 0 4px}
+.sub{color:var(--slate);font-size:13.5px;margin-bottom:16px}
+.sec{margin:42px 0 14px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;padding-bottom:34px;border-bottom:1px solid var(--line)}
+.score-n{font-family:var(--display);font-size:84px;line-height:.95;font-weight:700}
+.score-of{color:var(--slate);font-size:19px;margin-inline-start:10px}
+.tag{display:inline-block;padding:4px 11px;border-radius:3px;font-size:13px;font-weight:600;margin-top:14px}
+.tag.good{background:var(--ok-bg);color:var(--ok)} .tag.watch{background:var(--warn-bg);color:var(--warn)} .tag.risk{background:var(--bad-bg);color:var(--bad)}
+.panel{background:var(--ink);color:var(--paper);border-radius:4px;padding:22px 26px}
+.panel .row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.14)}
+.panel .row:last-child{border:none}
+.panel .k{font-size:13.5px;color:#CBD3E3}
+.panel .v{font-family:var(--display);font-size:21px;font-weight:600;white-space:nowrap}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:4px;padding:18px 20px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--brass)}
+.card h3{margin:0;font-size:16px;font-weight:600}
+.card .meta{color:var(--slate);font-size:12.5px;margin-top:2px}
+.bar{height:6px;background:var(--sand);border-radius:3px;margin:12px 0 8px;overflow:hidden}
+.bar i{display:block;height:100%}
+.bar i.good{background:var(--ok)} .bar i.watch{background:var(--warn)} .bar i.risk{background:var(--bad)}
+.cnt{display:flex;gap:14px;font-size:12.5px;color:var(--slate);flex-wrap:wrap}
+.issues{margin:10px 0 0;padding:0;list-style:none;font-size:13px}
+.issues li{padding:3px 0;display:flex;gap:8px;align-items:baseline}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.dot.overdue{background:var(--bad)} .dot.soon{background:var(--warn)} .dot.ok{background:var(--ok)}
+.list{border-top:1px solid var(--line)}
+.item{border-bottom:1px solid var(--line)}
+.item-h{display:grid;grid-template-columns:14px 1fr auto auto;gap:14px;align-items:center;padding:14px 4px;cursor:pointer}
+.item-h:hover{background:var(--sand)}
+.item-t{font-weight:600;font-size:14.5px}
+.item-s{font-size:12.5px;color:var(--slate);margin-top:1px}
+.pill{font-size:12px;font-weight:600;padding:3px 9px;border-radius:3px;white-space:nowrap}
+.pill.overdue{background:var(--bad-bg);color:var(--bad)} .pill.soon{background:var(--warn-bg);color:var(--warn)} .pill.ok{background:var(--ok-bg);color:var(--ok)}
+.when{font-size:13px;color:var(--ink-2);white-space:nowrap;min-width:110px;text-align:end}
+.det{display:none;background:var(--sand);padding:16px 22px 20px 22px;font-size:13.5px}
+.item.open .det{display:block}
+.det h4{margin:0 0 6px;font-size:13px;color:var(--slate);font-weight:600}
+.det ol{margin:0 0 12px;padding-inline-start:20px}
+.det ol li{margin:3px 0}
+.det .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.btn{background:var(--ink);color:var(--paper);border:none;border-radius:4px;padding:8px 14px;cursor:pointer;font-weight:600}
+.btn.alt{background:#fff;color:var(--ink);border:1px solid var(--ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.acts input[type=text],.acts input[type=date]{border:1px solid var(--line);border-radius:4px;padding:7px 10px;background:#fff}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 14px;cursor:pointer;font-size:13px}
+.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.flag{font-size:11.5px;padding:2px 7px;border-radius:2px;background:var(--sand);color:var(--slate);margin-inline-start:6px;white-space:nowrap}
+.flag.rev{background:var(--warn-bg);color:var(--warn)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:start;font-weight:600;color:var(--slate);font-size:12.5px;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chg{background:#fff;border:1px solid var(--line);border-radius:4px;padding:18px 22px;margin-bottom:14px}
+.chg h3{margin:0 0 4px;font-size:16px}
+.vipc{background:#fff;border:1px solid var(--line);border-radius:4px;padding:18px 20px}
+.vipc .price{font-family:var(--display);font-size:22px;color:var(--brass);font-weight:700}
+.empty{color:var(--slate);padding:26px 0;text-align:center}
+.toast{position:fixed;bottom:22px;inset-inline-start:22px;background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:4px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+.foot{margin:56px 0 40px;border-top:1px solid var(--line);padding-top:16px;font-size:12.5px;color:var(--slate);line-height:1.9}
+@media (max-width:760px){
+  .hero,.two,.det .grid{grid-template-columns:1fr}
+  .score-n{font-size:62px}
+  .item-h{grid-template-columns:12px 1fr auto}
+  .when{display:none}
+  table{display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+<div class="banner">نسخة تجريبية — بيانات توضيحية، والمكتبة التنظيمية قيد المراجعة القانونية، والمبالغ تقديرية</div>
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><div class="mark"></div><b>امتثال</b></div>
+    <div class="top-r"><span id="asof"></span><select id="orgSel" aria-label="المنشأة"></select></div>
+  </div>
+  <nav id="nav"></nav>
+  <main id="main"><div class="empty">جارٍ التحميل…</div></main>
+  <div class="foot">
+    الجداول والتواريخ تُدخل يدويًا أو تُستورد من ملفات الجهات الحكومية؛ لا يوجد ربط مباشر مع المنصات الحكومية في هذه النسخة.
+    المبالغ المعروضة تقديرات توضيحية للتعرض المالي وليست غرامات رسمية، والبنود المعلّمة "قيد المراجعة" لم يعتمدها مراجع قانوني بعد.
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const S = {orgs: [], org: null, asOf: '', view: 'overview', arg: null, filt: {status: '', kind: ''}, emp: {branch: '', code: '', status: ''}};
+const NAV = [['overview','نظرة عامة'],['branches','الفروع'],['employees','وثائق الموظفين'],['changes','التحديثات التنظيمية'],['vip','خدمات VIP'],['audit','سجل العمليات']];
+const ST = {overdue: 'متأخر', soon: 'قريب', ok: 'سليم'};
+const BAND = {good: 'جاهزية جيدة', watch: 'يحتاج متابعة', risk: 'مخاطر مرتفعة'};
+const SRC = {'رسمي': 'مصدر رسمي', 'ثانوي': 'مصدر ثانوي', 'مثال': 'مثال توضيحي'};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => Number(n).toLocaleString('en-US');
+const sar = n => fmt(n) + ' ريال';
+const ltr = t => `<bdi dir="ltr">${esc(t)}</bdi>`;
+
+async function api(path, opts) {
+  const r = await fetch(path, opts && opts.body ? {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(opts.body)} : opts);
+  if (!r.ok) { let m = 'تعذر تنفيذ الطلب'; try { m = (await r.json()).detail || m; } catch (e) {} throw new Error(m); }
+  return r.json();
+}
+function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 2600); }
+function when(i) {
+  if (i.days_left < 0) return `متأخر ${fmt(-i.days_left)} يومًا`;
+  if (i.days_left === 0) return 'اليوم';
+  return `خلال ${fmt(i.days_left)} يومًا`;
+}
+function title(i) {
+  if (i.kind === 'group') return `${fmt(i.count)} × ${i.title}`;
+  if (i.kind === 'employee_doc') return `${i.title} — ${i.employee.name}`;
+  return i.title;
+}
+function sub(i) {
+  const parts = [i.branch_name, i.authority];
+  if (i.kind === 'employee_doc') parts.splice(1, 0, i.employee.role);
+  return parts.join(' · ');
+}
+
+/* ---------- item row (shared) ---------- */
+function itemRow(i) {
+  const steps = i.fix_steps.map(s => `<li>${esc(s)}</li>`).join('');
+  const verif = i.verified ? '' : '<span class="flag rev">قيد المراجعة القانونية</span>';
+  const src = i.source_url ? `<a href="${esc(i.source_url)}" target="_blank" rel="noopener">المصدر</a>` : '';
+  let actions = '';
+  if (i.kind === 'group') {
+    actions = `<button class="btn alt" data-act="emp" data-branch="${i.branch_id}" data-code="${esc(i.code)}" data-status="${i.status}">عرض الموظفين</button>`;
+  } else if (i.kind === 'obligation') {
+    actions = `<input type="text" placeholder="ملاحظة / رقم الإيصال" data-note="${i.id}" size="22">
+      <button class="btn" data-act="done" data-id="${i.id}">تم التنفيذ</button>`;
+  } else {
+    actions = `<input type="date" data-exp="${i.id}" title="تاريخ الانتهاء الجديد (اختياري)">
+      <button class="btn" data-act="done" data-id="${i.id}">تم التجديد</button>`;
+  }
+  const vip = `<button class="btn alt" data-act="vip" data-code="${esc(i.vip_code || '')}" data-branch="${i.branch_id}" data-ref="${esc(title(i))}" ${i.vip_code ? '' : 'disabled'}>${i.vip_name ? 'اطلب VIP: ' + esc(i.vip_name) : 'لا توجد خدمة VIP لهذا البند'}</button>`;
+  return `<div class="item" id="it-${esc(i.id)}">
+    <div class="item-h" data-act="toggle">
+      <span class="dot ${i.status}"></span>
+      <div><div class="item-t">${esc(title(i))}${verif}</div><div class="item-s">${esc(sub(i))}</div></div>
+      <span class="when">${when(i)}</span><span class="pill ${i.status}">${ST[i.status]}</span>
+    </div>
+    <div class="det">
+      <div class="grid">
+        <div><h4>كيف أعالج هذا البند</h4><ol>${steps}</ol></div>
+        <div>
+          <h4>الدليل المطلوب</h4><p style="margin:0 0 10px">${esc(i.evidence)}</p>
+          <h4>التعرض المالي (تقدير تجريبي)</h4><p style="margin:0 0 6px">${sar(i.penalty_sar)}${i.kind === 'group' ? ' (للمجموعة)' : ''}</p>
+          ${i.penalty_note ? `<p style="margin:0 0 8px;color:var(--slate)">${esc(i.penalty_note)}</p>` : ''}
+          ${src}
+        </div>
+      </div>
+      <div class="acts">${actions}${vip}</div>
+    </div>
+  </div>`;
+}
+function itemList(items, empty) {
+  return items.length ? `<div class="list">${items.map(itemRow).join('')}</div>` : `<div class="empty">${empty}</div>`;
+}
+
+/* ---------- views ---------- */
+async function vOverview() {
+  const d = await api(`/api/orgs/${S.org}/overview`);
+  const c = d.counts;
+  const cards = d.branches.map(b => `
+    <div class="card" data-act="branch" data-id="${b.id}">
+      <h3>${esc(b.name)}</h3><div class="meta">${esc(b.city)} · ${fmt(b.headcount)} موظفًا</div>
+      <div class="bar"><i class="${b.band}" style="width:${b.score}%"></i></div>
+      <div class="cnt"><b>${ltr(b.score + ' / 100')}</b><span>${fmt(b.counts.overdue)} متأخر</span><span>${fmt(b.counts.soon)} قريب</span></div>
+      <ul class="issues">${b.top_issues.map(t => `<li><span class="dot ${t.status}"></span><span>${esc(t.title)}</span></li>`).join('') || '<li>لا توجد بنود عاجلة</li>'}</ul>
+    </div>`).join('');
+  const ledger = d.by_authority.map(a => `<tr><td>${esc(a.authority)}</td><td>${a.overdue || '—'}</td><td>${a.soon || '—'}</td><td>${a.ok}</td></tr>`).join('');
+  return `
+  <section class="hero">
+    <div>
+      <div class="sub" style="margin:0 0 6px">مؤشر الجاهزية — ${esc(d.org.name)}</div>
+      <div><span class="score-n">${d.score}</span><span class="score-of">/ 100</span></div>
+      <span class="tag ${d.band}">${BAND[d.band]}</span>
+      <p class="sub" style="margin-top:16px;max-width:52ch">${fmt(c.overdue)} بندًا متأخرًا و${fmt(c.soon)} بندًا يقترب موعده، من أصل ${fmt(c.total)} بندًا عبر ${d.branches.length} فروع.
+      المؤشر يزن البنود بحسب خطورتها: المتأخر يخصم كاملًا، والقريب يخصم جزئيًا.</p>
+    </div>
+    <div class="panel">
+      <div class="row"><span class="k">التعرض المالي للبنود المتأخرة</span><span class="v">${sar(d.money_at_risk)}</span></div>
+      <div class="row"><span class="k">تعرض محتمل خلال 30 يومًا</span><span class="v">${sar(d.exposure_30)}</span></div>
+      <div class="row"><span class="k">بنود متأخرة</span><span class="v">${fmt(c.overdue)}</span></div>
+      <div class="row"><span class="k">بنود تقترب</span><span class="v">${fmt(c.soon)}</span></div>
+    </div>
+  </section>
+  <div class="sec"><div><h2>الفروع</h2><div class="sub" style="margin:0">اضغط على فرع لعرض كل بنوده وكيفية معالجتها</div></div></div>
+  <div class="cards">${cards}</div>
+  <div class="sec"><div><h2>يحتاج إجراءً الآن</h2><div class="sub" style="margin:0">مرتبة بحسب الخطورة ثم الاستعجال — اضغط على أي بند لمعرفة طريقة المعالجة</div></div></div>
+  ${itemList(d.urgent, 'لا توجد بنود عاجلة')}
+  <div class="sec"><div><h2>حسب الجهة التنظيمية</h2></div></div>
+  <table><thead><tr><th>الجهة</th><th>متأخر</th><th>قريب</th><th>سليم</th></tr></thead><tbody>${ledger}</tbody></table>`;
+}
+
+async function vBranches() {
+  const d = await api(`/api/orgs/${S.org}/overview`);
+  if (!S.arg) S.arg = d.branches[0].id;
+  const sel = d.branches.map(b => `<option value="${b.id}" ${b.id == S.arg ? 'selected' : ''}>${esc(b.name)}</option>`).join('');
+  const q = new URLSearchParams(); if (S.filt.status) q.set('status', S.filt.status); if (S.filt.kind) q.set('kind', S.filt.kind);
+  const b = await api(`/api/branches/${S.arg}/items?${q}`);
+  const chip = (g, v, l) => `<button class="chip ${S.filt[g] === v ? 'on' : ''}" data-act="filt" data-g="${g}" data-v="${v}">${l}</button>`;
+  return `
+  <div class="sec" style="margin-top:0"><div><h2>${esc(b.branch.name)}</h2>
+    <div class="sub" style="margin:0">${esc(b.branch.city)} · الجاهزية <b>${ltr(b.score + ' / 100')}</b> — ${BAND[b.band]}</div></div>
+    <select id="brSel">${sel}</select></div>
+  <div class="chips">${chip('status','','كل الحالات')}${chip('status','overdue','متأخر')}${chip('status','soon','قريب')}${chip('status','ok','سليم')}
+    <span style="width:14px"></span>${chip('kind','','الكل')}${chip('kind','obligation','التزامات وتراخيص')}${chip('kind','employee_doc','وثائق موظفين')}</div>
+  ${itemList(b.items.slice(0, 120), 'لا توجد بنود مطابقة')}
+  ${b.items.length > 120 ? `<div class="sub" style="margin-top:12px">يظهر أول 120 بندًا من ${fmt(b.items.length)} — استخدم المرشحات للتضييق.</div>` : ''}`;
+}
+
+async function vEmployees() {
+  const ov = await api(`/api/orgs/${S.org}/overview`);
+  const q = new URLSearchParams(); if (S.emp.branch) q.set('branch_id', S.emp.branch); if (S.emp.code) q.set('code', S.emp.code); if (S.emp.status) q.set('status', S.emp.status);
+  const d = await api(`/api/orgs/${S.org}/employee-docs?${q}`);
+  const codes = {};
+  (await api(`/api/orgs/${S.org}/employee-docs`)).items.forEach(i => codes[i.code] = i.title);
+  const opt = (v, cur, l) => `<option value="${esc(v)}" ${String(v) === String(cur) ? 'selected' : ''}>${esc(l)}</option>`;
+  const rows = d.items.map(i => `<tr>
+    <td><b>${esc(i.employee.name)}</b><div class="item-s">${esc(i.employee.role)}</div></td>
+    <td>${esc(i.title)}</td><td>${esc(i.branch_name)}</td><td>${ltr(i.due_date)}</td><td>${when(i)}</td>
+    <td><span class="pill ${i.status}">${ST[i.status]}</span></td>
+    <td><input type="date" data-exp="${i.id}" style="width:140px;border:1px solid var(--line);border-radius:4px;padding:5px 7px">
+      <button class="btn alt" data-act="done" data-id="${i.id}">تم التجديد</button></td></tr>`).join('');
+  return `
+  <div class="sec" style="margin-top:0"><div><h2>وثائق الموظفين</h2><div class="sub" style="margin:0">${fmt(d.total)} وثيقة مطابقة — إقامات، رخص عمل، تأمين، شهادات صحية، عقود</div></div></div>
+  <div class="chips">
+    <select id="eBr"><option value="">كل الفروع</option>${ov.branches.map(b => opt(b.id, S.emp.branch, b.name)).join('')}</select>
+    <select id="eCode"><option value="">كل أنواع الوثائق</option>${Object.entries(codes).map(([k, v]) => opt(k, S.emp.code, v)).join('')}</select>
+    <select id="eSt">${opt('', S.emp.status, 'كل الحالات')}${opt('overdue', S.emp.status, 'متأخر')}${opt('soon', S.emp.status, 'قريب')}${opt('ok', S.emp.status, 'سليم')}</select>
+  </div>
+  ${rows ? `<table><thead><tr><th>الموظف</th><th>الوثيقة</th><th>الفرع</th><th>تاريخ الانتهاء</th><th>المتبقي</th><th>الحالة</th><th>تجديد</th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="empty">لا توجد وثائق مطابقة</div>'}
+  ${d.total > 300 ? '<div class="sub" style="margin-top:12px">يظهر أول 300 وثيقة — استخدم المرشحات.</div>' : ''}`;
+}
+
+async function vChanges() {
+  const d = await api(`/api/orgs/${S.org}/changes`);
+  const cards = d.changes.map(c => {
+    const eff = c.days_to_effective > 0 ? `يسري بعد ${fmt(c.days_to_effective)} يومًا (${ltr(c.effective)})` : `ساري منذ ${ltr(c.effective)}`;
+    const imp = c.impact.map(b => `<tr><td>${esc(b.branch_name)}</td><td>${fmt(b.items)}</td><td>${b.attention ? `<span class="pill soon">${fmt(b.attention)} يحتاج متابعة</span>` : '<span class="pill ok">سليم</span>'}</td></tr>`).join('');
+    return `<div class="chg">
+      <h3>${esc(c.title)}<span class="flag">${SRC[c.source_quality] || ''}</span>${c.is_demo ? '' : '<span class="flag rev">قيد المراجعة</span>'}</h3>
+      <div class="item-s">${esc(c.authority)} · ${eff}</div>
+      <p style="margin:12px 0 6px">${esc(c.summary)}</p>
+      <p style="margin:0 0 12px"><b>المطلوب:</b> ${esc(c.action_required)}</p>
+      <table><thead><tr><th>الفرع المتأثر</th><th>البنود المرتبطة</th><th>الوضع</th></tr></thead><tbody>${imp}</tbody></table>
+      <div class="acts">${c.acknowledged_at ? '<span class="pill ok">تم الاطلاع</span>' : `<button class="btn" data-act="ack" data-id="${c.id}">تم الاطلاع وبدء المعالجة</button>`}
+        ${c.source_url ? `<a href="${esc(c.source_url)}" target="_blank" rel="noopener">المصدر</a>` : ''}</div>
+    </div>`;
+  }).join('');
+  return `<div class="sec" style="margin-top:0"><div><h2>التحديثات التنظيمية</h2>
+    <div class="sub" style="margin:0">التغييرات التي تمس فروعك فقط، مع الفروع المتأثرة والبنود المرتبطة. في هذه النسخة يدخلها محلل بشري وتُراجع قبل ظهورها للعميل.</div></div></div>
+    ${cards || '<div class="empty">لا توجد تحديثات تمس منشأتك</div>'}`;
+}
+
+async function vVip() {
+  const d = await api(`/api/orgs/${S.org}/vip`);
+  const cat = d.catalog.map(v => `<div class="vipc"><h3 style="margin:0 0 4px;font-size:15.5px">${esc(v.name)}</h3>
+    <div class="item-s" style="margin-bottom:10px">${esc(v.description)}</div>
+    <div class="price">${fmt(v.price_from)} ريال <span style="font-size:12.5px;color:var(--slate);font-family:var(--sans);font-weight:400">ابتداءً — ${esc(v.price_unit)}</span></div>
+    <div class="item-s">مدة التنفيذ المستهدفة: ${v.sla_days} أيام عمل</div>
+    <div class="acts"><button class="btn" data-act="vip" data-code="${esc(v.code)}" data-branch="" data-ref="">اطلب الخدمة</button></div></div>`).join('');
+  const SN = {new: 'جديد', in_progress: 'قيد التنفيذ', done: 'مكتمل'};
+  const rows = d.requests.map(r => `<tr><td>#${r.id}</td><td>${esc(r.service_name)}</td><td>${esc(r.branch_name || '—')}</td><td>${esc(r.item_ref || '—')}</td>
+    <td><span class="pill ${r.status === 'done' ? 'ok' : r.status === 'new' ? 'soon' : 'ok'}">${SN[r.status]}</span></td>
+    <td>${r.status === 'done' ? '' : `<button class="btn alt" data-act="adv" data-id="${r.id}">تقدّم (محاكاة فريق العمليات)</button>`}</td></tr>`).join('');
+  return `<div class="sec" style="margin-top:0"><div><h2>خدمات VIP — نعالجها عنك</h2>
+    <div class="sub" style="margin:0">كتالوج بأسعار ثابتة تُطلب مباشرة من البند المتأخر. الأسعار تجريبية، والرسوم الحكومية تُحتسب بالتكلفة.</div></div></div>
+    <div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">${cat}</div>
+    <div class="sec"><div><h2>طلباتك</h2></div></div>
+    ${rows ? `<table><thead><tr><th>الرقم</th><th>الخدمة</th><th>الفرع</th><th>البند</th><th>الحالة</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="empty">لم تطلب أي خدمة بعد</div>'}`;
+}
+
+async function vAudit() {
+  const d = await api(`/api/orgs/${S.org}/audit`);
+  const A = {complete: 'إنجاز بند', renew: 'تجديد وثيقة', ack_change: 'اطلاع على تحديث', vip_request: 'طلب VIP', vip_status: 'حالة طلب'};
+  const rows = d.entries.map(e => `<tr><td>${esc(e.ts.replace('T', ' ').replace('+00:00', ' UTC'))}</td><td>${A[e.action] || esc(e.action)}</td><td>${esc(e.detail)}</td></tr>`).join('');
+  return `<div class="sec" style="margin-top:0"><div><h2>سجل العمليات</h2><div class="sub" style="margin:0">أثر تدقيق لكل إجراء — أساس الدليل أمام الجهات الرقابية</div></div></div>
+    ${rows ? `<table><thead><tr><th>الوقت</th><th>الإجراء</th><th>التفاصيل</th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="empty">لا توجد عمليات مسجلة بعد</div>'}`;
+}
+
+const VIEWS = {overview: vOverview, branches: vBranches, employees: vEmployees, changes: vChanges, vip: vVip, audit: vAudit};
+
+async function render() {
+  $('#nav').innerHTML = NAV.map(([k, l]) => `<button class="${S.view === k ? 'on' : ''}" data-act="nav" data-v="${k}">${l}</button>`).join('');
+  try { $('#main').innerHTML = await VIEWS[S.view](); }
+  catch (e) { $('#main').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+function go(v, arg) { S.view = v; S.arg = arg ?? null; render(); window.scrollTo(0, 0); }
+
+/* ---------- events ---------- */
+document.addEventListener('click', async ev => {
+  const el = ev.target.closest('[data-act]'); if (!el) return;
+  const a = el.dataset.act;
+  try {
+    if (a === 'toggle') el.closest('.item').classList.toggle('open');
+    else if (a === 'nav') go(el.dataset.v);
+    else if (a === 'branch') go('branches', +el.dataset.id);
+    else if (a === 'filt') { S.filt[el.dataset.g] = el.dataset.v; render(); }
+    else if (a === 'emp') { S.emp = {branch: el.dataset.branch, code: el.dataset.code, status: el.dataset.status}; go('employees'); }
+    else if (a === 'done') {
+      const id = el.dataset.id;
+      const body = {};
+      const note = document.querySelector(`[data-note="${id}"]`); if (note) body.note = note.value;
+      const exp = document.querySelector(`[data-exp="${id}"]`); if (exp && exp.value) body.new_expiry = exp.value;
+      const r = await api(`/api/items/${id}/complete`, {body});
+      toast(`تم الحفظ — الاستحقاق التالي \u2066${r.next_due}\u2069`); render();
+    }
+    else if (a === 'vip') {
+      if (!el.dataset.code) return;
+      await api(`/api/orgs/${S.org}/vip/requests`, {body: {service_code: el.dataset.code, branch_id: el.dataset.branch ? +el.dataset.branch : null, item_ref: el.dataset.ref}});
+      toast('تم إرسال طلب VIP — ستجده في تبويب خدمات VIP');
+    }
+    else if (a === 'ack') { await api(`/api/orgs/${S.org}/changes/${el.dataset.id}/acknowledge`, {body: {}}); toast('تم تسجيل الاطلاع'); render(); }
+    else if (a === 'adv') { await api(`/api/vip/requests/${el.dataset.id}/advance`, {body: {}}); render(); }
+  } catch (e) { toast(e.message); }
+});
+document.addEventListener('change', ev => {
+  const t = ev.target;
+  if (t.id === 'brSel') { S.arg = +t.value; render(); }
+  else if (t.id === 'eBr') { S.emp.branch = t.value; render(); }
+  else if (t.id === 'eCode') { S.emp.code = t.value; render(); }
+  else if (t.id === 'eSt') { S.emp.status = t.value; render(); }
+});
+$('#orgSel').addEventListener('change', e => { S.org = +e.target.value; S.arg = null; S.emp = {branch: '', code: '', status: ''}; S.filt = {status: '', kind: ''}; render(); });
+
+(async () => {
+  try {
+    const d = await api('/api/orgs');
+    S.orgs = d.orgs; S.asOf = d.as_of; S.org = d.orgs[0].id;
+    $('#orgSel').innerHTML = d.orgs.map(o => `<option value="${o.id}">${esc(o.name)}</option>`).join('');
+    $('#asof').innerHTML = 'بتاريخ ' + ltr(d.as_of);
+    render();
+  } catch (e) { $('#main').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+})();
+</script>
+</body>
+</html>
