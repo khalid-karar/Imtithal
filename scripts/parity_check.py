@@ -31,7 +31,7 @@ def main():
     orgs = [o["id"] for o in snap["orgs"]]
     reqs = [("GET", "/api/health", None), ("GET", "/api/orgs", None), ("GET", "/api/import/doc-types", None)]
     for o in orgs:
-        reqs += [("GET", f"/api/orgs/{o}/{p}", None) for p in ("overview", "changes", "vip", "audit", "employee-docs")]
+        reqs += [("GET", f"/api/orgs/{o}/{p}", None) for p in ("overview", "changes", "vip", "audit", "employee-docs", "score-explain", "owner")]
         for q in ("status=overdue", "status=due_soon", "code=iqama", "status=overdue&code=iqama"):
             reqs.append(("GET", f"/api/orgs/{o}/employee-docs?{q}", None))
     for b in snap["branches"]:
@@ -39,6 +39,7 @@ def main():
         for q in ("status=overdue", "kind=employee_doc", "kind=obligation&status=due_soon", "status=ok"):
             reqs.append(("GET", f"/api/branches/{b['id']}/items?{q}", None))
         reqs.append(("GET", f"/api/orgs/{b['org_id']}/employee-docs?branch_id={b['id']}", None))
+        reqs.append(("GET", f"/api/orgs/{b['org_id']}/score-explain?branch_id={b['id']}", None))
     ins = [i["id"] for i in snap["instances"]]
     docs = [d["id"] for d in snap["emp_docs"]]
     # mutations, each followed by reads of what they touch
@@ -70,6 +71,15 @@ def main():
              ("POST", f"/api/orgs/{orgs[0]}/assign", {"item_id": "o-999999", "owner_id": "hr"}),
              ("POST", f"/api/orgs/{orgs[0]}/assign", {"item_id": "g-999-EMP-IQAMA", "owner_id": "hr"}),
              ("POST", "/api/orgs/99/assign", {"item_id": "o-1", "owner_id": "hr"}), ("GET", "/api/orgs/99/staff", None)]
+    # one-tap reminders: obligation, single employee document, grouped employee documents, and the error paths
+    reqs += [("POST", f"/api/orgs/{orgs[0]}/remind", {"item_id": f"o-{ob0}"}),
+             ("POST", f"/api/orgs/{orgs[0]}/remind", {"item_id": f"e-{docs[0]}"}),
+             ("POST", f"/api/orgs/{orgs[0]}/remind", {"item_id": f"g-{b0}-EMP-IQAMA-overdue"}),
+             ("POST", f"/api/orgs/{orgs[0]}/remind", {"item_id": f"g-{b0}-EMP-IQAMA-soon"}),
+             ("POST", f"/api/orgs/{orgs[0]}/remind", {"item_id": "nonsense"}), ("POST", f"/api/orgs/{orgs[0]}/remind", {"item_id": "o-999999"}),
+             ("POST", f"/api/orgs/{orgs[0]}/remind", {"item_id": "g-999-EMP-IQAMA-overdue"}), ("POST", "/api/orgs/99/remind", {"item_id": "o-1"})]
+    reqs += [("GET", f"/api/orgs/{o}/{p}", None) for o in orgs for p in ("score-explain", "owner", "audit")]
+    reqs += [("GET", "/api/orgs/99/score-explain", None), ("GET", "/api/orgs/99/owner", None), ("GET", f"/api/orgs/{orgs[0]}/score-explain?branch_id=999", None)]
     # alerts (before and after the mutations above)
     reqs += [("GET", f"/api/orgs/{o}/alerts", None) for o in orgs]
     # import: aliases (Arabic/English/hamza variants), duplicates, bad dates, unknown docs, sector mismatch, scope errors
@@ -102,7 +112,7 @@ def main():
     nb = max(b["id"] for b in snap["branches"])
     reqs += [("POST", "/api/import", dict(org_name="منشأة تجريبية", pack="hotel", rows=rows))]
     new_org = max(orgs) + 1
-    reqs += [("GET", f"/api/orgs/{new_org}/{p}", None) for p in ("overview", "alerts", "changes", "vip", "audit", "employee-docs")]
+    reqs += [("GET", f"/api/orgs/{new_org}/{p}", None) for p in ("overview", "alerts", "changes", "vip", "audit", "employee-docs", "score-explain", "owner")]
     reqs += [("GET", "/api/orgs", None)] + [("GET", f"/api/branches/{nb + k}/items", None) for k in (1, 2)]
     reqs += [("POST", f"/api/items/e-{max(docs) + 1}/complete", {"new_expiry": "2029-01-01"}),
              ("POST", f"/api/orgs/{new_org}/vip/requests", {"service_code": code, "branch_id": nb + 1}),
@@ -123,7 +133,7 @@ def main():
              ("POST", f"/api/orgs/{orgs[0]}/changes/999/acknowledge", None)]
     # re-read everything touched
     for o in orgs:
-        reqs += [("GET", f"/api/orgs/{o}/{p}", None) for p in ("overview", "changes", "vip", "audit", "employee-docs")]
+        reqs += [("GET", f"/api/orgs/{o}/{p}", None) for p in ("overview", "changes", "vip", "audit", "employee-docs", "score-explain", "owner")]
     for b in snap["branches"]:
         reqs.append(("GET", f"/api/branches/{b['id']}/items", None))
 
