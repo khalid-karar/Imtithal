@@ -437,12 +437,12 @@
       const key = 'imtithal-demo:' + snap.build_id;
       api = createApi(snap, localStore(key));
       const bar = document.createElement('div');
-      bar.style.cssText = 'background:#EFE9DC;color:#2B3B5C;font-size:12.5px;text-align:center;padding:7px 12px;border-bottom:1px solid #D8D0BE';
+      bar.style.cssText = 'background:#E9EFFF;color:#17348F;font-size:12.5px;text-align:center;padding:7px 12px;font-family:inherit';
       bar.className = 'demobar';
       bar.innerHTML = 'نسخة تجريبية ببيانات توضيحية — المبالغ تقديرية والمكتبة التنظيمية قيد المراجعة القانونية. تغييراتك تبقى في متصفحك فقط. ';
       const btn = document.createElement('button');
       btn.textContent = 'إعادة ضبط العرض';
-      btn.style.cssText = 'margin-inline-start:8px;border:1px solid #16233F;background:#fff;color:#16233F;border-radius:4px;padding:2px 10px;cursor:pointer;font:inherit';
+      btn.style.cssText = 'margin-inline-start:8px;border:1px solid #B9C9FF;background:#fff;color:#17348F;border-radius:8px;padding:2px 10px;cursor:pointer;font:inherit';
       btn.onclick = () => { try { window.localStorage.removeItem(key); } catch (e) {} delete memory[key]; location.reload(); };
       bar.appendChild(btn);
       document.body.insertBefore(bar, document.body.firstChild.nextSibling || null);
