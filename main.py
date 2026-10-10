@@ -12,6 +12,7 @@ import alerts
 import db
 import engine
 import importer
+import staff
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -309,3 +310,49 @@ def import_org(body: ImportReq):
         raise HTTPException(422, e.detail)
     c.close()
     return res
+
+
+@app.get("/api/orgs/{org_id}/staff")
+def org_staff(org_id: int):
+    c = db.conn()
+    _org(c, org_id)
+    out = staff.roster(c, org_id)
+    c.close()
+    return dict(staff=out)
+
+
+class Assign(BaseModel):
+    item_id: str
+    owner_id: str
+    due: str | None = None
+
+
+@app.post("/api/orgs/{org_id}/assign")
+def assign(org_id: int, body: Assign):
+    c = db.conn()
+    _org(c, org_id)
+    key = staff.normalize_key(body.item_id)
+    if not key:
+        c.close()
+        raise HTTPException(400, "معرّف غير صالح")
+    people = {p["id"]: p for p in staff.roster(c, org_id)}
+    if body.owner_id not in people:
+        c.close()
+        raise HTTPException(404, "المسؤول غير موجود")
+    if body.due:
+        try:
+            if date.fromisoformat(body.due).isoformat() != body.due:
+                raise ValueError
+        except ValueError:
+            c.close()
+            raise HTTPException(422, "التاريخ يجب أن يكون بصيغة YYYY-MM-DD")
+    items = [i for i in engine.load_items(c, org_id) if staff.item_key(i) == key]
+    if not items:
+        c.close()
+        raise HTTPException(404, "البند غير موجود")
+    c.execute("INSERT INTO assignment(org_id,key,owner_id,due) VALUES(?,?,?,?) ON CONFLICT(org_id,key) DO UPDATE SET owner_id=excluded.owner_id, due=excluded.due",
+              (org_id, key, body.owner_id, body.due or None))
+    _log(c, org_id, "assign", f"{items[0]['title']} ← {people[body.owner_id]['name']}")
+    c.commit()
+    c.close()
+    return dict(ok=True, owner=dict(id=body.owner_id, name=people[body.owner_id]["name"], role=people[body.owner_id]["role"]))

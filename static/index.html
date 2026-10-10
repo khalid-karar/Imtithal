@@ -244,6 +244,49 @@ details.auth{margin-top:28px} details.auth summary{cursor:pointer;font-size:17px
   .when{display:none} table{display:block;overflow-x:auto}
   .tour{bottom:8px}
 }
+
+/* role switch */
+.rolebox{margin-bottom:6px}
+.seg{display:grid;gap:3px;background:var(--fill);border-radius:var(--r-m);padding:3px}
+.seg button{background:none;border:0;border-radius:9px;padding:7px 10px;cursor:pointer;font-size:13px;color:var(--ink-2);text-align:start;font-weight:500}
+.seg button.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(11,22,38,.12)}
+#roleBr{width:100%;margin-top:6px;font-size:12.5px}
+/* heat map */
+.heat{display:grid;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:14px;overflow-x:auto}
+.hm-h{background:none;border:0;font-size:12.5px;font-weight:600;color:var(--ink-2);padding:4px 2px 8px;cursor:pointer;line-height:1.4}
+.hm-h:hover{color:var(--brand)}
+.hm-r{background:none;border:0;text-align:start;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;justify-content:center;gap:1px;border-radius:var(--r-s)}
+.hm-r:hover{background:var(--fill)} .hm-r b{font-size:14px;font-weight:600} .hm-r span{font-size:12px;color:var(--mute)}
+.hm-c{border:0;border-radius:var(--r-m);min-height:62px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:transform .12s,box-shadow .12s}
+.hm-c b{font-size:22px;font-weight:700;line-height:1.2} .hm-c span{font-size:11.5px;font-weight:500}
+.hm-c.o{background:var(--bad-bg);color:var(--bad)} .hm-c.s{background:var(--warn-bg);color:var(--warn)} .hm-c.k{background:var(--ok-bg);color:var(--ok)} .hm-c.n{background:var(--fill);color:#A3AEC0;cursor:default}
+.hm-c:not(.n):hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(11,22,38,.12)}
+.hm-key{display:flex;gap:12px;font-size:12.5px;align-items:center}
+.hm-key span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:6px;vertical-align:-1px}
+.hm-key .o::before{background:var(--bad)} .hm-key .s::before{background:#E89A12} .hm-key .k::before{background:var(--ok)}
+/* owners */
+.ows{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);overflow:hidden}
+.ow{display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)} .ow:last-child{border-bottom:0}
+.av2{width:36px;height:36px;border-radius:50%;background:var(--brand-bg);color:var(--brand);display:grid;place-items:center;font-weight:700}
+.ow-n{display:flex;gap:6px;flex-wrap:wrap}
+.vh.role{padding:20px 26px} .vh.role h1{font-size:22px;margin-bottom:4px} .vh.role p{margin:0}
+/* assignment + consequence in item details */
+.own{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center;background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:12px 14px;margin-top:14px}
+.own h4{margin:0 0 2px}
+.own select{max-width:260px}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(11,22,38,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+.scrim.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;bottom:0;inset-inline-end:0;width:min(640px,100%);background:var(--bg);z-index:45;transform:translateX(-102%);transition:transform .25s cubic-bezier(.2,.8,.3,1);box-shadow:0 0 40px rgba(11,22,38,.25);display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.dr-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:20px 22px 14px;background:#fff;border-bottom:1px solid var(--line)}
+.dr-h h3{margin:0 0 2px;font-size:18px;font-weight:600}
+.dr-h .x{border:0;background:var(--fill);width:34px;height:34px;border-radius:50%;font-size:20px;cursor:pointer;line-height:1}
+.dr-b{overflow-y:auto;padding:16px 18px 40px;flex:1}
+.drawer .det .grid{grid-template-columns:1fr}
+.drawer .item-h{grid-template-columns:12px 1fr auto}
+.drawer .when{display:none}
+@media (prefers-reduced-motion:reduce){.drawer,.scrim{transition:none}}
 </style>
 </head>
 <body>
@@ -251,6 +294,7 @@ details.auth{margin-top:28px} details.auth summary{cursor:pointer;font-size:17px
   <aside class="side">
     <div class="brand"><div class="mark"></div><b>امتثال</b></div>
     <select id="orgSel" aria-label="المنشأة"></select>
+    <div class="rolebox"><div class="grp" style="padding-top:4px">أنت تشاهد كـ</div><div class="seg" id="roleSeg"></div><select id="roleBr" aria-label="الفرع" hidden></select></div>
     <nav id="nav"></nav>
     <div class="grp">أدوات أخرى</div>
     <div class="more" id="more"></div>
@@ -265,6 +309,8 @@ details.auth{margin-top:28px} details.auth summary{cursor:pointer;font-size:17px
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<div class="scrim" id="scrim" data-act="drawer-close"></div>
+<aside class="drawer" id="drawer" aria-label="تفاصيل"></aside>
 <div class="ov" id="welcome"><div class="modal"><div class="brand" style="justify-content:center"><div class="mark"></div><b>امتثال</b></div>
   <h1>اعرف موقف منشأتك من الامتثال وكم قد يكلّفك</h1>
   <p>كل التراخيص ووثائق الموظفين ومواعيد الجهات الحكومية في مكان واحد، مع تنبيه قبل وقوع الغرامة وخدمة تنفيذ نيابةً عنك.</p>
@@ -279,7 +325,7 @@ details.auth{margin-top:28px} details.auth summary{cursor:pointer;font-size:17px
 
 <script src="import-parse.js"></script>
 <script>
-const S = {orgs: [], org: null, asOf: '', view: 'overview', arg: null, filt: {status: '', kind: ''}, emp: {branch: '', code: '', status: ''}, imp: null, pending: null};
+const S = {orgs: [], org: null, asOf: '', view: 'overview', arg: null, filt: {status: '', kind: ''}, emp: {branch: '', code: '', status: ''}, imp: null, pending: null, role: 'gm', roleBranch: null, staff: [], dr: null, lanes: null};
 const IC = {overview:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',branches:'<path d="M4 21V5l8-2v18M12 9h8v12M7 9h2M7 13h2M7 17h2M15 13h2M15 17h2"/>',alerts:'<path d="M6 16v-5a6 6 0 1 1 12 0v5l2 2H4zM10 21h4"/>',vip:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',employees:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.5 3-5.5 6.5-5.5S15 16.5 15.5 20M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .6 3.2 2.3 3.5 5.2"/>',changes:'<path d="M6 3h8l5 5v13H6zM14 3v5h5M9 13h7M9 17h7"/>',audit:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',import:'<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>'};
 const icon = k => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[k] || ''}</svg>`;
 const NAV = [['overview','الرئيسية'],['branches','الفروع والبنود'],['alerts','التنبيهات'],['vip','خدمات VIP']];
@@ -313,7 +359,17 @@ function title(i) {
 function sub(i) {
   const parts = [i.branch_name, i.authority];
   if (i.kind === 'employee_doc') parts.splice(1, 0, i.employee.role);
+  if (i.owner) parts.push('المسؤول: ' + i.owner.name);
   return parts.join(' · ');
+}
+function ownerBlock(i) {
+  if (!i.owner) return '';
+  const can = i.kind !== 'employee_doc';
+  const opts = (S.staff || []).map(p => `<option value="${esc(p.id)}" ${p.id === i.owner.id ? 'selected' : ''}>${esc(p.name)} — ${esc(p.role)}</option>`).join('');
+  const ctl = can ? `<select data-asg="${esc(i.id)}" aria-label="المسؤول">${opts}</select>
+      <input type="date" data-asgd="${esc(i.id)}" value="${esc(i.internal_due || '')}" title="موعد التسليم الداخلي">
+      <button class="btn alt" data-act="assign" data-id="${esc(i.id)}">أسند</button>` : '';
+  return `<div class="own"><div><h4>المسؤول</h4><b>${esc(i.owner.name)}</b> <span class="item-s">${esc(i.owner.role)}${i.assigned ? ' · أُسند يدويًا' : ' · المسؤول الافتراضي'}${i.internal_due ? ' · التسليم الداخلي ' + ltr(i.internal_due) : ''}</span></div><div class="acts" style="margin:0">${ctl}</div></div>`;
 }
 
 /* ---------- item row (shared) ---------- */
@@ -345,10 +401,12 @@ function itemRow(i) {
           <h4>حالة التحقق</h4>${verifLine(i)}
           <h4>الدليل المطلوب</h4><p style="margin:0 0 10px">${esc(i.evidence)}</p>
           <h4>التعرض المالي (تقدير تجريبي)</h4><p style="margin:0 0 6px">${sar(i.penalty_sar)}${i.kind === 'group' ? ' (للمجموعة)' : ''}</p>
+          ${i.consequence ? `<h4>العاقبة المحتملة</h4><p style="margin:0 0 6px">${esc(i.consequence)}</p><p class="item-s" style="margin:0 0 8px">صياغة عامة — تُراجَع قانونيًا قبل اعتمادها.</p>` : ''}
           ${i.penalty_note ? `<p style="margin:0 0 8px;color:var(--slate)">${esc(i.penalty_note)}</p>` : ''}
           ${src}
         </div>
       </div>
+      ${ownerBlock(i)}
       <div class="acts">${vip}${actions}</div>
     </div>
   </div>`;
@@ -359,6 +417,7 @@ function itemList(items, empty) {
 
 async function vBranches() {
   const d = await api(`/api/orgs/${S.org}/overview`);
+  if (S.role === 'bm') { d.branches = d.branches.filter(b => b.id === S.roleBranch); S.arg = S.roleBranch; }
   if (!S.arg) S.arg = d.branches[0].id;
   const sel = d.branches.map(b => `<option value="${b.id}" ${b.id == S.arg ? 'selected' : ''}>${esc(b.name)}</option>`).join('');
   const q = new URLSearchParams(); if (S.filt.status) q.set('status', S.filt.status); if (S.filt.kind) q.set('kind', S.filt.kind);
@@ -420,7 +479,7 @@ async function vChanges() {
 
 async function vAudit() {
   const d = await api(`/api/orgs/${S.org}/audit`);
-  const A = {complete: 'إنجاز بند', renew: 'تجديد وثيقة', ack_change: 'اطلاع على تحديث', vip_request: 'طلب VIP', vip_status: 'حالة طلب'};
+  const A = {assign: 'إسناد بند', complete: 'إنجاز بند', renew: 'تجديد وثيقة', ack_change: 'اطلاع على تحديث', vip_request: 'طلب VIP', vip_status: 'حالة طلب'};
   const rows = d.entries.map(e => `<tr><td>${esc(e.ts.replace('T', ' ').replace('+00:00', ' UTC'))}</td><td>${A[e.action] || esc(e.action)}</td><td>${esc(e.detail)}</td></tr>`).join('');
   return `<div class="sec" style="margin-top:0"><div><h2>سجل العمليات</h2><div class="sub" style="margin:0">أثر تدقيق لكل إجراء — أساس الدليل أمام الجهات الرقابية</div></div></div>
     ${rows ? `<table><thead><tr><th>الوقت</th><th>الإجراء</th><th>التفاصيل</th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="empty">لا توجد عمليات مسجلة بعد</div>'}`;
@@ -463,51 +522,130 @@ function timeline(d, lanes) {
       <div class="axis"><span style="inset-inline-start:0">قبل ${fmt(-LO)} يومًا</span><span style="inset-inline-end:0">بعد ${fmt(HI)} يومًا</span></div></div></div>`;
 }
 
+/* ---------- helpers: grouping, domains, roles ---------- */
+const DOMAINS = ['الموارد البشرية', 'وثائق الموظفين', 'التراخيص', 'السلامة والدفاع المدني', 'الضرائب والزكاة', 'حماية البيانات', 'الجودة والاعتماد'];
+const ORD = {overdue: 0, soon: 1, ok: 2};
+const prio = (a, b) => (ORD[a.status] - ORD[b.status]) || (b.severity - a.severity) || (a.days_left - b.days_left);
+function groupItems(items) {                    // obligations individually; employee documents grouped per branch + document + status
+  const out = [], g = new Map();
+  for (const i of items) {
+    if (i.status === 'ok') continue;
+    if (i.kind === 'obligation') out.push(i);
+    else { const k = i.branch_id + '|' + i.code + '|' + i.status; if (!g.has(k)) g.set(k, []); g.get(k).push(i); }
+  }
+  for (const a of g.values()) {
+    const f = a.reduce((m, x) => x.days_left < m.days_left ? x : m, a[0]);
+    out.push(Object.assign({}, f, {id: `g-${f.branch_id}-${f.code}-${f.status}`, kind: 'group', count: a.length, employee: null, penalty_sar: a.reduce((t, x) => t + x.penalty_sar, 0)}));
+  }
+  return out.sort(prio);
+}
+const meId = () => S.role === 'hr' ? 'hr' : S.role === 'bm' ? 'b' + S.roleBranch : 'gm';
+const ROLE_L = {gm: 'المالك / المدير العام', hr: 'مدير الموارد البشرية', bm: 'مدير فرع'};
+function cellStat(items) {
+  const o = items.filter(i => i.status === 'overdue').length, s = items.filter(i => i.status === 'soon').length;
+  return {o, s, n: items.length, cls: !items.length ? 'n' : o ? 'o' : s ? 's' : 'k'};
+}
+function heatmap(lanes) {
+  const present = new Set(); lanes.forEach(l => l.items.forEach(i => present.add(i.domain)));
+  const cols = DOMAINS.filter(d => present.has(d)).concat([...present].filter(d => !DOMAINS.includes(d)));
+  const head = cols.map(d => `<button class="hm-h" data-act="cell" data-b="" data-d="${esc(d)}">${esc(d)}</button>`).join('');
+  const rows = lanes.map(({b, items}) => {
+    const cells = cols.map(d => {
+      const it = items.filter(i => i.domain === d), st = cellStat(it);
+      const txt = st.cls === 'n' ? '—' : st.cls === 'k' ? '✓' : fmt(st.o || st.s);
+      const lab = st.cls === 'o' ? 'متأخر' : st.cls === 's' ? 'يقترب' : st.cls === 'k' ? 'سليم' : '';
+      return `<button class="hm-c ${st.cls}" ${st.cls === 'n' ? 'disabled' : `data-act="cell" data-b="${b.id}" data-d="${esc(d)}"`} title="${esc(b.name)} — ${esc(d)}: ${fmt(st.o)} متأخر، ${fmt(st.s)} يقترب"><b>${txt}</b><span>${lab}</span></button>`;
+    }).join('');
+    const money = items.filter(i => i.status === 'overdue').reduce((a, i) => a + i.penalty_sar, 0);
+    return `<button class="hm-r" data-act="cell" data-b="${b.id}" data-d=""><b>${esc(b.name)}</b><span>${fmt(money)} ريال تعرّض</span></button>${cells}`;
+  }).join('');
+  return `<div class="heat" id="heat" style="grid-template-columns:minmax(150px,1.4fr) repeat(${cols.length},minmax(84px,1fr))"><div></div>${head}${rows}</div>`;
+}
+function ownersBlock(lanes) {
+  const by = new Map();
+  lanes.forEach(l => groupItems(l.items).forEach(i => {
+    const k = i.owner.id; if (!by.has(k)) by.set(k, {o: i.owner, od: 0, so: 0, money: 0});
+    const r = by.get(k); if (i.status === 'overdue') { r.od++; r.money += i.penalty_sar; } else r.so++;
+  }));
+  const rows = [...by.values()].sort((a, b) => b.od - a.od || b.so - a.so || (a.o.id < b.o.id ? -1 : 1)).map(r => `
+    <div class="ow"><span class="av2">${esc([...r.o.name][0] || '؟')}</span><div><b>${esc(r.o.name)}</b><div class="item-s">${esc(r.o.role)}</div></div>
+      <div class="ow-n"><span class="pill overdue">${fmt(r.od)} متأخر</span><span class="pill soon">${fmt(r.so)} يقترب</span></div>
+      <button class="btn alt" data-act="cell" data-o="${esc(r.o.id)}" data-b="" data-d="">اعرض بنوده</button></div>`).join('');
+  return rows ? `<div class="ows">${rows}</div>` : '';
+}
+function myTasks(lanes) {
+  const me = meId(), mine = [];
+  lanes.forEach(l => groupItems(l.items).forEach(i => { if (i.owner.id === me) mine.push(i); }));
+  return mine.sort(prio);
+}
+function scopedLanes() { return S.role === 'bm' ? S.lanes.filter(l => l.b.id === S.roleBranch) : S.lanes; }
+
+/* ---------- drawer: the items behind a heat-map cell, a branch, a domain or a person ---------- */
+function drawerItems() {
+  const f = S.dr; let items = [];
+  scopedLanes().forEach(l => { if (!f.b || l.b.id === +f.b) items = items.concat(l.items); });
+  if (f.d) items = items.filter(i => i.domain === f.d);
+  if (f.o) items = groupItems(items).filter(i => i.owner.id === f.o);
+  else items = groupItems(items);
+  return items;
+}
+function renderDrawer() {
+  const f = S.dr; if (!f) return;
+  const br = f.b ? (S.lanes.find(l => l.b.id === +f.b) || {}).b : null;
+  const who = f.o ? (S.staff.find(p => p.id === f.o) || {}).name : '';
+  const t = [br ? br.name : 'كل الفروع', f.d || (f.o ? 'بنود ' + who : 'كل المجالات')].join(' — ');
+  const was = [...document.querySelectorAll('#drawer .item.open')].map(n => n.id);
+  const list = drawerItems();
+  const money = list.filter(i => i.status === 'overdue').reduce((a, i) => a + i.penalty_sar, 0);
+  $('#drawer').innerHTML = `<div class="dr-h"><div><h3>${esc(t)}</h3><div class="item-s">${fmt(list.filter(i => i.status === 'overdue').length)} متأخر · ${fmt(list.filter(i => i.status === 'soon').length)} يقترب · تعرّض ${sar(money)}</div></div><button class="x" data-act="drawer-close" aria-label="إغلاق">×</button></div>
+    <div class="dr-b">${list.length ? `<div class="list">${list.map(itemRow).join('')}</div>` : '<div class="empty">لا توجد بنود تحتاج إجراءً هنا — كل شيء سليم ✓</div>'}</div>`;
+  $('#drawer').classList.add('open'); $('#scrim').classList.add('show');
+  was.forEach(id => { const n = document.getElementById(id); if (n) n.classList.add('open'); });
+  if (f.open) { const n = document.getElementById('it-' + f.open); if (n) { n.classList.add('open'); n.scrollIntoView({block: 'center'}); } delete f.open; }
+}
+function closeDrawer() { S.dr = null; $('#drawer').classList.remove('open'); $('#scrim').classList.remove('show'); }
+function locate(id) {
+  for (const l of S.lanes || []) for (const i of l.items) if (i.id === id || `g-${i.branch_id}-${i.code}-${i.status}` === id) return i;
+  return null;
+}
+
 /* ---------- overview ---------- */
 async function vOverview() {
   const [d, al] = await Promise.all([api(`/api/orgs/${S.org}/overview`), api(`/api/orgs/${S.org}/alerts`)]);
-  const c = d.counts;
-  const avg = d.branches.length ? Math.round(d.branches.reduce((a, b) => a + b.score, 0) / d.branches.length) : 0;
-  const ranked = d.branches.slice().sort((a, b) => a.score - b.score || a.id - b.id);
-  const cards = ranked.map((b, n) => {
-    const diff = b.score - avg;
-    const dl = d.branches.length < 2 ? '' : diff === 0 ? '<div class="delta">بمستوى متوسط فروعك</div>'
-      : `<div class="delta ${diff < 0 ? 'neg' : 'pos'}">${fmt(Math.abs(diff))} نقطة ${diff < 0 ? 'أقل' : 'أعلى'} من متوسط فروعك</div>`;
-    return `<div class="card band-${b.band}" data-act="branch" data-id="${b.id}">
-      <h3><span class="rank">${n + 1}</span>${esc(b.name)}${n === 0 && b.band !== 'good' && d.branches.length > 1 ? '<span class="flag rev">الأضعف</span>' : ''}</h3>
-      <div class="meta">${esc(b.city)} · ${fmt(b.headcount)} موظفًا</div>
-      <div class="bar"><i class="${b.band}" style="width:${b.score}%"></i></div>
-      <div class="cnt"><b>${ltr(b.score + ' / 100')}</b><span>${fmt(b.counts.overdue)} متأخر</span><span>${fmt(b.counts.soon)} قريب</span><span>${sar(b.money_at_risk)}</span></div>
-      ${dl}
-      <ul class="issues">${b.top_issues.map(t => `<li><span class="dot ${t.status}"></span><span>${esc(t.title)}</span></li>`).join('') || '<li>لا توجد بنود عاجلة</li>'}</ul>
-    </div>`;
-  }).join('');
+  S.lanes = await Promise.all(d.branches.map(async b => ({b, items: (await api(`/api/branches/${b.id}/items`)).items})));
+  const lanes = scopedLanes(), bm = S.role === 'bm';
+  const all = lanes.flatMap(l => l.items);
+  const brOv = bm ? d.branches.find(b => b.id === S.roleBranch) : null;
+  const fig = bm && brOv ? {score: brOv.score, band: brOv.band, c: brOv.counts, money: brOv.money_at_risk, exp: all.filter(i => i.days_left >= 0 && i.days_left <= 30).reduce((a, i) => a + i.penalty_sar, 0), label: brOv.name}
+    : {score: d.score, band: d.band, c: d.counts, money: d.money_at_risk, exp: d.exposure_30, label: d.org.name};
+  const nItems = fig.c.overdue + fig.c.soon + fig.c.ok, nBr = lanes.length, nAuth = new Set(all.map(i => i.authority)).size;
   const ledger = d.by_authority.map(a => `<tr><td>${esc(a.authority)}</td><td>${a.overdue || '—'}</td><td>${a.soon || '—'}</td><td>${a.ok}</td></tr>`).join('');
   const why = d.urgent.filter(i => i.status === 'overdue').sort((a, b) => b.penalty_sar - a.penalty_sar || a.days_left - b.days_left).slice(0, 6)
-    .map(i => `<div class="r"><div><b>${esc(title(i))}</b><div class="item-s">${esc(i.branch_name)} · ${esc(i.authority)} · ${when(i)}</div></div><span>${sar(i.penalty_sar)}</span><button class="btn alt" data-act="open-item" data-id="${esc(i.id)}">كيف أعالجه</button></div>`).join('');
-  const tick = d.urgent.slice().sort((a, b) => a.days_left - b.days_left || b.severity - a.severity).slice(0, 10).map(i => `
-    <div class="tk ${i.status}" data-act="open-item" data-id="${esc(i.id)}"><div class="n">${ltr(i.days_left < 0 ? '−' + fmt(-i.days_left) : fmt(i.days_left))}</div>
-      <div class="u">${i.days_left < 0 ? 'يومًا من التأخر' : 'يومًا متبقيًا'}</div><div class="t">${esc(title(i))}</div><div class="b">${esc(i.branch_name)}</div></div>`).join('');
-  const lanes = await Promise.all(d.branches.map(async b => ({b, items: (await api(`/api/branches/${b.id}/items`)).items})));
-  const first = d.org.name;
-  const nItems = c.overdue + c.soon + c.ok, nBr = d.branches.length, nAuth = d.by_authority.length;
-  const weakest = ranked[0], top = why ? d.urgent.filter(i => i.status === 'overdue').sort((a, b) => b.penalty_sar - a.penalty_sar || a.days_left - b.days_left)[0] : null;
-  const vipMin = Object.values(S.cat || {}).reduce((m, v) => Math.min(m, v.price_from), Infinity);
-  return `
+    .map(i => `<div class="r"><div><b>${esc(title(i))}</b><div class="item-s">${esc(i.branch_name)} · ${esc(i.authority)} · ${when(i)}</div></div><span>${sar(i.penalty_sar)}</span><button class="btn alt" data-act="open-item" data-id="${esc(i.id)}">التفاصيل</button></div>`).join('');
+  const tasks = S.role === 'gm' ? [] : myTasks(lanes);
+  const intro = S.role === 'gm' ? `
   <section class="vh">
     <h1>كل التزامات منشأتك الحكومية في شاشة واحدة — قبل أن تتحول إلى غرامة</h1>
-    <p>يراقب امتثال <b>${fmt(nItems)}</b> التزامًا ووثيقة في <b>${fmt(nBr)}</b> ${nBr > 1 ? 'فروع' : 'فرع'} لدى <b>${fmt(nAuth)}</b> جهة حكومية، وينبّه المسؤول قبل الموعد، وينفّذ المتأخر نيابةً عنك.</p>
+    <p>يراقب امتثال <b>${fmt(nItems)}</b> التزامًا ووثيقة في <b>${fmt(nBr)}</b> ${nBr > 1 ? 'فروع' : 'فرع'} لدى <b>${fmt(nAuth)}</b> جهة حكومية، ويحدد المسؤول عن كل بند، وينبّهه قبل الموعد، وينفّذ المتأخر نيابةً عنك.</p>
     <div class="vals">
       <div><b>نراقب</b><span>كل رخصة وإقامة وتأمين وشهادة بمواعيدها وجهتها</span></div>
-      <div><b>ننبّه</b><span>رسالة واتساب وبريد قبل الموعد، لا بعد الغرامة</span></div>
+      <div><b>نُسند وننبّه</b><span>كل بند له مسؤول وموعد تسليم، وتنبيه قبل الموعد لا بعد الغرامة</span></div>
       <div><b>ننفّذ عنك</b><span>فريق VIP يجدّد ويقدّم ويتابع بسعر ومدة معلنين</span></div>
     </div>
-  </section>
+  </section>` : `
+  <section class="vh role">
+    <h1>${S.role === 'hr' ? 'مهامك اليوم' : esc((brOv || {}).name || 'فرعك')}</h1>
+    <p>${tasks.length ? `<b>${fmt(tasks.length)}</b> بندًا مسندًا إليك${tasks.some(t => t.status === 'overdue') ? '، منها <b>' + fmt(tasks.filter(t => t.status === 'overdue').length) + '</b> متأخر' : ''} — ابدأ بالأعلى.` : 'لا توجد بنود مسندة إليك الآن.'}</p>
+  </section>`;
+  const taskBlock = S.role === 'gm' ? '' : `
+  <div class="sec" style="margin-top:6px"><div><h2>مهامي</h2><div class="sub" style="margin:0">مرتبة بالأخطر — افتح البند لترى الخطوات وتُسنده أو تغلقه</div></div></div>
+  ${itemList(tasks.slice(0, 8), 'لا توجد مهام مسندة إليك — أحسنت ✓')}`;
+  return `${intro}
   <section class="alarm" id="hero-money">
     <div style="position:relative">
-      <div class="lbl">وضع ${esc(first)} اليوم — تعرّض مالي تقديري لبنود تجاوزت موعدها</div>
-      <div class="big"><span data-count="${d.money_at_risk}">0</span><small>ريال</small></div>
-      <div class="next">وخلال 30 يومًا القادمة: ${sar(d.exposure_30)} إن لم تُعالج البنود التي تقترب</div>
+      <div class="lbl">وضع ${esc(fig.label)} اليوم — تعرّض مالي تقديري لبنود تجاوزت موعدها</div>
+      <div class="big"><span data-count="${fig.money}">0</span><small>ريال</small></div>
+      <div class="next">وخلال 30 يومًا القادمة: ${sar(fig.exp)} إن لم تُعالج البنود التي تقترب</div>
       <div class="btns">
         <button class="btn" data-act="why">من أين جاء هذا الرقم؟</button>
         <button class="btn alt" data-act="report">تقرير للمالك (PDF)</button>
@@ -515,26 +653,23 @@ async function vOverview() {
       </div>
     </div>
     <div class="side2">
-      <div><div class="k">مؤشر الجاهزية</div><div class="v">${ltr(d.score + ' / 100')} — ${BAND[d.band]}</div></div>
-      <div><div class="k">حالة البنود</div><div class="chips2"><span class="pill overdue">${fmt(c.overdue)} متأخر</span><span class="pill soon">${fmt(c.soon)} يقترب</span><span class="pill ok">${fmt(c.ok)} سليم</span></div></div>
+      <div><div class="k">مؤشر الجاهزية</div><div class="v">${ltr(fig.score + ' / 100')} — ${BAND[fig.band]}</div></div>
+      <div><div class="k">حالة البنود</div><div class="chips2"><span class="pill overdue">${fmt(fig.c.overdue)} متأخر</span><span class="pill soon">${fmt(fig.c.soon)} يقترب</span><span class="pill ok">${fmt(fig.c.ok)} سليم</span></div></div>
       <div class="k">تقديرات توضيحية مبنية على بنود المكتبة، وليست غرامات رسمية.</div>
     </div>
     ${timeline(d, lanes)}
   </section>
   <div class="why" id="why">${why || '<div class="empty">لا توجد بنود متأخرة</div>'}</div>
-  <div class="would"><span>🔔 <b>مع امتثال</b> كان سيصلك تنبيه بكل واحد من هذه البنود الـ${fmt(al.summary.overdue_items)} المتأخرة قبل موعده.</span>
+  ${taskBlock}
+  <div class="sec" id="leader"><div><h2>أين المشكلة؟</h2><div class="sub" style="margin:0">كل صف فرع وكل عمود مجال — اضغط على أي خلية لترى بنودها ومن المسؤول عنها وكيف تُعالج</div></div>
+    <div class="hm-key"><span class="o">متأخر</span><span class="s">يقترب</span><span class="k">سليم</span></div></div>
+  ${heatmap(lanes)}
+  ${S.role === 'gm' ? `<div class="sec"><div><h2>من المسؤول؟</h2><div class="sub" style="margin:0">البنود موزعة على أصحابها — من يتأخر أكثر يظهر أولًا</div></div></div>${ownersBlock(lanes)}` : ''}
+  <div class="would" style="margin-top:22px"><span>🔔 <b>مع امتثال</b> كان سيصلك تنبيه بكل واحد من هذه البنود الـ${fmt(al.summary.overdue_items)} المتأخرة قبل موعده${S.role === 'gm' ? '، ويصل لصاحبه مباشرة' : ''}.</span>
     <button class="btn alt" data-act="nav" data-v="alerts">شاهد الرسائل التي كانت ستصلك</button></div>
-  <div class="sec" style="margin-top:6px"><div><h2>ابدأ في 3 خطوات</h2><div class="sub" style="margin:0">من معرفة المشكلة إلى حلّها — بضغطة على كل بطاقة</div></div></div>
-  <div class="steps">
-    <div class="stp" data-act="branch" data-id="${weakest.id}"><i>1</i><h4>اعرف أين المشكلة</h4><p>${esc(weakest.name)} هو الأضعف: ${fmt(weakest.counts.overdue)} بندًا متأخرًا وتعرّض ${sar(weakest.money_at_risk)}.</p><span class="go">افتح الفرع ←</span></div>
-    <div class="stp" ${top ? `data-act="open-item" data-id="${esc(top.id)}"` : 'data-act="nav" data-v="branches"'}><i>2</i><h4>اعرف كيف تعالجها</h4><p>${top ? `أعلى بند خطورة: ${esc(title(top))} (${esc(top.branch_name)}) — خطوات المعالجة والدليل المطلوب أمامك.` : 'خطوات المعالجة والدليل المطلوب لكل بند.'}</p><span class="go">اعرض الخطوات ←</span></div>
-    <div class="stp" data-act="nav" data-v="vip"><i>3</i><h4>أو فوّضنا</h4><p>لا وقت لديك؟ فريق VIP ينفّذ نيابةً عنك${isFinite(vipMin) ? ' — ابتداءً من ' + sar(vipMin) : ''}، وتتابع الحالة حتى التسليم.</p><span class="go">شاهد الخدمات ←</span></div>
-  </div>
-  <div class="sec" id="leader"><div><h2>ترتيب الفروع — من الأضعف إلى الأقوى</h2><div class="sub" style="margin:0">المقارنة بمتوسط فروعك أنت (${ltr(avg + ' / 100')}) — مقارنة السوق تحتاج بيانات عملاء حقيقية وسنضيفها لاحقًا</div></div></div>
-  <div class="cards">${cards}</div>
-  <div class="sec"><div><h2>يحتاج إجراءً الآن</h2><div class="sub" style="margin:0">أخطر 5 بنود — اضغط على أي بند لمعرفة طريقة المعالجة</div></div>
-    <button class="btn alt" data-act="branch" data-id="${weakest.id}">عرض كل البنود (${fmt(d.urgent.length)}) ←</button></div>
-  ${itemList(d.urgent.slice(0, 5), 'لا توجد بنود عاجلة')}
+  ${S.role === 'gm' ? `<div class="sec"><div><h2>يحتاج إجراءً الآن</h2><div class="sub" style="margin:0">أخطر 5 بنود — اضغط على أي بند لمعرفة طريقة المعالجة</div></div>
+    <button class="btn alt" data-act="cell" data-b="" data-d="">عرض كل البنود (${fmt(d.urgent.length)})</button></div>
+  ${itemList(d.urgent.slice(0, 5), 'لا توجد بنود عاجلة')}` : ''}
   <details class="auth"><summary>حسب الجهة التنظيمية (${fmt(nAuth)} جهة)</summary>
     <table><thead><tr><th>الجهة</th><th>متأخر</th><th>قريب</th><th>سليم</th></tr></thead><tbody>${ledger}</tbody></table></details>`;
 }
@@ -542,6 +677,7 @@ async function vOverview() {
 /* ---------- alerts ---------- */
 async function vAlerts() {
   const d = await api(`/api/orgs/${S.org}/alerts`);
+  if (S.role === 'bm') { const p = S.staff.find(x => x.branch_id === S.roleBranch) || {}, to = p.role && p.role !== 'مدير الفرع' ? p.role : p.name; d.messages = d.messages.filter(m => m.to === to); }
   const bubbles = d.messages.map(m => `<div class="bub">${esc(m.text)}<span class="tm">${ltr('08:00')}</span></div>`).join('');
   return `<div class="sec" style="margin-top:0"><div><h2>التنبيهات — ما كان سيصلك</h2>
     <div class="sub" style="margin:0">رسائل مولَّدة الآن من بيانات ${esc(S.orgs.find(o => o.id === S.org)?.name || '')}: واتساب لمدير الفرع، وملخص أسبوعي للمالك.</div></div></div>
@@ -703,7 +839,7 @@ async function openReport() {
 /* ---------- guided tour ---------- */
 const TOUR = [
   {v: 'overview', sel: '#hero-money', t: 'ابدأ بالرقم الذي يهمّ المالك', d: 'مجموع التعرض المالي لكل بند تجاوز موعده اليوم، محسوبًا من بيانات المنشأة. وكل رقم يمكن تتبّعه إلى بند وفرع وجهة.'},
-  {v: 'overview', sel: '#leader', t: 'أي فرع هو المشكلة؟', d: 'الفروع مرتبة من الأضعف إلى الأقوى مع الفارق عن متوسط فروعك، فتعرف أين تبدأ.'},
+  {v: 'overview', sel: '#heat', t: 'أين المشكلة، ومن المسؤول؟', d: 'كل صف فرع وكل عمود مجال، واللون يدلّك على الأسوأ. اضغط أي خلية لترى بنودها وصاحب كل بند وعاقبته وكيف يُعالج.'},
   {v: 'branches', sel: '.item', open: true, t: 'وكيف أعالجها؟', d: 'كل بند يشرح خطوات المعالجة والدليل المطلوب والجهة، ويمكنك إنجازه أو طلب تنفيذه نيابةً عنك.'},
   {v: 'alerts', sel: '.phone', t: 'تنبيه قبل أن تقع الغرامة', d: 'هذه الرسائل تُبنى من بياناتك: واتساب لمدير الفرع وملخص أسبوعي للمالك.'},
   {v: 'vip', sel: '.vipc', t: 'ولا تريد أن تتابع بنفسك؟', d: 'خدمات VIP بسعر ومدة معلنة، تُطلب من البند نفسه وتتابع حالتها حتى التسليم.'},
@@ -727,7 +863,11 @@ async function tourGo(i) {
 function tourStop() { clearTimeout(T.timer); T.i = -1; $('#tour').classList.remove('show'); document.querySelectorAll('.spot').forEach(e => e.classList.remove('spot')); }
 function tourPause() { T.paused = !T.paused; $('#tourP').textContent = T.paused ? 'تشغيل' : 'إيقاف مؤقت'; tourGo(T.i); }
 function tourStart() { $('#welcome').classList.remove('show'); T.paused = false; $('#tourP').textContent = 'إيقاف مؤقت'; tourGo(0); }
-async function loadCat() { try { S.cat = Object.fromEntries((await api(`/api/orgs/${S.org}/vip`)).catalog.map(v => [v.code, v])); } catch (e) { S.cat = {}; } }
+async function loadCat() {
+  try { S.cat = Object.fromEntries((await api(`/api/orgs/${S.org}/vip`)).catalog.map(v => [v.code, v])); } catch (e) { S.cat = {}; }
+  try { S.staff = (await api(`/api/orgs/${S.org}/staff`)).staff; } catch (e) { S.staff = []; }
+  const bs = S.staff.filter(p => p.branch_id); S.roleBranch = bs.length ? bs[0].branch_id : null; S.dr = null;
+}
 function fillOrgs() { $('#orgSel').innerHTML = S.orgs.map(o => `<option value="${o.id}" ${o.id === S.org ? 'selected' : ''}>${esc(o.name)}</option>`).join(''); }
 
 const VIEWS = {overview: vOverview, branches: vBranches, employees: vEmployees, alerts: vAlerts, changes: vChanges, vip: vVip, import: vImport, audit: vAudit};
@@ -742,10 +882,13 @@ function wireDrop() {
 async function render() {
   $('#nav').innerHTML = NAV.map(([k, l]) => `<button class="${S.view === k ? 'on' : ''}" data-act="nav" data-v="${k}">${icon(k)}${l}</button>`).join('');
   $('#more').innerHTML = MORE.map(([k, l]) => `<button class="${S.view === k ? 'on' : ''}" data-act="nav" data-v="${k}">${icon(k)}${l}</button>`).join('');
-  try { $('#main').innerHTML = await VIEWS[S.view](); document.querySelectorAll('[data-count]').forEach(countUp); wireDrop(); }
+  $('#roleSeg').innerHTML = Object.entries(ROLE_L).map(([k, l]) => `<button class="${S.role === k ? 'on' : ''}" data-act="role" data-r="${k}">${l}</button>`).join('');
+  const rb = $('#roleBr'); rb.hidden = S.role !== 'bm';
+  rb.innerHTML = S.staff.filter(p => p.branch_id).map(p => `<option value="${p.branch_id}" ${p.branch_id === S.roleBranch ? 'selected' : ''}>${esc(p.role)} — ${esc(p.name)}</option>`).join('');
+  try { $('#main').innerHTML = await VIEWS[S.view](); document.querySelectorAll('[data-count]').forEach(countUp); wireDrop(); if (S.dr && S.view === 'overview') renderDrawer(); else if (S.dr) closeDrawer(); }
   catch (e) { $('#main').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
 }
-function go(v, arg) { S.view = v; S.arg = arg ?? null; const p = render(); window.scrollTo(0, 0); return p; }
+function go(v, arg) { closeDrawer(); S.view = v; S.arg = arg ?? null; const p = render(); window.scrollTo(0, 0); return p; }
 
 /* ---------- events ---------- */
 document.addEventListener('click', async ev => {
@@ -755,6 +898,14 @@ document.addEventListener('click', async ev => {
     if (a === 'toggle') el.closest('.item').classList.toggle('open');
     else if (a === 'nav') go(el.dataset.v);
     else if (a === 'branch') go('branches', +el.dataset.id);
+    else if (a === 'role') { S.role = el.dataset.r; closeDrawer(); render(); }
+    else if (a === 'cell') { S.dr = {b: el.dataset.b || '', d: el.dataset.d || '', o: el.dataset.o || ''}; renderDrawer(); }
+    else if (a === 'drawer-close') closeDrawer();
+    else if (a === 'assign') {
+      const id = el.dataset.id, ow = document.querySelector(`[data-asg="${id}"]`), du = document.querySelector(`[data-asgd="${id}"]`);
+      const r = await api(`/api/orgs/${S.org}/assign`, {body: {item_id: id, owner_id: ow.value, due: du && du.value ? du.value : null}});
+      toast(`تم الإسناد إلى ${r.owner.name}`); render();
+    }
     else if (a === 'filt') { S.filt[el.dataset.g] = el.dataset.v; render(); }
     else if (a === 'emp') { S.emp = {branch: el.dataset.branch, code: el.dataset.code, status: el.dataset.status}; go('employees'); }
     else if (a === 'start') { S.imp = null; go('import'); }
@@ -784,7 +935,8 @@ document.addEventListener('click', async ev => {
     else if (a === 'welcome-close') $('#welcome').classList.remove('show');
     else if (a === 'welcome-import') { $('#welcome').classList.remove('show'); S.imp = null; go('import'); }
     else if (a === 'open-item') {
-      const id = el.dataset.id;
+      const id = el.dataset.id, hit = S.view === 'overview' ? locate(id) : null;
+      if (hit) { S.dr = {b: String(hit.branch_id), d: hit.domain, o: '', open: hit.kind === 'obligation' ? hit.id : `g-${hit.branch_id}-${hit.code}-${hit.status}`}; renderDrawer(); return; }
       if (id.startsWith('g-')) { const m = /^g-(\d+)-(.+)-(overdue|soon)$/.exec(id); S.emp = {branch: m[1], code: m[2], status: m[3]}; go('employees'); }
       else { const it = (await api(`/api/orgs/${S.org}/overview`)).urgent.find(x => x.id === id); await go('branches', it ? it.branch_id : null); const n = document.getElementById('it-' + id); if (n) { n.classList.add('open'); n.scrollIntoView({block: 'center'}); } }
     }
@@ -798,11 +950,13 @@ document.addEventListener('click', async ev => {
     else if (a === 'adv') { await api(`/api/vip/requests/${el.dataset.id}/advance`, {body: {}}); render(); }
   } catch (e) { toast(e.message); }
 });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 document.addEventListener('input', ev => { const t = ev.target; if (t.id === 'impName') S.form.name = t.value; else if (t.id === 'impBranch') S.form.defBranch = t.value; });
 document.addEventListener('change', async ev => {
   const t = ev.target;
   if (t.id === 'impFile' && t.files[0]) { try { await stage(await readTable(t.files[0]), t.files[0].name); } catch (e) { toast(e.message); } return; }
   if (t.id === 'impPack') S.form.pack = t.value;
+  if (t.id === 'roleBr') { S.roleBranch = +t.value; closeDrawer(); render(); return; }
   if (t.id === 'brSel') { S.arg = +t.value; render(); }
   else if (t.id === 'eBr') { S.emp.branch = t.value; render(); }
   else if (t.id === 'eCode') { S.emp.code = t.value; render(); }

@@ -256,3 +256,34 @@ def test_v1_database_is_migrated(tmp_path, monkeypatch):
     assert {"status", "provenance", "reviewed_by", "source_text"} <= cols
     assert c.execute("SELECT status FROM change WHERE id=99").fetchone()["status"] == "published"
     c.close()
+
+
+# ---------- responsibility: roster, default owners, assignment, consequences ----------
+def test_owner_consequence_and_assignment(tmp_path, monkeypatch):
+    import importlib, sys
+    monkeypatch.setenv("IMTITHAL_DB", str(tmp_path / "t.db")); monkeypatch.setenv("AS_OF", "2026-10-09")
+    for m in ("db", "engine", "staff", "main"):
+        sys.modules.pop(m, None)
+    import db; db.DB_PATH = tmp_path / "t.db"; db.init(reset=True)
+    from fastapi.testclient import TestClient
+    import main
+    c = TestClient(main.app)
+    st = c.get("/api/orgs/1/staff").json()["staff"]
+    assert [p["id"] for p in st][:2] == ["gm", "hr"] and st[2]["branch_id"] == 1 and st[2]["name"] == "فهد الشمري"
+    items = c.get("/api/branches/1/items").json()["items"]
+    ob = next(i for i in items if i["kind"] == "obligation")
+    assert ob["owner"]["id"] == "b1" and ob["assigned"] is False and ob["domain"] and ob["consequence"]
+    emp = next(i for i in items if i["kind"] == "employee_doc")
+    assert emp["owner"]["id"] == "hr"
+    r = c.post("/api/orgs/1/assign", json={"item_id": ob["id"], "owner_id": "hr", "due": "2026-10-20"})
+    assert r.status_code == 200 and r.json()["owner"]["name"] == "نورة العتيبي"
+    again = next(i for i in c.get("/api/branches/1/items").json()["items"] if i["id"] == ob["id"])
+    assert again["owner"]["id"] == "hr" and again["internal_due"] == "2026-10-20" and again["assigned"] is True
+    assert c.post("/api/orgs/1/assign", json={"item_id": ob["id"], "owner_id": "zzz"}).status_code == 404
+    assert c.post("/api/orgs/1/assign", json={"item_id": "bad", "owner_id": "hr"}).status_code == 400
+    assert c.post("/api/orgs/1/assign", json={"item_id": ob["id"], "owner_id": "hr", "due": "2026-02-30"}).status_code == 422
+    # employee documents are assigned per branch + document type
+    g = c.post("/api/orgs/1/assign", json={"item_id": f"g-1-{emp['code']}-overdue", "owner_id": "gm"})
+    assert g.status_code == 200
+    after = next(i for i in c.get("/api/branches/1/items").json()["items"] if i["kind"] == "employee_doc" and i["code"] == emp["code"])
+    assert after["owner"]["id"] == "gm"

@@ -54,3 +54,9 @@ the xlsx case needs `npm i xlsx` and is skipped otherwise.
 ## Tests
     pip install -r requirements-dev.txt
     pytest
+
+## v0.4 — "where / who / how / what it costs" in one look
+- Heat map (branch × domain) on the home screen; click a cell, a branch, a domain or a person to open a side drawer with the items.
+- Every item now carries a domain, an owner (default: branch manager, or HR for employee documents), an optional internal due date and a cautious, unverified "possible consequence" line. Assignment: `POST /api/orgs/{id}/assign`; roster: `GET /api/orgs/{id}/staff`.
+- "View as" switch: owner / HR manager / branch manager (client-side view; real roles and auth come later).
+- Named people exist only for the three seeded demo organisations; imported organisations get role titles.

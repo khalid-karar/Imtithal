@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS vip_service(
 CREATE TABLE IF NOT EXISTS vip_request(
   id INTEGER PRIMARY KEY, org_id INTEGER, branch_id INTEGER, service_code TEXT, item_ref TEXT, note TEXT,
   status TEXT, created_at TEXT, updated_at TEXT);
+CREATE TABLE IF NOT EXISTS assignment(org_id INTEGER, key TEXT, owner_id TEXT, due TEXT, PRIMARY KEY(org_id, key));
 CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY, org_id INTEGER, ts TEXT, action TEXT, detail TEXT);
 CREATE INDEX IF NOT EXISTS ix_inst_branch ON instance(branch_id);
 CREATE INDEX IF NOT EXISTS ix_doc_emp ON emp_doc(employee_id);

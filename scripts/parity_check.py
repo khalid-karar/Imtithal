@@ -57,6 +57,19 @@ def main():
              ("POST", f"/api/orgs/{orgs[0]}/vip/requests", {"service_code": code}),
              ("POST", "/api/vip/requests/1/advance", None), ("POST", "/api/vip/requests/1/advance", None),
              ("POST", "/api/vip/requests/1/advance", None), ("POST", "/api/vip/requests/2/advance", None)]
+    # responsibility: roster, default owners, assignments (obligation + employee-doc group), reassign, errors
+    ob0 = ins[2]
+    reqs += [("GET", f"/api/orgs/{o}/staff", None) for o in orgs]
+    reqs += [("POST", f"/api/orgs/{orgs[0]}/assign", {"item_id": f"o-{ob0}", "owner_id": "hr", "due": "2026-10-20"}),
+             ("POST", f"/api/orgs/{orgs[0]}/assign", {"item_id": f"o-{ob0}", "owner_id": f"b{b0}"}),
+             ("POST", f"/api/orgs/{orgs[0]}/assign", {"item_id": f"g-{b0}-EMP-IQAMA-overdue", "owner_id": "gm", "due": "2026-10-25"}),
+             ("POST", f"/api/orgs/{orgs[0]}/assign", {"item_id": f"g-{b0}-EMP-IQAMA", "owner_id": f"b{b0}"}),
+             ("POST", f"/api/orgs/{orgs[0]}/assign", {"item_id": "x-1", "owner_id": "hr"}),
+             ("POST", f"/api/orgs/{orgs[0]}/assign", {"item_id": f"o-{ob0}", "owner_id": "nobody"}),
+             ("POST", f"/api/orgs/{orgs[0]}/assign", {"item_id": f"o-{ob0}", "owner_id": "hr", "due": "2026-02-30"}),
+             ("POST", f"/api/orgs/{orgs[0]}/assign", {"item_id": "o-999999", "owner_id": "hr"}),
+             ("POST", f"/api/orgs/{orgs[0]}/assign", {"item_id": "g-999-EMP-IQAMA", "owner_id": "hr"}),
+             ("POST", "/api/orgs/99/assign", {"item_id": "o-1", "owner_id": "hr"}), ("GET", "/api/orgs/99/staff", None)]
     # alerts (before and after the mutations above)
     reqs += [("GET", f"/api/orgs/{o}/alerts", None) for o in orgs]
     # import: aliases (Arabic/English/hamza variants), duplicates, bad dates, unknown docs, sector mismatch, scope errors
@@ -94,6 +107,7 @@ def main():
     reqs += [("POST", f"/api/items/e-{max(docs) + 1}/complete", {"new_expiry": "2029-01-01"}),
              ("POST", f"/api/orgs/{new_org}/vip/requests", {"service_code": code, "branch_id": nb + 1}),
              ("GET", f"/api/orgs/{new_org}/vip", None), ("GET", f"/api/orgs/{new_org}/alerts", None)]
+    reqs += [("GET", f"/api/orgs/{new_org}/staff", None)]
     reqs += [("POST", "/api/import", dict(org_name="", pack="hotel", rows=rows)),
              ("POST", "/api/import", dict(org_name="x", pack="bank", rows=rows)),
              ("POST", "/api/import", dict(org_name="x", pack="hotel", rows=[])),

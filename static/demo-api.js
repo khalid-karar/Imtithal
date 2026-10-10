@@ -38,9 +38,10 @@
     const fresh = () => ({
       instances: JSON.parse(JSON.stringify(snapshot.instances)),
       emp_docs: JSON.parse(JSON.stringify(snapshot.emp_docs)),
-      acks: {}, vip_requests: [], audit: [], next_vip: 1, next_audit: 1, orgs_x: [], branches_x: [],
+      acks: {}, assign: {}, vip_requests: [], audit: [], next_vip: 1, next_audit: 1, orgs_x: [], branches_x: [],
     });
     let S = (store && store.get()) || fresh();
+    S.assign = S.assign || {};
     const save = () => { if (store) store.set(S); };
 
     // ---------- static lookups ----------
@@ -61,12 +62,40 @@
     // ---------- engine (mirror of engine.py) ----------
     const status = (left, lead) => left < 0 ? 'overdue' : left <= lead ? 'soon' : 'ok';
     const pub = t => ({
-      code: t.code, title: t.title, authority: t.authority, category: t.category, severity: t.severity,
+      code: t.code, title: t.title, authority: t.authority, category: t.category,
+      domain: (snapshot.domain_override || {})[t.code] || t.category, consequence: (snapshot.consequences || {})[t.code] || '', severity: t.severity,
       penalty_sar: t.penalty_sar, penalty_note: t.penalty_note, fix_steps: t.fix_steps, evidence: t.evidence,
       vip_code: t.vip_code, source_url: t.source_url, verified: !!t.verified, verified_by: t.verified_by ?? null,
       verified_on: t.verified_on ?? null, lead_days: t.lead_days,
       recurrence_months: t.recurrence_months,
     });
+
+    // ---------- who is responsible (mirror of staff.py) ----------
+    function roster(orgId) {
+      const org = orgById(orgId), named = org && (snapshot.demo_staff || {})[org.name];
+      const out = [{ id: 'gm', name: named ? named.gm : 'المدير العام', role: 'المدير العام / المالك', branch_id: null },
+                   { id: 'hr', name: named ? named.hr : 'مسؤول الموارد البشرية', role: 'مدير الموارد البشرية', branch_id: null }];
+      branchesAll.filter(b => b.org_id === orgId).sort((a, b) => a.id - b.id).forEach((b, k) => {
+        out.push({ id: 'b' + b.id, name: named && k < named.branches.length ? named.branches[k] : 'مدير ' + b.name,
+                   role: named ? 'مدير ' + b.name : 'مدير الفرع', branch_id: b.id });
+      });
+      return out;
+    }
+    const itemKey = i => i.kind === 'obligation' ? i.id : `g-${i.branch_id}-${i.code}`;
+    function decorate(orgId, items) {
+      const people = Object.fromEntries(roster(orgId).map(p => [p.id, p])), given = S.assign[orgId] || {};
+      for (const i of items) {
+        const a = given[itemKey(i)];
+        const oid = a && people[a.owner_id] ? a.owner_id : (i.kind === 'employee_doc' ? 'hr' : 'b' + i.branch_id);
+        const p = people[oid] || people.hr;
+        i.owner = { id: p.id, name: p.name, role: p.role }; i.internal_due = a ? (a.due || null) : null; i.assigned = !!a;
+      }
+    }
+    const normalizeKey = id => {
+      if (/^o-\d+$/.test(id)) return id;
+      const m = /^(g-\d+-.+?)(?:-(?:overdue|soon|ok))?$/.exec(id);
+      return m ? m[1] : null;
+    };
 
     function loadItems(orgId, branchId) {
       const items = [];
@@ -89,6 +118,7 @@
           employee: { id: r.eid, name: r.name, role: r.role },
         }, pub(t)));
       }
+      decorate(orgId, items);
       return items;
     }
 
@@ -272,6 +302,22 @@
       return { ok: true, status: nxt };
     }
 
+    function staffList(orgId) { needOrg(orgId); return { staff: roster(orgId) }; }
+    function assign(orgId, b) {
+      needOrg(orgId);
+      const key = normalizeKey(String(b.item_id ?? ''));
+      if (!key) throw new HttpError(400, 'معرّف غير صالح');
+      const people = Object.fromEntries(roster(orgId).map(p => [p.id, p]));
+      if (!people[b.owner_id]) throw new HttpError(404, 'المسؤول غير موجود');
+      if (b.due && !validDate(b.due)) throw new HttpError(422, 'التاريخ يجب أن يكون بصيغة YYYY-MM-DD');
+      const hit = loadItems(orgId).find(i => itemKey(i) === key);
+      if (!hit) throw new HttpError(404, 'البند غير موجود');
+      (S.assign[orgId] = S.assign[orgId] || {})[key] = { owner_id: b.owner_id, due: b.due || null };
+      log(orgId, 'assign', `${hit.title} ← ${people[b.owner_id].name}`);
+      save(); const p = people[b.owner_id];
+      return { ok: true, owner: { id: p.id, name: p.name, role: p.role } };
+    }
+
     function audit(orgId) {
       return { entries: S.audit.filter(e => e.org_id === orgId).slice().sort((a, b) => b.id - a.id).slice(0, 50) };
     }
@@ -405,12 +451,14 @@
           if ((m = /^\/api\/orgs\/(\d+)\/vip$/.exec(path))) return ok(vip(+m[1]));
           if ((m = /^\/api\/orgs\/(\d+)\/audit$/.exec(path))) return ok(audit(+m[1]));
           if ((m = /^\/api\/orgs\/(\d+)\/alerts$/.exec(path))) return ok(alerts(+m[1]));
+          if ((m = /^\/api\/orgs\/(\d+)\/staff$/.exec(path))) return ok(staffList(+m[1]));
           if (path === '/api/import/doc-types') return ok(docTypes());
         } else if (method === 'POST') {
           if ((m = /^\/api\/items\/([^/]+)\/complete$/.exec(path))) return ok(complete(decodeURIComponent(m[1]), b));
           if ((m = /^\/api\/orgs\/(\d+)\/changes\/(\d+)\/acknowledge$/.exec(path))) return ok(acknowledge(+m[1], +m[2]));
           if ((m = /^\/api\/orgs\/(\d+)\/vip\/requests$/.exec(path))) return ok(vipRequest(+m[1], b));
           if ((m = /^\/api\/vip\/requests\/(\d+)\/advance$/.exec(path))) return ok(vipAdvance(+m[1]));
+          if ((m = /^\/api\/orgs\/(\d+)\/assign$/.exec(path))) return ok(assign(+m[1], b));
           if (path === '/api/import') return ok(importOrg(b));
         }
         return { status: 404, body: { detail: 'Not Found' } };

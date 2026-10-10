@@ -50,6 +50,7 @@ def snapshot(as_of: str, db_path: Path) -> dict:
     snap = dict(as_of=as_of, orgs=rows("SELECT * FROM org ORDER BY id"), branches=rows("SELECT * FROM branch ORDER BY id"),
                 templates=templates, instances=rows("SELECT * FROM instance ORDER BY id"), emp_docs=emp_docs,
                 changes=changes, vip_services=vip, doc_aliases=library.DOC_ALIASES,
+                consequences=library.CONSEQUENCES, domain_override=library.DOMAIN_OVERRIDE, demo_staff=library.DEMO_STAFF,
                 max_eid=c.execute("SELECT COALESCE(MAX(id),0) FROM employee").fetchone()[0])
     c.close()
     snap["build_id"] = hashlib.sha256(json.dumps(snap, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12]

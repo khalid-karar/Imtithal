@@ -3,7 +3,9 @@ import json
 from collections import defaultdict
 from datetime import date
 
+import staff
 from db import add_months, as_of
+from library import CONSEQUENCES, DOMAIN_OVERRIDE
 
 SOON_WEIGHT = 0.35          # a due-soon item counts as 35% of an overdue one in the score
 EMP_SHARE = 0.4             # employee documents carry 40% of the score so they cannot drown licences/filings
@@ -54,11 +56,13 @@ def load_items(c, org_id: int, branch_id: int | None = None) -> list[dict]:
             due_date=r["expiry"], last_done=None, days_left=left, status=_status(left, t["lead_days"]),
             evidence_note="", vip_name=vip.get(t["vip_code"]),
             employee=dict(id=r["eid"], name=r["name"], role=r["role"]), **_public(t)))
+    staff.decorate(c, org_id, items)
     return items
 
 
 def _public(t: dict) -> dict:
     return dict(code=t["code"], title=t["title"], authority=t["authority"], category=t["category"],
+                domain=DOMAIN_OVERRIDE.get(t["code"], t["category"]), consequence=CONSEQUENCES.get(t["code"], ""),
                 severity=t["severity"], penalty_sar=t["penalty_sar"], penalty_note=t["penalty_note"],
                 fix_steps=t["fix_steps"], evidence=t["evidence"], vip_code=t["vip_code"],
                 source_url=t["source_url"], verified=t["verified"], verified_by=t["verified_by"],
