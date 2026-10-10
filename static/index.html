@@ -287,6 +287,26 @@ details.auth{margin-top:28px} details.auth summary{cursor:pointer;font-size:17px
 .drawer .item-h{grid-template-columns:12px 1fr auto}
 .drawer .when{display:none}
 @media (prefers-reduced-motion:reduce){.drawer,.scrim{transition:none}}
+
+.bks{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.bk{text-align:start;background:rgba(255,255,255,.05);border-radius:var(--r-m);padding:12px 12px 10px;cursor:pointer;display:flex;flex-direction:column;gap:3px;transition:background .15s;min-width:0;border-top:3px solid transparent}
+.bk:hover{background:rgba(255,255,255,.1)}
+.bk.o{border-top-color:#FF6B64} .bk.s{border-top-color:#FFC24D} .bk.f{border-top-color:#8FA6D6}
+.bk.z{opacity:.55;cursor:default} .bk.z:hover{background:rgba(255,255,255,.05)}
+.bk-l{font-size:12px;color:#A9B6CC;line-height:1.4;min-height:34px}
+.bk-n{font-size:34px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.bk.o .bk-n{color:#FF8A84} .bk.s .bk-n{color:#FFD08A} .bk.f .bk-n{color:#B9C8EA}
+.bk-bar{height:4px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden}
+.bk-bar i{display:block;height:100%;border-radius:99px;background:currentColor}
+.bk.o .bk-bar i{background:#FF6B64} .bk.s .bk-bar i{background:#FFC24D} .bk.f .bk-bar i{background:#8FA6D6}
+.bk-m{font-size:12px;color:#C9D4E6;margin:2px 0 6px}
+.bk-i{display:block;padding:5px 0;border-top:1px solid rgba(255,255,255,.08);font-size:12.5px;line-height:1.45}
+.bk-i b{display:block;font-weight:500;color:#fff;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.bk-i em{display:block;font-style:normal;color:#8D9BB5;font-size:11.5px}
+.bk-i:hover b{text-decoration:underline}
+.bk-more{font-size:12px;color:#9DB4FF;margin-top:4px}
+@media (max-width:1100px){.bks{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:600px){.bks{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -502,24 +522,25 @@ function verifLine(i) {
 }
 
 
-/* ---------- deadline timeline (the signature visual) ---------- */
+/* ---------- "when is it due": time buckets with the actual items written out ---------- */
+const BUCKETS = [
+  {l: 'متأخر أكثر من 30 يومًا', lo: -99999, hi: -31, c: 'o'}, {l: 'متأخر من 8 إلى 30 يومًا', lo: -30, hi: -8, c: 'o'},
+  {l: 'متأخر خلال آخر 7 أيام', lo: -7, hi: -1, c: 'o'}, {l: 'يستحق خلال 7 أيام', lo: 0, hi: 7, c: 's'},
+  {l: 'يستحق بعد 8 إلى 30 يومًا', lo: 8, hi: 30, c: 's'}, {l: 'يستحق بعد 31 إلى 60 يومًا', lo: 31, hi: 60, c: 'f'}];
 function timeline(d, lanes) {
-  const LO = -45, HI = 60, span = HI - LO, pos = n => ((Math.max(LO, Math.min(HI, n)) - LO) / span) * 100;
-  let k = 0;
-  const rows = lanes.map(({b, items}) => {
-    const dots = items.filter(i => i.status !== 'ok' && i.days_left <= HI).map(i => {
-      const h = (i.id.split('').reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % 100) / 100;
-      const size = Math.round(8 + Math.min(10, Math.sqrt(Math.max(0, i.penalty_sar)) / 14));
-      const y = 14 + h * 16;
-      return `<button class="td ${i.status}" style="inset-inline-start:${pos(i.days_left).toFixed(2)}%;top:${y.toFixed(1)}px;width:${size}px;height:${size}px;--d:${Math.min(900, (k++) * 9)}ms" data-act="open-item" data-id="${esc(i.id)}" title="${esc(title(i))} — ${when(i)}" aria-label="${esc(title(i))} — ${when(i)}"></button>`;
-    }).join('');
-    return `<div class="lane"><span class="ln">${esc(b.name.replace(/^فندق\s*/, ''))}</span><div class="trk">${dots}</div></div>`;
+  const issues = groupItems(lanes.flatMap(l => l.items));
+  const cols = BUCKETS.map(B => issues.filter(i => i.days_left >= B.lo && i.days_left <= B.hi).sort((a, b) => a.days_left - b.days_left || b.severity - a.severity));
+  const max = Math.max(1, ...cols.map(c => c.length));
+  const short = n => n.replace(/^(فندق|مستشفى)\s*/, '');
+  const html = cols.map((c, k) => {
+    const B = BUCKETS[k], money = c.reduce((a, i) => a + i.penalty_sar, 0);
+    const lines = c.slice(0, 3).map(i => `<span class="bk-i" data-act="open-item" data-id="${esc(i.id)}"><b>${esc(title(i))}</b><em>${esc(short(i.branch_name))}</em></span>`).join('');
+    return `<div class="bk ${B.c}${c.length ? '' : ' z'}" ${c.length ? `data-act="cell" data-b="" data-d="" data-t="${k}"` : ''}>
+      <div class="bk-l">${B.l}</div><div class="bk-n">${fmt(c.length)}</div>
+      <div class="bk-bar"><i style="width:${Math.round(c.length / max * 100)}%"></i></div>
+      <div class="bk-m">${c.length ? sar(money) : 'لا شيء'}</div>${lines}${c.length > 3 ? `<span class="bk-more">و${fmt(c.length - 3)} بنود أخرى ←</span>` : ''}</div>`;
   }).join('');
-  const t0 = pos(0).toFixed(2);
-  return `<div class="tl"><div class="tl-h"><span>أين تقع مواعيدك على الخط الزمني — اضغط على أي نقطة لتفتح البند</span><span><i class="o">متأخر</i><i class="s">يقترب</i></span></div>
-    <div class="tl-grid">${rows}
-      <div class="today" style="inset-inline-start:calc(128px + (100% - 128px) * ${t0 / 100})"><span>اليوم</span></div>
-      <div class="axis"><span style="inset-inline-start:0">قبل ${fmt(-LO)} يومًا</span><span style="inset-inline-end:0">بعد ${fmt(HI)} يومًا</span></div></div></div>`;
+  return `<div class="tl"><div class="tl-h"><span>متى تستحق بنودك؟ — من الأقدم تأخرًا إلى الأبعد موعدًا</span><span>اضغط على أي عمود لترى كل بنوده</span></div><div class="bks">${html}</div></div>`;
 }
 
 /* ---------- helpers: grouping, domains, roles ---------- */
@@ -585,15 +606,16 @@ function drawerItems() {
   const f = S.dr; let items = [];
   scopedLanes().forEach(l => { if (!f.b || l.b.id === +f.b) items = items.concat(l.items); });
   if (f.d) items = items.filter(i => i.domain === f.d);
-  if (f.o) items = groupItems(items).filter(i => i.owner.id === f.o);
-  else items = groupItems(items);
-  return items;
+  let list = groupItems(items);
+  if (f.o) list = list.filter(i => i.owner.id === f.o);
+  if (f.t !== undefined && f.t !== '') { const B = BUCKETS[+f.t]; list = list.filter(i => i.days_left >= B.lo && i.days_left <= B.hi); }
+  return list;
 }
 function renderDrawer() {
   const f = S.dr; if (!f) return;
   const br = f.b ? (S.lanes.find(l => l.b.id === +f.b) || {}).b : null;
   const who = f.o ? (S.staff.find(p => p.id === f.o) || {}).name : '';
-  const t = [br ? br.name : 'كل الفروع', f.d || (f.o ? 'بنود ' + who : 'كل المجالات')].join(' — ');
+  const t = f.t !== undefined && f.t !== '' ? BUCKETS[+f.t].l + (br ? ' — ' + br.name : '') : [br ? br.name : 'كل الفروع', f.d || (f.o ? 'بنود ' + who : 'كل المجالات')].join(' — ');
   const was = [...document.querySelectorAll('#drawer .item.open')].map(n => n.id);
   const list = drawerItems();
   const money = list.filter(i => i.status === 'overdue').reduce((a, i) => a + i.penalty_sar, 0);
@@ -899,7 +921,7 @@ document.addEventListener('click', async ev => {
     else if (a === 'nav') go(el.dataset.v);
     else if (a === 'branch') go('branches', +el.dataset.id);
     else if (a === 'role') { S.role = el.dataset.r; closeDrawer(); render(); }
-    else if (a === 'cell') { S.dr = {b: el.dataset.b || '', d: el.dataset.d || '', o: el.dataset.o || ''}; renderDrawer(); }
+    else if (a === 'cell') { S.dr = {b: el.dataset.b || '', d: el.dataset.d || '', o: el.dataset.o || '', t: el.dataset.t ?? ''}; renderDrawer(); }
     else if (a === 'drawer-close') closeDrawer();
     else if (a === 'assign') {
       const id = el.dataset.id, ow = document.querySelector(`[data-asg="${id}"]`), du = document.querySelector(`[data-asgd="${id}"]`);
