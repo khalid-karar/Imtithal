@@ -1,4 +1,5 @@
 import json
+import re
 from contextlib import asynccontextmanager
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -25,9 +26,9 @@ app.include_router(admin.router)
 STATIC = Path(__file__).parent / "static"
 
 
-def _log(c, org_id: int, action: str, detail: str) -> None:
-    c.execute("INSERT INTO audit(org_id,ts,action,detail) VALUES(?,?,?,?)",
-              (org_id, datetime.now(timezone.utc).isoformat(timespec="seconds"), action, detail))
+def _log(c, org_id: int, action: str, detail: str, amount: int = 0) -> None:
+    c.execute("INSERT INTO audit(org_id,ts,action,detail,amount) VALUES(?,?,?,?,?)",
+              (org_id, datetime.now(timezone.utc).isoformat(timespec="seconds"), action, detail, amount))
 
 
 def _org(c, org_id: int):
@@ -124,23 +125,25 @@ def complete(item_id: str, body: Complete):
     c = db.conn()
     today = db.as_of()
     if kind == "o":
-        r = c.execute("SELECT i.*, t.recurrence_months, t.title FROM instance i JOIN template t ON t.code=i.template_code WHERE i.id=?", (raw,)).fetchone()
+        r = c.execute("SELECT i.*, t.recurrence_months, t.title, t.lead_days, t.penalty_sar FROM instance i JOIN template t ON t.code=i.template_code WHERE i.id=?", (raw,)).fetchone()
         if not r:
             raise HTTPException(404, "البند غير موجود")
         done = date.fromisoformat(body.done_date) if body.done_date else today
         new_due = engine.next_due(date.fromisoformat(r["due_date"]), done, r["recurrence_months"])
         c.execute("UPDATE instance SET due_date=?, last_done=?, evidence_note=? WHERE id=?",
                   (new_due.isoformat(), done.isoformat(), body.note, raw))
-        _log(c, r["org_id"], "complete", f"{r['title']} — الاستحقاق التالي {new_due.isoformat()}")
+        removed = r["penalty_sar"] if engine._status((date.fromisoformat(r["due_date"]) - today).days, r["lead_days"]) != "ok" else 0
+        _log(c, r["org_id"], "complete", f"{r['title']} — الاستحقاق التالي {new_due.isoformat()}", removed)
         result = dict(next_due=new_due.isoformat())
     else:
-        r = c.execute("SELECT d.*, t.recurrence_months, t.title, e.name FROM emp_doc d JOIN template t ON t.code=d.template_code "
+        r = c.execute("SELECT d.*, t.recurrence_months, t.title, t.lead_days, t.penalty_sar, e.name FROM emp_doc d JOIN template t ON t.code=d.template_code "
                       "JOIN employee e ON e.id=d.employee_id WHERE d.id=?", (raw,)).fetchone()
         if not r:
             raise HTTPException(404, "الوثيقة غير موجودة")
         new_exp = date.fromisoformat(body.new_expiry) if body.new_expiry else db.add_months(today, r["recurrence_months"])
         c.execute("UPDATE emp_doc SET expiry=? WHERE id=?", (new_exp.isoformat(), raw))
-        _log(c, r["org_id"], "renew", f"{r['title']} — {r['name']} — ينتهي {new_exp.isoformat()}")
+        removed = r["penalty_sar"] if engine._status((date.fromisoformat(r["expiry"]) - today).days, r["lead_days"]) != "ok" else 0
+        _log(c, r["org_id"], "renew", f"{r['title']} — {r['name']} — ينتهي {new_exp.isoformat()}", removed)
         result = dict(next_due=new_exp.isoformat())
     c.commit()
     c.close()
@@ -265,6 +268,73 @@ def org_alerts(org_id: int):
     items = engine.load_items(c, org_id)
     c.close()
     return alerts.build(dict(org), branches, items)
+
+
+@app.get("/api/orgs/{org_id}/score-explain")
+def score_explain(org_id: int, branch_id: int | None = None):
+    """Why the readiness score is what it is, and what would move it (whole organisation, or one branch)."""
+    c = db.conn()
+    _org(c, org_id)
+    items = engine.load_items(c, org_id, branch_id)
+    c.close()
+    return engine.explain_score(items)
+
+
+class Remind(BaseModel):
+    item_id: str
+
+
+@app.post("/api/orgs/{org_id}/remind")
+def remind(org_id: int, body: Remind):
+    """Prepares the reminder the item's owner would receive (the text is returned so the customer can send it from their own
+    WhatsApp today; automatic sending needs a messaging provider) and records that it was prepared."""
+    c = db.conn()
+    _org(c, org_id)
+    if not re.fullmatch(r"(o|e)-\d+|g-\d+-.+-(overdue|soon|ok)", body.item_id):
+        c.close()
+        raise HTTPException(400, "معرّف غير صالح")
+    items = engine.load_items(c, org_id)
+    pool = items + [g for g, _ in engine._grouped(items)]
+    hit = next((i for i in pool if i["id"] == body.item_id), None)
+    if not hit:
+        c.close()
+        raise HTTPException(404, "البند غير موجود")
+    owner = hit["owner"]
+    _log(c, org_id, "remind", f"{hit['title']} → {owner['name']}")
+    c.commit()
+    c.close()
+    return dict(ok=True, to=dict(name=owner["name"], role=owner["role"]), text=alerts.message_text(hit))
+
+
+@app.get("/api/orgs/{org_id}/owner")
+def owner_summary(org_id: int):
+    """One page for whoever holds the budget: the number, the worst branch, the three things to do, what has been fixed since
+    the organisation started using the product, and the score history (one point per day the page is opened)."""
+    c = db.conn()
+    org = _org(c, org_id)
+    items = engine.load_items(c, org_id)
+    branches = [dict(r) for r in c.execute("SELECT * FROM branch WHERE org_id=? ORDER BY id", (org_id,))]
+    today = db.as_of().isoformat()
+    s, money = engine.score(items), engine.money_at_risk(items)
+    c.execute("INSERT INTO score_history(org_id,day,score,money) VALUES(?,?,?,?) ON CONFLICT(org_id,day) DO UPDATE SET score=excluded.score, money=excluded.money",
+              (org_id, today, s, money))
+    c.commit()
+    history = [dict(r) for r in c.execute("SELECT day,score,money FROM (SELECT day,score,money FROM score_history WHERE org_id=? ORDER BY day DESC LIMIT 60) ORDER BY day", (org_id,))]
+    wins = c.execute("SELECT COUNT(*) AS n, COALESCE(SUM(amount),0) AS removed FROM audit WHERE org_id=? AND action IN ('complete','renew')", (org_id,)).fetchone()
+    vip_done = c.execute("SELECT COUNT(*) FROM vip_request WHERE org_id=? AND status='done'", (org_id,)).fetchone()[0]
+    scored = [(b["name"], engine.score([i for i in items if i["branch_id"] == b["id"]]),
+               engine.money_at_risk([i for i in items if i["branch_id"] == b["id"]])) for b in branches]
+    worst = None
+    for name, bs, bm in scored:
+        if worst is None or bs < worst["score"]:
+            worst = dict(name=name, score=bs, money=bm)
+    al = alerts.build(dict(org), branches, items)
+    c.close()
+    return dict(org=dict(id=org["id"], name=org["name"]), as_of=today, score=s, band=engine.band(s), money_at_risk=money,
+                exposure_30=engine.exposure_30(items), counts=engine.counts(items), worst_branch=worst,
+                actions=[dict(id=i["id"], title=i["title"], kind=i["kind"], count=i.get("count", 1), branch_name=i["branch_name"],
+                              status=i["status"], days_left=i["days_left"], penalty_sar=i["penalty_sar"]) for i in engine.urgent(items, 3)],
+                wins=dict(fixed=wins["n"], exposure_removed=wins["removed"], vip_done=vip_done), history=history, digest=al["digest"])
 
 
 class ImportRow(BaseModel):

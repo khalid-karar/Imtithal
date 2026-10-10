@@ -38,10 +38,11 @@
     const fresh = () => ({
       instances: JSON.parse(JSON.stringify(snapshot.instances)),
       emp_docs: JSON.parse(JSON.stringify(snapshot.emp_docs)),
-      acks: {}, assign: {}, vip_requests: [], audit: [], next_vip: 1, next_audit: 1, orgs_x: [], branches_x: [],
+      acks: {}, assign: {}, history: {}, vip_requests: [], audit: [], next_vip: 1, next_audit: 1, orgs_x: [], branches_x: [],
     });
     let S = (store && store.get()) || fresh();
     S.assign = S.assign || {};
+    S.history = S.history || {};
     const save = () => { if (store) store.set(S); };
 
     // ---------- static lookups ----------
@@ -57,7 +58,7 @@
     const orgById = id => orgs.find(o => o.id === id);
 
     class HttpError extends Error { constructor(status, detail) { super(detail); this.status = status; this.detail = detail; } }
-    const log = (org_id, action, detail) => { S.audit.push({ id: S.next_audit++, org_id, ts: nowTs(), action, detail }); };
+    const log = (org_id, action, detail, amount) => { S.audit.push({ id: S.next_audit++, org_id, ts: nowTs(), action, detail, amount: amount || 0 }); };
 
     // ---------- engine (mirror of engine.py) ----------
     const status = (left, lead) => left < 0 ? 'overdue' : left <= lead ? 'soon' : 'ok';
@@ -227,15 +228,17 @@
         const r = S.instances.find(x => x.id === id);
         if (!r) throw new HttpError(404, 'البند غير موجود');
         const t = tpl[r.template_code], done = body.done_date || TODAY, nd = nextDue(r.due_date, done, t.recurrence_months);
+        const removed = status(daysBetween(r.due_date, TODAY), t.lead_days) !== 'ok' ? t.penalty_sar : 0;
         r.due_date = nd; r.last_done = done; r.evidence_note = body.note || '';
-        log(r.org_id, 'complete', `${t.title} — الاستحقاق التالي ${nd}`);
+        log(r.org_id, 'complete', `${t.title} — الاستحقاق التالي ${nd}`, removed);
         save(); return { ok: true, next_due: nd };
       }
       const r = S.emp_docs.find(x => x.id === id);
       if (!r) throw new HttpError(404, 'الوثيقة غير موجودة');
       const t = tpl[r.template_code], ne = body.new_expiry || addMonths(TODAY, t.recurrence_months);
+      const removed = status(daysBetween(r.expiry, TODAY), t.lead_days) !== 'ok' ? t.penalty_sar : 0;
       r.expiry = ne;
-      log(r.org_id, 'renew', `${t.title} — ${r.name} — ينتهي ${ne}`);
+      log(r.org_id, 'renew', `${t.title} — ${r.name} — ينتهي ${ne}`, removed);
       save(); return { ok: true, next_due: ne };
     }
 
@@ -323,6 +326,60 @@
     }
 
 
+
+    // ---------- why the score is what it is (mirror of engine.explain_score) ----------
+    function grouped(items) {
+      const out = [], groups = new Map();
+      for (const i of items) {
+        if (i.status === 'ok') continue;
+        if (i.kind === 'obligation') out.push([i, [i]]);
+        else { const k = i.branch_id + '|' + i.code + '|' + i.status; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); }
+      }
+      for (const g of groups.values()) {
+        let first = g[0];
+        for (const x of g) if (x.days_left < first.days_left) first = x;
+        out.push([Object.assign({}, first, {
+          id: `g-${first.branch_id}-${first.code}-${first.status}`, kind: 'group', count: g.length, employee: null,
+          penalty_sar: g.reduce((a, x) => a + x.penalty_sar, 0), days_left: first.days_left,
+        }), g]);
+      }
+      return out;
+    }
+    const asOk = (items, ids) => items.map(i => (ids === null || ids.has(i.id)) && i.status !== 'ok' ? Object.assign({}, i, { status: 'ok' }) : i);
+    function explainScore(items, limit) {
+      limit = limit || 6;
+      const defs = [[items.filter(i => i.kind === 'obligation'), 1 - EMP_SHARE, 'التزامات وتراخيص', 'obligation'],
+                    [items.filter(i => i.kind === 'employee_doc'), EMP_SHARE, 'وثائق الموظفين', 'employee_doc']].filter(d => d[0].length);
+      const w = defs.reduce((a, d) => a + d[1], 0);
+      const parts = [], totals = {};
+      for (const [g, share, label, kind] of defs) {
+        const [l, total] = loss(g);
+        totals[kind] = [total, share / w];
+        parts.push({ label, kind, weight: pyRound(100 * share / w), score: pyRound(100 * (1 - l / total)), count: g.length,
+                     overdue: g.filter(i => i.status === 'overdue').length, soon: g.filter(i => i.status === 'soon').length });
+      }
+      const drivers = grouped(items).map(([shown, members]) => {
+        const [total, nshare] = totals[members[0].kind];
+        const pts = members.reduce((a, m) => a + nshare * 100 * (m.severity * (m.status === 'overdue' ? 1.0 : SOON_WEIGHT)) / total, 0);
+        return [pts, shown, members];
+      });
+      drivers.sort((a, b) => (b[0] - a[0]) || prioCmp(a[1], b[1]));
+      const s = score(items), top3 = new Set();
+      drivers.slice(0, 3).forEach(d => d[2].forEach(m => top3.add(m.id)));
+      return {
+        score: s, band: band(s), soon_weight: SOON_WEIGHT, parts,
+        drivers: drivers.slice(0, limit).map(([p, d]) => ({
+          id: d.id, kind: d.kind, title: d.title, count: d.count ?? 1, branch_id: d.branch_id, branch_name: d.branch_name, status: d.status,
+          days_left: d.days_left, penalty_sar: d.penalty_sar, vip_code: d.vip_code, points: pyRound(p * 10) / 10 })),
+        other_points: pyRound(drivers.slice(limit).reduce((a, d) => a + d[0], 0) * 10) / 10,
+        scenarios: { fix_top3: score(asOk(items, top3)), fix_overdue: score(items.map(i => i.status === 'overdue' ? Object.assign({}, i, { status: 'ok' }) : i)) },
+      };
+    }
+    function scoreExplain(orgId, q) {
+      needOrg(orgId);
+      return explainScore(loadItems(orgId, q.branch_id ? Number(q.branch_id) : null));
+    }
+
     // ---------- alerts (mirror of alerts.py) ----------
     const arDays = n => n === 1 ? 'يوم واحد' : n === 2 ? 'يومين' : (n >= 3 && n <= 10) ? `${n} أيام` : `${n} يومًا`;
     const alertWhat = i => i.kind === 'group' ? `${i.count} × ${i.title}`
@@ -345,13 +402,49 @@
       let worst = null;
       for (const b of branches) { const sc = score(items.filter(i => i.branch_id === b.id)); if (!worst || sc < worst[1]) worst = [b.name, sc]; }
       const top = urgent(items, 3);
-      const body = [`مؤشر الجاهزية: ${score(items)} / 100`, `التعرض المالي للبنود المتأخرة: ${moneyAtRisk(items)} ريال`,
+      const body = [`مؤشر الجاهزية: ${score(items)} من 100`, `التعرض المالي للبنود المتأخرة: ${moneyAtRisk(items)} ريال`,
         `بنود متأخرة: ${cnt.overdue} — بنود تقترب: ${cnt.soon}`];
-      if (worst) body.push(`أضعف فرع: ${worst[0]} (${worst[1]} / 100)`);
+      if (worst) body.push(`أضعف فرع: ${worst[0]} (${worst[1]} من 100)`);
       if (top.length) { body.push('أهم ما يحتاج إجراءً هذا الأسبوع:'); top.forEach((i, n) => body.push(`${n + 1}. ${alertWhat(i)} — ${i.branch_name}`)); }
       return {
         summary: { overdue_items: cnt.overdue, penalty_sar: moneyAtRisk(items) }, messages,
         digest: { channel: 'email', to: 'مالك المنشأة / مدير الموارد البشرية', subject: `ملخص امتثال الأسبوعي — ${org.name}`, body: body.join('\n') },
+      };
+    }
+
+
+    // ---------- one-tap reminder + owner summary (mirror of main.remind / main.owner_summary) ----------
+    function remind(orgId, body) {
+      needOrg(orgId);
+      const id = String(body.item_id ?? '');
+      if (!/^((o|e)-\d+|g-\d+-.+-(overdue|soon|ok))$/.test(id)) throw new HttpError(400, 'معرّف غير صالح');
+      const items = loadItems(orgId);
+      const hit = items.concat(grouped(items).map(g => g[0])).find(i => i.id === id);
+      if (!hit) throw new HttpError(404, 'البند غير موجود');
+      log(orgId, 'remind', `${hit.title} → ${hit.owner.name}`);
+      save();
+      return { ok: true, to: { name: hit.owner.name, role: hit.owner.role }, text: alertText(hit) };
+    }
+    function ownerSummary(orgId) {
+      const org = needOrg(orgId), items = loadItems(orgId), branches = branchesAll.filter(b => b.org_id === orgId);
+      const s = score(items), money = moneyAtRisk(items);
+      (S.history[orgId] = S.history[orgId] || {})[TODAY] = { score: s, money };
+      save();
+      const history = Object.keys(S.history[orgId]).sort().slice(-60).map(day => ({ day, score: S.history[orgId][day].score, money: S.history[orgId][day].money }));
+      const done = S.audit.filter(e => e.org_id === orgId && (e.action === 'complete' || e.action === 'renew'));
+      let worst = null;
+      for (const b of branches) {
+        const bi = items.filter(i => i.branch_id === b.id), bs = score(bi);
+        if (!worst || bs < worst.score) worst = { name: b.name, score: bs, money: moneyAtRisk(bi) };
+      }
+      return {
+        org: { id: org.id, name: org.name }, as_of: TODAY, score: s, band: band(s), money_at_risk: money, exposure_30: exposure30(items),
+        counts: counts(items), worst_branch: worst,
+        actions: urgent(items, 3).map(i => ({ id: i.id, title: i.title, kind: i.kind, count: i.count ?? 1, branch_name: i.branch_name,
+                                              status: i.status, days_left: i.days_left, penalty_sar: i.penalty_sar })),
+        wins: { fixed: done.length, exposure_removed: done.reduce((a, e) => a + (e.amount || 0), 0),
+                vip_done: S.vip_requests.filter(r => r.org_id === orgId && r.status === 'done').length },
+        history, digest: alerts(orgId).digest,
       };
     }
 
@@ -452,6 +545,8 @@
           if ((m = /^\/api\/orgs\/(\d+)\/audit$/.exec(path))) return ok(audit(+m[1]));
           if ((m = /^\/api\/orgs\/(\d+)\/alerts$/.exec(path))) return ok(alerts(+m[1]));
           if ((m = /^\/api\/orgs\/(\d+)\/staff$/.exec(path))) return ok(staffList(+m[1]));
+          if ((m = /^\/api\/orgs\/(\d+)\/score-explain$/.exec(path))) return ok(scoreExplain(+m[1], q));
+          if ((m = /^\/api\/orgs\/(\d+)\/owner$/.exec(path))) return ok(ownerSummary(+m[1]));
           if (path === '/api/import/doc-types') return ok(docTypes());
         } else if (method === 'POST') {
           if ((m = /^\/api\/items\/([^/]+)\/complete$/.exec(path))) return ok(complete(decodeURIComponent(m[1]), b));
@@ -459,6 +554,7 @@
           if ((m = /^\/api\/orgs\/(\d+)\/vip\/requests$/.exec(path))) return ok(vipRequest(+m[1], b));
           if ((m = /^\/api\/vip\/requests\/(\d+)\/advance$/.exec(path))) return ok(vipAdvance(+m[1]));
           if ((m = /^\/api\/orgs\/(\d+)\/assign$/.exec(path))) return ok(assign(+m[1], b));
+          if ((m = /^\/api\/orgs\/(\d+)\/remind$/.exec(path))) return ok(remind(+m[1], b));
           if (path === '/api/import') return ok(importOrg(b));
         }
         return { status: 404, body: { detail: 'Not Found' } };

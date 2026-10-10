@@ -91,6 +91,7 @@
       for (const n of [t.code, ...t.names]) { const k = nk(n); if (!exact.has(k)) exact.set(k, t.code); }
     }
     const titles = Object.fromEntries(docTypes.doc_types.map(t => [t.code, t.names[0]]));
+    const packs = Object.fromEntries(docTypes.doc_types.map(t => [t.code, t.packs || []]));
     const find = text => {
       const k = nk(text); if (!k) return null;
       if (exact.has(k)) return exact.get(k);
@@ -98,7 +99,7 @@
       for (const [n, code] of exact) if (n.length >= 4 && k.includes(n) && (!best || n.length > best[0].length)) best = [n, code];
       return best ? best[1] : null;
     };
-    return { find, scope, titles };
+    return { find, scope, titles, packs };
   }
 
   /* ---------- table -> rows ---------- */

@@ -37,6 +37,11 @@ def _text(i: dict) -> str:
     return "\n".join(lines)
 
 
+def message_text(i: dict) -> str:
+    """The reminder text for one item (also what the one-tap reminder returns)."""
+    return _text(i)
+
+
 def build(org: dict, branches: list[dict], items: list[dict]) -> dict:
     picks = list(engine.urgent(items, 4))
     soon_emp = sorted((i for i in items if i["kind"] == "employee_doc" and i["status"] == "soon"),
@@ -53,11 +58,11 @@ def build(org: dict, branches: list[dict], items: list[dict]) -> dict:
         if worst is None or s < worst[1]:
             worst = (name, s)
     top = engine.urgent(items, 3)
-    body = [f"مؤشر الجاهزية: {score} / 100",
+    body = [f"مؤشر الجاهزية: {score} من 100",
             f"التعرض المالي للبنود المتأخرة: {engine.money_at_risk(items)} ريال",
             f"بنود متأخرة: {cnt['overdue']} — بنود تقترب: {cnt['soon']}"]
     if worst:
-        body.append(f"أضعف فرع: {worst[0]} ({worst[1]} / 100)")
+        body.append(f"أضعف فرع: {worst[0]} ({worst[1]} من 100)")
     if top:
         body.append("أهم ما يحتاج إجراءً هذا الأسبوع:")
         body += [f"{n}. {_what(i)} — {i['branch_name']}" for n, i in enumerate(top, start=1)]

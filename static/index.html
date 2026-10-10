@@ -307,6 +307,125 @@ details.auth{margin-top:28px} details.auth summary{cursor:pointer;font-size:17px
 .bk-more{font-size:12px;color:#9DB4FF;margin-top:4px}
 @media (max-width:1100px){.bks{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:600px){.bks{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ===== v0.5: one-tap actions, score explanation, reveal, owner view, calendar, search ===== */
+.qa{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.qb{border:1px solid var(--line);background:#fff;border-radius:99px;padding:3px 12px;font-size:12.5px;font-weight:500;cursor:pointer;color:var(--ink-2);line-height:1.7;transition:border-color .15s,color .15s,background .15s}
+.qb:hover{border-color:var(--brand);color:var(--brand)}
+.qb.pri{background:var(--brand);border-color:var(--brand);color:#fff} .qb.pri:hover{background:#1B46D6;color:#fff}
+.chk{width:17px;height:17px;accent-color:var(--brand);cursor:pointer}
+.item-h.sel{grid-template-columns:20px 12px 1fr auto auto}
+.drawer .item-h.sel{grid-template-columns:20px 12px 1fr auto}
+.bulk{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:10px 14px;margin-bottom:12px;font-size:13px;position:sticky;top:-16px;z-index:2}
+.bulk select{max-width:220px}
+.hjr{display:block;font-size:11.5px;color:var(--mute);margin-top:1px}
+.glad{background:var(--ok-bg);color:#0A6B47;border-radius:var(--r-m);padding:12px 18px;margin:0 0 12px;font-size:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.glad.wins{background:var(--brand-bg);color:#17348F}
+.lnkb{background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;font-weight:600}
+.scorebtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:99px;padding:2px 12px;font-size:12.5px;cursor:pointer;margin-inline-start:8px}
+.scorebtn:hover{background:rgba(255,255,255,.2)}
+
+/* search */
+.topbar{position:sticky;top:0;z-index:30;background:linear-gradient(var(--bg) 78%,rgba(243,245,249,0));padding:2px 0 14px;max-width:1060px;margin:-8px auto 4px}
+.search{position:relative}
+.search input{width:100%;border:1px solid var(--line);border-radius:var(--r-m);padding:10px 42px 10px 14px;background:#fff;box-shadow:0 1px 2px rgba(11,22,38,.04)}
+.search input:focus{outline:2px solid var(--brand);outline-offset:0;border-color:transparent}
+.search .ic{position:absolute;inset-inline-start:auto;inset-inline-end:14px;top:50%;transform:translateY(-50%);color:var(--mute);width:17px;height:17px;pointer-events:none}
+.qres{position:absolute;inset-inline:0;top:100%;margin-top:6px;background:#fff;border:1px solid var(--line);border-radius:var(--r-m);box-shadow:0 12px 32px rgba(11,22,38,.14);max-height:430px;overflow:auto;display:none}
+.qres.show{display:block}
+.qr{display:grid;grid-template-columns:12px 1fr auto;gap:12px;align-items:center;padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--line);text-align:start;width:100%;background:none;border-inline:0;border-top:0;font:inherit}
+.qr:hover,.qr:focus-visible{background:var(--bg)}
+.qr:last-child{border-bottom:0}
+.qr-all{font-weight:600;color:var(--brand);justify-content:center;display:block;text-align:center}
+
+/* score explanation */
+.sx-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+.sx-n{font-size:58px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.sx-part{background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:12px 16px;margin-bottom:10px}
+.sx-part b{font-weight:600}
+.sx-bar{height:8px;background:var(--fill);border-radius:99px;overflow:hidden;margin:8px 0 4px}
+.sx-bar i{display:block;height:100%;border-radius:99px}
+.sx-h{margin:20px 0 6px;font-size:14.5px;font-weight:600}
+.sx-drv{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.sx-pts{font-weight:700;color:var(--bad);font-variant-numeric:tabular-nums;font-size:17px}
+.sx-sc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sx-sc div{background:var(--ok-bg);color:#0A6B47;border-radius:var(--r-m);padding:12px 14px;font-size:13px}
+.sx-sc b{display:block;font-size:26px;line-height:1.2}
+
+/* reveal after import */
+.reveal{position:fixed;inset:0;z-index:85;background:radial-gradient(900px 520px at 50% -8%,#1F46B8 0%,var(--ink) 62%);color:#fff;display:none;overflow:auto;padding:28px 18px}
+.reveal.show{display:grid;place-items:center}
+.rv{max-width:780px;width:100%;text-align:center;margin:auto}
+.rv>*{animation:rise .7s cubic-bezier(.2,.8,.3,1) both;animation-delay:calc(var(--n,0)*170ms)}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.rv .k{color:#B4C2DB;font-size:15px}
+.rv .num{font-size:clamp(64px,14vw,140px);font-weight:700;line-height:1.02;letter-spacing:-3px;font-variant-numeric:tabular-nums;margin:6px 0 0;white-space:nowrap}
+.rv .num small{font-size:clamp(18px,3vw,26px);color:#FF8A84;margin-inline-start:10px;letter-spacing:0;font-weight:600}
+.rv .num.fine{color:#7DE0B5}
+.rv .line{color:#D5DEEE;font-size:16px;margin:6px 0 0}
+.rv-f{display:grid;gap:10px;margin:26px 0 6px;text-align:start}
+.rv-f>div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);border-radius:var(--r-m);padding:12px 18px;display:flex;justify-content:space-between;gap:14px;align-items:center}
+.rv-f b{font-weight:600} .rv-f em{font-style:normal;color:#9FB0CC;font-size:12.5px;display:block}
+.rv-f .m{color:#FF9A94;font-weight:600;white-space:nowrap}
+.rv .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.rv .btn{background:#fff;color:var(--ink);padding:13px 22px;font-size:15px;border-radius:var(--r-m)}
+.rv .btn.alt{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3)}
+.rv .tiny{margin-top:14px;font-size:12.5px;color:#8D9BB5}
+@media (prefers-reduced-motion:reduce){.rv>*{animation:none}}
+
+/* reminder sheet */
+.sheet-ov{position:fixed;inset:0;background:rgba(11,22,38,.55);z-index:75;display:none;align-items:center;justify-content:center;padding:18px}
+.sheet-ov.show{display:flex}
+.sheet-b{background:var(--surface);border-radius:var(--r-l);max-width:460px;width:100%;padding:22px 22px 18px}
+.sheet-b h3{margin:0 0 4px;font-size:17px}
+
+/* owner view */
+.own-w{max-width:760px;margin:0 auto}
+.ov-hero{background:var(--ink);color:#fff;border-radius:22px;padding:30px 32px 26px;margin-bottom:14px}
+.ov-hero .big{font-size:clamp(54px,11vw,92px);font-weight:700;line-height:1.05;letter-spacing:-2px;font-variant-numeric:tabular-nums;margin:6px 0 2px;white-space:nowrap}
+.ov-hero .big small{font-size:20px;color:#FF8A84;margin-inline-start:10px;letter-spacing:0}
+.ov-hero .k{color:#A9B6CC;font-size:13.5px}
+.ov-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.12)}
+.ov-row .v{font-size:20px;font-weight:600}
+.ov-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:18px 22px;margin-bottom:12px}
+.ov-card h3{margin:0 0 8px;font-size:15.5px}
+.spark{width:100%;height:84px;display:block}
+.act-r{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.act-r:last-child{border-bottom:0}
+.num-b{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:600;font-size:13px}
+.digest{white-space:pre-wrap;background:var(--bg);border-radius:var(--r-m);padding:14px 16px;font-size:13.5px;line-height:1.9;margin:8px 0 12px}
+.wins3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.wins3 div{background:var(--bg);border-radius:var(--r-m);padding:12px 14px;font-size:12.5px;color:var(--mute)}
+.wins3 b{display:block;font-size:24px;color:var(--ink);font-weight:700;line-height:1.3}
+
+/* calendar */
+.cal-h{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.cal-t{font-size:20px;font-weight:600} .cal-t span{display:block;font-size:13px;color:var(--mute);font-weight:400}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal-w{font-size:12.5px;color:var(--mute);font-weight:600;text-align:center;padding:4px 0}
+.cal-d{min-height:92px;background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:6px 8px 7px;cursor:pointer;text-align:start;display:flex;flex-direction:column;gap:5px;font:inherit;transition:box-shadow .12s,border-color .12s}
+.cal-d:hover{border-color:#C4CEDF;box-shadow:0 6px 16px rgba(11,22,38,.08)}
+.cal-d.out{background:transparent;border-style:dashed;opacity:.5}
+.cal-d.is-today{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-bg)}
+.cal-d.empty{cursor:default} .cal-d.empty:hover{border-color:var(--line);box-shadow:none}
+.cal-n{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;font-size:14px}
+.cal-hj{font-size:11px;color:var(--mute);font-weight:400}
+.cc{font-size:11.5px;border-radius:99px;padding:0 8px;font-weight:600;line-height:1.7;display:inline-block;white-space:nowrap}
+.cc.o{background:var(--bad-bg);color:var(--bad)} .cc.s{background:var(--warn-bg);color:var(--warn)} .cc.k{background:var(--ok-bg);color:var(--ok)}
+.cal-cc{display:flex;flex-wrap:wrap;gap:4px}
+
+/* import: problems found before importing */
+.probs{width:100%}
+.probs td{vertical-align:top}
+.probs input,.probs select{width:100%;min-width:130px;border:1px solid var(--line);border-radius:var(--r-s);padding:6px 8px;background:#fff}
+.sumline{display:flex;gap:10px;flex-wrap:wrap}
+.sumline .pill{font-size:13px;padding:4px 14px}
+@media (max-width:900px){
+  .topbar{margin-top:0}
+  .cal{gap:4px} .cal-d{min-height:64px;padding:4px 5px} .cal-hj{display:none} .cc{padding:0 6px;font-size:11px}
+  .wins3{grid-template-columns:1fr} .ov-hero{padding:22px 20px} .sx-sc{grid-template-columns:1fr}
+}
+.search input::-webkit-search-cancel-button{display:none}
 </style>
 </head>
 <body>
@@ -321,6 +440,7 @@ details.auth{margin-top:28px} details.auth summary{cursor:pointer;font-size:17px
     <div class="side-f"><button class="cta" data-act="start">ابدأ ببيانات منشأتك</button><button class="lnk" data-act="tour">جولة سريعة (دقيقة)</button></div>
   </aside>
   <div class="content">
+    <div class="topbar"><div class="search" role="search"><input id="q" type="search" placeholder="ابحث عن موظف أو ترخيص أو فرع…" autocomplete="off" aria-label="بحث في كل البنود"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg><div class="qres" id="qres"></div></div></div>
     <main id="main"><div class="empty">جارٍ التحميل…</div></main>
     <div class="foot">
       الجداول والتواريخ تُدخل يدويًا أو تُستورد من ملفات الجهات الحكومية؛ لا يوجد ربط مباشر مع المنصات الحكومية في هذه النسخة.
@@ -342,13 +462,15 @@ details.auth{margin-top:28px} details.auth summary{cursor:pointer;font-size:17px
     <button data-act="tour-prev">السابق</button><button id="tourP" data-act="tour-pause">إيقاف مؤقت</button><button data-act="tour-next">التالي</button><button data-act="tour-stop">إنهاء</button></span></div>
   <div class="prog"><i id="tourBar"></i></div></div>
 <div class="report" id="report"></div>
+<div class="reveal" id="reveal" role="dialog" aria-modal="true" aria-label="نتيجة تحليل بياناتك"></div>
+<div class="sheet-ov" id="sheet" role="dialog" aria-modal="true"></div>
 
 <script src="import-parse.js"></script>
 <script>
-const S = {orgs: [], org: null, asOf: '', view: 'overview', arg: null, filt: {status: '', kind: ''}, emp: {branch: '', code: '', status: ''}, imp: null, pending: null, role: 'gm', roleBranch: null, staff: [], dr: null, lanes: null};
-const IC = {overview:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',branches:'<path d="M4 21V5l8-2v18M12 9h8v12M7 9h2M7 13h2M7 17h2M15 13h2M15 17h2"/>',alerts:'<path d="M6 16v-5a6 6 0 1 1 12 0v5l2 2H4zM10 21h4"/>',vip:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',employees:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.5 3-5.5 6.5-5.5S15 16.5 15.5 20M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .6 3.2 2.3 3.5 5.2"/>',changes:'<path d="M6 3h8l5 5v13H6zM14 3v5h5M9 13h7M9 17h7"/>',audit:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',import:'<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>'};
+const S = {orgs: [], org: null, asOf: '', view: 'overview', arg: null, filt: {status: '', kind: ''}, emp: {branch: '', code: '', status: ''}, imp: null, pending: null, role: 'gm', roleBranch: null, staff: [], dr: null, lanes: null, lanesOrg: 0, lanesVer: -1, ver: 0, cal: null};
+const IC = {overview:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',branches:'<path d="M4 21V5l8-2v18M12 9h8v12M7 9h2M7 13h2M7 17h2M15 13h2M15 17h2"/>',alerts:'<path d="M6 16v-5a6 6 0 1 1 12 0v5l2 2H4zM10 21h4"/>',vip:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',employees:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.5 3-5.5 6.5-5.5S15 16.5 15.5 20M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .6 3.2 2.3 3.5 5.2"/>',changes:'<path d="M6 3h8l5 5v13H6zM14 3v5h5M9 13h7M9 17h7"/>',audit:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',import:'<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>',owner:'<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.7 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/>',calendar:'<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'};
 const icon = k => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${IC[k] || ''}</svg>`;
-const NAV = [['overview','الرئيسية'],['branches','الفروع والبنود'],['alerts','التنبيهات'],['vip','خدمات VIP']];
+const NAV = [['overview','الرئيسية'],['owner','نظرة المالك'],['calendar','التقويم'],['branches','الفروع والبنود'],['alerts','التنبيهات'],['vip','خدمات VIP']];
 const MORE = [['employees','وثائق الموظفين'],['changes','جديد الأنظمة'],['audit','سجل الإجراءات'],['import','استيراد بياناتك']];
 const ST = {overdue: 'متأخر', soon: 'قريب', ok: 'سليم'};
 const BAND = {good: 'جاهزية جيدة', watch: 'يحتاج متابعة', risk: 'مخاطر مرتفعة'};
@@ -359,8 +481,18 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const fmt = n => Number(n).toLocaleString('en-US');
 const sar = n => fmt(n) + ' ريال';
 const ltr = t => `<bdi dir="ltr">${esc(t)}</bdi>`;
+/* Hijri (Umm al-Qura) shown beside every Gregorian date; empty string when the browser lacks the calendar */
+const mkFmt = (loc, o) => { try { return new Intl.DateTimeFormat(loc, Object.assign({timeZone: 'UTC'}, o)); } catch (e) { return null; } };
+const HJ = mkFmt('ar-SA-u-ca-islamic-umalqura-nu-latn', {day: 'numeric', month: 'long', year: 'numeric'});
+const HJ_D = mkFmt('ar-SA-u-ca-islamic-umalqura-nu-latn', {day: 'numeric'});
+const HJ_M = mkFmt('ar-SA-u-ca-islamic-umalqura-nu-latn', {month: 'long', year: 'numeric'});
+const HJ_MN = mkFmt('ar-SA-u-ca-islamic-umalqura-nu-latn', {month: 'long'});
+const GR_M = mkFmt('ar-SA-u-ca-gregory-nu-latn', {month: 'long', year: 'numeric'});
+const utcDate = iso => new Date(iso + 'T00:00:00Z');
+const hij = iso => { try { return HJ && iso ? HJ.format(utcDate(iso)) : ''; } catch (e) { return ''; } };
 
 async function api(path, opts) {
+  if (opts && opts.body) S.ver++;                  // any write invalidates the cached branch items (search, calendar)
   const r = await fetch(path, opts && opts.body ? {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(opts.body)} : opts);
   if (!r.ok) { let m = 'تعذر تنفيذ الطلب'; try { m = (await r.json()).detail || m; } catch (e) {} throw new Error(m); }
   return r.json();
@@ -393,7 +525,18 @@ function ownerBlock(i) {
 }
 
 /* ---------- item row (shared) ---------- */
-function itemRow(i) {
+function quick(i) {                                 // one tap from the row itself: remind the owner, assign, hand to VIP, or close it
+  if (i.status === 'ok') return '';
+  const id = esc(i.id), b = [`<button class="qb" data-act="remind" data-id="${id}">🔔 ذكّر المسؤول</button>`];
+  if (i.kind !== 'employee_doc') b.push(`<button class="qb" data-act="open-assign" data-id="${id}">أسند</button>`);
+  if (i.vip_code) b.push(`<button class="qb pri" data-act="vip" data-code="${esc(i.vip_code)}" data-branch="${i.branch_id}" data-ref="${esc(title(i))}">عالجه لي</button>`);
+  if (i.kind === 'obligation') b.push(`<button class="qb" data-act="done" data-id="${id}">تم التنفيذ</button>`);
+  else if (i.kind === 'employee_doc') b.push(`<button class="qb" data-act="done" data-id="${id}">تم التجديد</button>`);
+  else if (i.kind === 'group') b.push(`<button class="qb" data-act="emp" data-branch="${i.branch_id}" data-code="${esc(i.code)}" data-status="${i.status}">الموظفون</button>`);
+  return `<div class="qa">${b.join('')}</div>`;
+}
+function itemRow(i, o) {
+  const pick = !!(o && o.select), canPick = pick && i.status !== 'ok' && i.kind !== 'employee_doc';
   const steps = i.fix_steps.map(s => `<li>${esc(s)}</li>`).join('');
   const src = i.source_url ? `<a href="${esc(i.source_url)}" target="_blank" rel="noopener">المصدر</a>` : '';
   let actions = '';
@@ -409,15 +552,17 @@ function itemRow(i) {
   const cv = (S.cat || {})[i.vip_code];
   const vip = i.vip_code ? `<button class="btn gold" data-act="vip" data-code="${esc(i.vip_code)}" data-branch="${i.branch_id}" data-ref="${esc(title(i))}">عالجه لي (VIP)${cv ? ' — من ' + fmt(cv.price_from) + ' ريال · ' + fmt(cv.sla_days) + ' أيام عمل' : ''}</button>` : '';
   return `<div class="item" id="it-${esc(i.id)}">
-    <div class="item-h" data-act="toggle">
+    <div class="item-h${pick ? ' sel' : ''}" data-act="toggle">
+      ${pick ? (canPick ? `<input type="checkbox" class="chk" data-act="sel" data-sel="${esc(i.id)}" aria-label="تحديد البند">` : '<span></span>') : ''}
       <span class="dot ${i.status}"></span>
-      <div><div class="item-t">${esc(title(i))}</div><div class="item-s">${esc(sub(i))}</div></div>
-      <span class="when">${when(i)}</span><span class="pill ${i.status}">${ST[i.status]}</span>
+      <div><div class="item-t">${esc(title(i))}</div><div class="item-s">${esc(sub(i))}</div>${quick(i)}</div>
+      <span class="when">${when(i)}<span class="hjr">${esc(hij(i.due_date))}</span></span><span class="pill ${i.status}">${ST[i.status]}</span>
     </div>
     <div class="det">
       <div class="grid">
         <div><h4>كيف أعالج هذا البند</h4><ol>${steps}</ol></div>
         <div>
+          <h4>موعد الاستحقاق</h4><p style="margin:0 0 10px">${ltr(i.due_date)}${hij(i.due_date) ? ' — ' + esc(hij(i.due_date)) : ''}</p>
           <h4>حالة التحقق</h4>${verifLine(i)}
           <h4>الدليل المطلوب</h4><p style="margin:0 0 10px">${esc(i.evidence)}</p>
           <h4>التعرض المالي (تقدير تجريبي)</h4><p style="margin:0 0 6px">${sar(i.penalty_sar)}${i.kind === 'group' ? ' (للمجموعة)' : ''}</p>
@@ -432,7 +577,7 @@ function itemRow(i) {
   </div>`;
 }
 function itemList(items, empty) {
-  return items.length ? `<div class="list">${items.map(itemRow).join('')}</div>` : `<div class="empty">${empty}</div>`;
+  return items.length ? `<div class="list">${items.map(i => itemRow(i)).join('')}</div>` : `<div class="empty">${empty}</div>`;
 }
 
 async function vBranches() {
@@ -507,6 +652,7 @@ async function vAudit() {
 
 /* ---------- helpers for the new screens ---------- */
 const addDays = (iso, n) => { const d = new Date(iso + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const arItems = n => n === 1 ? 'بندًا واحدًا' : n === 2 ? 'بندين' : n >= 3 && n <= 10 ? `${fmt(n)} بنود` : `${fmt(n)} بندًا`;
 const PACKS = {hotel: 'فنادق وضيافة', hospital: 'مستشفيات ومنشآت صحية', company: 'شركات ومقاولات'};
 function countUp(el) {
   const to = +el.dataset.count, reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -547,10 +693,10 @@ function timeline(d, lanes) {
 const DOMAINS = ['الموارد البشرية', 'وثائق الموظفين', 'التراخيص', 'السلامة والدفاع المدني', 'الضرائب والزكاة', 'حماية البيانات', 'الجودة والاعتماد'];
 const ORD = {overdue: 0, soon: 1, ok: 2};
 const prio = (a, b) => (ORD[a.status] - ORD[b.status]) || (b.severity - a.severity) || (a.days_left - b.days_left);
-function groupItems(items) {                    // obligations individually; employee documents grouped per branch + document + status
+function groupItems(items, withOk) {            // obligations individually; employee documents grouped per branch + document + status
   const out = [], g = new Map();
   for (const i of items) {
-    if (i.status === 'ok') continue;
+    if (i.status === 'ok' && !withOk) continue;
     if (i.kind === 'obligation') out.push(i);
     else { const k = i.branch_id + '|' + i.code + '|' + i.status; if (!g.has(k)) g.set(k, []); g.get(k).push(i); }
   }
@@ -567,6 +713,7 @@ function cellStat(items) {
   return {o, s, n: items.length, cls: !items.length ? 'n' : o ? 'o' : s ? 's' : 'k'};
 }
 function heatmap(lanes) {
+  lanes = lanes.slice().sort((a, b) => a.b.score - b.b.score || a.b.id - b.b.id);        // weakest branch on top
   const present = new Set(); lanes.forEach(l => l.items.forEach(i => present.add(i.domain)));
   const cols = DOMAINS.filter(d => present.has(d)).concat([...present].filter(d => !DOMAINS.includes(d)));
   const head = cols.map(d => `<button class="hm-h" data-act="cell" data-b="" data-d="${esc(d)}">${esc(d)}</button>`).join('');
@@ -578,7 +725,8 @@ function heatmap(lanes) {
       return `<button class="hm-c ${st.cls}" ${st.cls === 'n' ? 'disabled' : `data-act="cell" data-b="${b.id}" data-d="${esc(d)}"`} title="${esc(b.name)} — ${esc(d)}: ${fmt(st.o)} متأخر، ${fmt(st.s)} يقترب"><b>${txt}</b><span>${lab}</span></button>`;
     }).join('');
     const money = items.filter(i => i.status === 'overdue').reduce((a, i) => a + i.penalty_sar, 0);
-    return `<button class="hm-r" data-act="cell" data-b="${b.id}" data-d=""><b>${esc(b.name)}</b><span>${fmt(money)} ريال تعرّض</span></button>${cells}`;
+    const clear = !items.some(i => i.status !== 'ok');
+    return `<button class="hm-r" data-act="cell" data-b="${b.id}" data-d=""><b>${esc(b.name)}</b><span>${clear ? 'كل شيء سليم ✓' : fmt(money) + ' ريال تعرّض'} · ${ltr(b.score + '/100')}</span></button>${cells}`;
   }).join('');
   return `<div class="heat" id="heat" style="grid-template-columns:minmax(150px,1.4fr) repeat(${cols.length},minmax(84px,1fr))"><div></div>${head}${rows}</div>`;
 }
@@ -599,28 +747,72 @@ function myTasks(lanes) {
   lanes.forEach(l => groupItems(l.items).forEach(i => { if (i.owner.id === me) mine.push(i); }));
   return mine.sort(prio);
 }
+async function ensureLanes(d, force) {          // every branch's items, cached until something is written
+  if (!force && S.lanes && S.lanesOrg === S.org && S.lanesVer === S.ver) return S.lanes;
+  d = d || await api(`/api/orgs/${S.org}/overview`);
+  S.lanes = await Promise.all(d.branches.map(async b => ({b, items: (await api(`/api/branches/${b.id}/items`)).items})));
+  S.lanesOrg = S.org; S.lanesVer = S.ver;
+  return S.lanes;
+}
 function scopedLanes() { return S.role === 'bm' ? S.lanes.filter(l => l.b.id === S.roleBranch) : S.lanes; }
 
 /* ---------- drawer: the items behind a heat-map cell, a branch, a domain or a person ---------- */
+function searchRaw(q) {                         // every matching item (employee documents one by one), worst first
+  const k = ImtParse.nk(q); if (k.length < 2) return [];
+  const words = k.split(' '), hits = [];
+  scopedLanes().forEach(l => l.items.forEach(i => {
+    const hay = ImtParse.nk([i.title, i.employee ? i.employee.name + ' ' + i.employee.role : '', i.branch_name, i.authority, i.code, i.owner ? i.owner.name : ''].join(' '));
+    if (words.every(w => hay.includes(w))) hits.push(i);
+  }));
+  return hits.sort(prio);
+}
 function drawerItems() {
-  const f = S.dr; let items = [];
+  const f = S.dr;
+  if (f.q) return searchRaw(f.q).slice(0, 60);
+  let items = [];
   scopedLanes().forEach(l => { if (!f.b || l.b.id === +f.b) items = items.concat(l.items); });
+  if (f.day) return groupItems(items.filter(i => i.due_date === f.day), true);
   if (f.d) items = items.filter(i => i.domain === f.d);
   let list = groupItems(items);
   if (f.o) list = list.filter(i => i.owner.id === f.o);
   if (f.t !== undefined && f.t !== '') { const B = BUCKETS[+f.t]; list = list.filter(i => i.days_left >= B.lo && i.days_left <= B.hi); }
   return list;
 }
+const sxColor = n => n >= 85 ? 'var(--ok)' : n >= 65 ? '#E89A12' : 'var(--bad)';
+async function explainData() { return api(`/api/orgs/${S.org}/score-explain${S.role === 'bm' && S.roleBranch ? '?branch_id=' + S.roleBranch : ''}`); }
+function explainHtml(d) {
+  const parts = d.parts.map(p => `<div class="sx-part"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><b>${esc(p.label)}</b><span>${ltr(p.score + ' / 100')} · وزنها ${fmt(p.weight)}% من المؤشر</span></div>
+      <div class="sx-bar"><i style="width:${p.score}%;background:${sxColor(p.score)}"></i></div>
+      <div class="item-s">${fmt(p.count)} بندًا — ${fmt(p.overdue)} متأخر · ${fmt(p.soon)} يقترب</div></div>`).join('');
+  const drv = d.drivers.map(x => `<div class="sx-drv"><span class="sx-pts">${ltr('−' + x.points.toFixed(1))}</span>
+      <div><b>${esc(title(x))}</b><div class="item-s">${esc(x.branch_name)} · <span class="pill ${x.status}">${ST[x.status]}</span> · ${when(x)}</div></div>
+      <div class="acts" style="margin:0;gap:6px"><button class="qb" data-act="open-item" data-id="${esc(x.id)}">التفاصيل</button>${x.vip_code ? `<button class="qb pri" data-act="vip" data-code="${esc(x.vip_code)}" data-branch="${x.branch_id}" data-ref="${esc(title(x))}">عالجه لي</button>` : ''}</div></div>`).join('');
+  return `<div class="dr-h"><div><h3>لماذا ${ltr(d.score)}؟</h3><div class="item-s">كيف حُسب المؤشر وما الذي يخفضه</div></div><button class="x" data-act="drawer-close" aria-label="إغلاق">×</button></div>
+  <div class="dr-b">
+    <div class="sx-top"><span class="sx-n" style="color:${sxColor(d.score)}">${ltr(d.score)}</span><span>من 100 — ${BAND[d.band]}</span></div>
+    ${parts || '<div class="empty">لا توجد بنود بعد</div>'}
+    ${d.drivers.length ? `<div class="sx-h">أكثر ما يخفض مؤشرك</div>${drv}${d.other_points > 0 ? `<div class="item-s" style="padding:10px 0">وبقية البنود الأقل أثرًا: ${ltr('−' + d.other_points.toFixed(1))} نقطة</div>` : ''}
+    <div class="sx-h">ماذا لو عالجتها؟</div>
+    <div class="sx-sc"><div><b>${ltr(d.scenarios.fix_top3)}</b>إن عالجت أعلى 3 بنود (${ltr('+' + (d.scenarios.fix_top3 - d.score))})</div><div><b>${ltr(d.scenarios.fix_overdue)}</b>إن عالجت كل المتأخر (${ltr('+' + (d.scenarios.fix_overdue - d.score))})</div></div>` : '<div class="glad" style="margin-top:12px">لا توجد بنود تخفض مؤشرك — كل شيء سليم ✓</div>'}
+    <div class="note" style="margin-top:18px">طريقة الحساب: كل بند متأخر يخصم وزنه (درجة خطورته) كاملًا، والبند الذي يقترب يخصم ${ltr(Math.round(d.soon_weight * 100) + '%')} منه. هذه الأوزان افتراضات تقديرية للنسخة التجريبية وستُعايَر مع المراجع القانوني؛ والأرقام هنا تجمع بدقة إلى ما خُصم من الـ100.</div>
+  </div>`;
+}
 function renderDrawer() {
   const f = S.dr; if (!f) return;
+  if (f.explain) { $('#drawer').innerHTML = explainHtml(f.explain); $('#drawer').classList.add('open'); $('#scrim').classList.add('show'); return; }
   const br = f.b ? (S.lanes.find(l => l.b.id === +f.b) || {}).b : null;
   const who = f.o ? (S.staff.find(p => p.id === f.o) || {}).name : '';
-  const t = f.t !== undefined && f.t !== '' ? BUCKETS[+f.t].l + (br ? ' — ' + br.name : '') : [br ? br.name : 'كل الفروع', f.d || (f.o ? 'بنود ' + who : 'كل المجالات')].join(' — ');
+  const t = f.q ? `نتائج البحث: «${f.q}»` : f.day ? `بنود ${f.day}${hij(f.day) ? ' — ' + hij(f.day) : ''}`
+    : f.t !== undefined && f.t !== '' ? BUCKETS[+f.t].l + (br ? ' — ' + br.name : '') : [br ? br.name : 'كل الفروع', f.d || (f.o ? 'بنود ' + who : 'كل المجالات')].join(' — ');
   const was = [...document.querySelectorAll('#drawer .item.open')].map(n => n.id);
   const list = drawerItems();
   const money = list.filter(i => i.status === 'overdue').reduce((a, i) => a + i.penalty_sar, 0);
-  $('#drawer').innerHTML = `<div class="dr-h"><div><h3>${esc(t)}</h3><div class="item-s">${fmt(list.filter(i => i.status === 'overdue').length)} متأخر · ${fmt(list.filter(i => i.status === 'soon').length)} يقترب · تعرّض ${sar(money)}</div></div><button class="x" data-act="drawer-close" aria-label="إغلاق">×</button></div>
-    <div class="dr-b">${list.length ? `<div class="list">${list.map(itemRow).join('')}</div>` : '<div class="empty">لا توجد بنود تحتاج إجراءً هنا — كل شيء سليم ✓</div>'}</div>`;
+  const pickable = !f.q && list.some(i => i.status !== 'ok' && i.kind !== 'employee_doc');
+  const bulk = pickable ? `<div class="bulk"><label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" class="chk" data-act="sel-all"> تحديد الكل</label>
+      <select id="bulkOwner" aria-label="المسؤول الجديد">${(S.staff || []).map(p => `<option value="${esc(p.id)}">${esc(p.name)} — ${esc(p.role)}</option>`).join('')}</select>
+      <button class="btn alt" data-act="bulk-assign">أسند المحدد</button><span class="item-s" id="bulkN"></span></div>` : '';
+  $('#drawer').innerHTML = `<div class="dr-h"><div><h3>${esc(t)}</h3><div class="item-s">${f.q ? `${fmt(list.length)} نتيجة` : `${fmt(list.filter(i => i.status === 'overdue').length)} متأخر · ${fmt(list.filter(i => i.status === 'soon').length)} يقترب · تعرّض ${sar(money)}`}</div></div><button class="x" data-act="drawer-close" aria-label="إغلاق">×</button></div>
+    <div class="dr-b">${bulk}${list.length ? `<div class="list">${list.map(i => itemRow(i, {select: pickable})).join('')}</div>` : '<div class="empty">لا توجد بنود تحتاج إجراءً هنا — كل شيء سليم ✓</div>'}</div>`;
   $('#drawer').classList.add('open'); $('#scrim').classList.add('show');
   was.forEach(id => { const n = document.getElementById(id); if (n) n.classList.add('open'); });
   if (f.open) { const n = document.getElementById('it-' + f.open); if (n) { n.classList.add('open'); n.scrollIntoView({block: 'center'}); } delete f.open; }
@@ -633,8 +825,8 @@ function locate(id) {
 
 /* ---------- overview ---------- */
 async function vOverview() {
-  const [d, al] = await Promise.all([api(`/api/orgs/${S.org}/overview`), api(`/api/orgs/${S.org}/alerts`)]);
-  S.lanes = await Promise.all(d.branches.map(async b => ({b, items: (await api(`/api/branches/${b.id}/items`)).items})));
+  const [d, al, ow] = await Promise.all([api(`/api/orgs/${S.org}/overview`), api(`/api/orgs/${S.org}/alerts`), S.role === 'gm' ? api(`/api/orgs/${S.org}/owner`) : null]);
+  await ensureLanes(d, true);
   const lanes = scopedLanes(), bm = S.role === 'bm';
   const all = lanes.flatMap(l => l.items);
   const brOv = bm ? d.branches.find(b => b.id === S.roleBranch) : null;
@@ -645,6 +837,9 @@ async function vOverview() {
   const why = d.urgent.filter(i => i.status === 'overdue').sort((a, b) => b.penalty_sar - a.penalty_sar || a.days_left - b.days_left).slice(0, 6)
     .map(i => `<div class="r"><div><b>${esc(title(i))}</b><div class="item-s">${esc(i.branch_name)} · ${esc(i.authority)} · ${when(i)}</div></div><span>${sar(i.penalty_sar)}</span><button class="btn alt" data-act="open-item" data-id="${esc(i.id)}">التفاصيل</button></div>`).join('');
   const tasks = S.role === 'gm' ? [] : myTasks(lanes);
+  const nextUp = all.filter(i => i.days_left >= 0).sort((a, b) => a.days_left - b.days_left)[0];
+  const gladBlock = (fig.c.overdue === 0 ? `<div class="glad"><span>✓ <b>لا توجد بنود متأخرة اليوم.</b> ${nextUp ? `أقرب استحقاق بعد ${fmt(nextUp.days_left)} يومًا: ${esc(title(nextUp))}.` : ''}</span></div>` : '')
+    + (ow && ow.wins.fixed > 0 ? `<div class="glad wins"><span>🏁 أنجزت <b>${arItems(ow.wins.fixed)}</b> منذ بدأت، وأزلت تعرّضًا مقدّرًا قدره <b>${sar(ow.wins.exposure_removed)}</b>.</span><button class="lnkb" data-act="nav" data-v="owner">نظرة المالك ←</button></div>` : '');
   const intro = S.role === 'gm' ? `
   <section class="vh">
     <h1>كل التزامات منشأتك الحكومية في شاشة واحدة — قبل أن تتحول إلى غرامة</h1>
@@ -663,6 +858,7 @@ async function vOverview() {
   <div class="sec" style="margin-top:6px"><div><h2>مهامي</h2><div class="sub" style="margin:0">مرتبة بالأخطر — افتح البند لترى الخطوات وتُسنده أو تغلقه</div></div></div>
   ${itemList(tasks.slice(0, 8), 'لا توجد مهام مسندة إليك — أحسنت ✓')}`;
   return `${intro}
+  ${gladBlock}
   <section class="alarm" id="hero-money">
     <div style="position:relative">
       <div class="lbl">وضع ${esc(fig.label)} اليوم — تعرّض مالي تقديري لبنود تجاوزت موعدها</div>
@@ -675,7 +871,7 @@ async function vOverview() {
       </div>
     </div>
     <div class="side2">
-      <div><div class="k">مؤشر الجاهزية</div><div class="v">${ltr(fig.score + ' / 100')} — ${BAND[fig.band]}</div></div>
+      <div><div class="k">مؤشر الجاهزية</div><div class="v">${ltr(fig.score + ' / 100')} — ${BAND[fig.band]}<button class="scorebtn" data-act="explain">لماذا ${fig.score}؟</button></div></div>
       <div><div class="k">حالة البنود</div><div class="chips2"><span class="pill overdue">${fmt(fig.c.overdue)} متأخر</span><span class="pill soon">${fmt(fig.c.soon)} يقترب</span><span class="pill ok">${fmt(fig.c.ok)} سليم</span></div></div>
       <div class="k">تقديرات توضيحية مبنية على بنود المكتبة، وليست غرامات رسمية.</div>
     </div>
@@ -696,11 +892,123 @@ async function vOverview() {
     <table><thead><tr><th>الجهة</th><th>متأخر</th><th>قريب</th><th>سليم</th></tr></thead><tbody>${ledger}</tbody></table></details>`;
 }
 
+/* ---------- owner view: one page for whoever holds the budget ---------- */
+function spark(h) {
+  if (h.length < 2) return '<div class="item-s">يظهر اتجاه الجاهزية بعد يومين من الاستخدام — نسجّل لقطة يومية عند فتح هذه الصفحة، ولا نختلق أرقامًا سابقة.</div>';
+  const W = 600, H = 84, pad = 8, lo = Math.max(0, Math.min(...h.map(p => p.score)) - 6), hi = Math.min(100, Math.max(...h.map(p => p.score)) + 6);
+  const x = k => W - pad - k * (W - 2 * pad) / (h.length - 1), y = v => H - pad - (v - lo) / Math.max(1, hi - lo) * (H - 2 * pad);   // oldest on the right: Arabic reading order
+  const pts = h.map((p, k) => `${x(k).toFixed(1)},${y(p.score).toFixed(1)}`).join(' ');
+  const last = h[h.length - 1], first = h[0];
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="اتجاه مؤشر الجاهزية">
+    <polyline points="${pts}" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${x(h.length - 1).toFixed(1)}" cy="${y(last.score).toFixed(1)}" r="4" fill="var(--brand)"/></svg>
+    <div class="cnt" style="justify-content:space-between"><span>${ltr(last.day)}</span><span>${last.score >= first.score ? '▲' : '▼'} ${ltr(first.score + ' ← ' + last.score)}</span><span>${ltr(first.day)}</span></div>`;
+}
+async function vOwner() {
+  if (S.role !== 'gm') return `<div class="own-w"><div class="empty">هذه الصفحة هي الصورة الكاملة للمالك: رقم واحد، وأضعف فرع، وثلاثة إجراءات.<br><br><button class="btn" data-act="role" data-r="gm">اعرضها كمالك / مدير عام</button></div></div>`;
+  const d = await api(`/api/orgs/${S.org}/owner`);
+  S.digest = d.digest;
+  const acts = d.actions.map((a, k) => `<div class="act-r"><span class="num-b">${k + 1}</span>
+      <div><b>${esc(title(a))}</b><div class="item-s">${esc(a.branch_name)} · <span class="pill ${a.status}">${ST[a.status]}</span> · ${when(a)} · ${sar(a.penalty_sar)}</div></div>
+      <div class="acts" style="margin:0;gap:6px"><button class="qb" data-act="remind" data-id="${esc(a.id)}">🔔 ذكّر</button><button class="qb pri" data-act="open-item" data-id="${esc(a.id)}">افتح</button></div></div>`).join('');
+  const w = d.wins;
+  return `<div class="own-w">
+  <div class="sec" style="margin-top:0"><div><h2>نظرة المالك</h2><div class="sub" style="margin:0">${esc(d.org.name)} — ${ltr(d.as_of)}${hij(d.as_of) ? ' · ' + esc(hij(d.as_of)) : ''}</div></div></div>
+  <section class="ov-hero">
+    <div class="k">التعرض المالي التقديري للبنود المتأخرة</div>
+    <div class="big"><span data-count="${d.money_at_risk}">0</span><small>ريال</small></div>
+    <div class="k" style="color:#FFD08A">وخلال 30 يومًا القادمة: ${sar(d.exposure_30)} إن لم تُعالج البنود التي تقترب</div>
+    <div class="ov-row"><div><div class="k">مؤشر الجاهزية</div><div class="v">${ltr(d.score + ' / 100')} <button class="scorebtn" data-act="explain">لماذا؟</button></div></div>
+      <div><div class="k">أضعف فرع</div><div class="v">${d.worst_branch ? esc(d.worst_branch.name) : '—'}</div><div class="k">${d.worst_branch ? ltr(d.worst_branch.score + ' / 100') + ' · ' + sar(d.worst_branch.money) : ''}</div></div></div>
+  </section>
+  <div class="ov-card"><h3>اتجاه الجاهزية</h3>${spark(d.history)}</div>
+  <div class="ov-card"><h3>ثلاثة أشياء لهذا الأسبوع</h3>${acts || '<div class="glad">لا توجد إجراءات عاجلة — كل شيء سليم ✓</div>'}</div>
+  <div class="ov-card"><h3>ما تحقق منذ بدأت</h3>${w.fixed || w.vip_done ? `<div class="wins3"><div><b>${fmt(w.fixed)}</b>بند أُنجز</div><div><b>${fmt(w.exposure_removed)}</b>ريال تعرّض أُزيل</div><div><b>${fmt(w.vip_done)}</b>طلب VIP مكتمل</div></div>` : '<div class="item-s">لم يُنجز أي بند بعد. أنجز أول بند من «يحتاج إجراءً الآن» وسيظهر أثره هنا بالريال.</div>'}</div>
+  <div class="ov-card"><h3>ملخصك الأسبوعي</h3><div class="item-s">${esc(d.digest.subject)}</div><div class="digest">${esc(d.digest.body)}</div>
+    <div class="acts" style="margin:0"><button class="btn" data-act="wa-digest">أرسله لي على واتساب</button><button class="btn alt" data-act="report">تقرير PDF</button><button class="btn alt" data-act="copy-digest">نسخ</button></div>
+    <div class="note" style="margin:12px 0 0">الإرسال الأسبوعي التلقائي (كل أحد صباحًا) يُفعَّل عند ربط مزوّد واتساب والبريد. حاليًا يفتح واتساب برسالة جاهزة وترسلها بنفسك.</div></div>
+  </div>`;
+}
+
+/* ---------- calendar: every due date, Gregorian and Hijri side by side ---------- */
+const WD = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+async function vCalendar() {
+  await ensureLanes();
+  const lanes = scopedLanes(), all = lanes.flatMap(l => l.items);
+  if (!S.cal) { const [yy, mm] = S.asOf.split('-').map(Number); S.cal = {y: yy, m: mm}; }
+  const {y, m} = S.cal, ym = `${y}-${String(m).padStart(2, '0')}`, first = new Date(Date.UTC(y, m - 1, 1)), dim = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const byDay = new Map();
+  all.forEach(i => { if (i.due_date.slice(0, 7) === ym) { const k = i.due_date; if (!byDay.has(k)) byDay.set(k, []); byDay.get(k).push(i); } });
+  let cells = '', tot = {o: 0, s: 0, k: 0};
+  for (let k = 0; k < first.getUTCDay(); k++) cells += '<div class="cal-d out empty"></div>';
+  for (let d = 1; d <= dim; d++) {
+    const iso = `${ym}-${String(d).padStart(2, '0')}`, g = groupItems(byDay.get(iso) || [], true);
+    const c = {o: g.filter(x => x.status === 'overdue').length, s: g.filter(x => x.status === 'soon').length, k: g.filter(x => x.status === 'ok').length};
+    tot.o += c.o; tot.s += c.s; tot.k += c.k;
+    let hd = ''; try { hd = HJ_D ? HJ_D.format(utcDate(iso)) : ''; } catch (e) {}
+    const hm = hd === '1' && HJ_MN ? ' ' + HJ_MN.format(utcDate(iso)) : '';
+    const body = `<span class="cal-n"><span>${d}</span><span class="cal-hj">${esc(hd + hm)}</span></span>
+      <span class="cal-cc">${c.o ? `<span class="cc o">${fmt(c.o)} متأخر</span>` : ''}${c.s ? `<span class="cc s">${fmt(c.s)} يقترب</span>` : ''}${c.k ? `<span class="cc k">${fmt(c.k)} سليم</span>` : ''}</span>`;
+    const has = c.o + c.s + c.k > 0;
+    cells += has ? `<button class="cal-d${iso === S.asOf ? ' is-today' : ''}" data-act="cal-day" data-day="${iso}" aria-label="${iso}">${body}</button>`
+                 : `<div class="cal-d empty${iso === S.asOf ? ' is-today' : ''}">${body}</div>`;
+  }
+  const last = new Date(Date.UTC(y, m - 1, dim)), h1 = HJ_M ? HJ_M.format(first) : '', h2 = HJ_M ? HJ_M.format(last) : '';
+  return `<div class="cal-h"><div class="cal-t">${esc(GR_M ? GR_M.format(first) : ym)}<span>${esc(h1 === h2 ? h1 : h1 + ' — ' + h2)}</span></div>
+    <div class="acts" style="margin:0"><button class="btn alt" data-act="cal-nav" data-d="-1" aria-label="الشهر السابق">→ السابق</button><button class="btn alt" data-act="cal-nav" data-d="0">اليوم</button><button class="btn alt" data-act="cal-nav" data-d="1" aria-label="الشهر التالي">التالي ←</button></div></div>
+  <div class="sumline" style="margin-bottom:12px"><span class="pill overdue">${fmt(tot.o)} متأخر</span><span class="pill soon">${fmt(tot.s)} يقترب</span><span class="pill ok">${fmt(tot.k)} سليم</span><span class="item-s" style="align-self:center">اضغط على أي يوم لترى بنوده${S.role === 'bm' ? ' — فرعك فقط' : ''}</span></div>
+  <div class="cal">${WD.map(w => `<div class="cal-w">${w}</div>`).join('')}${cells}</div>`;
+}
+
+/* ---------- search across every branch, employee and licence ---------- */
+async function runSearch(v) {
+  const box = $('#qres'); v = v.trim();
+  if (ImtParse.nk(v).length < 2) { box.classList.remove('show'); return; }
+  await ensureLanes();
+  const hits = searchRaw(v);
+  box.innerHTML = hits.length ? hits.slice(0, 8).map(i => `<button class="qr" data-act="q-open" data-id="${esc(i.id)}"><span class="dot ${i.status}"></span>
+      <span><b>${esc(title(i))}</b><span class="item-s" style="display:block">${esc(i.branch_name)}${i.employee ? ' · ' + esc(i.employee.role) : ''} · ${when(i)}</span></span><span class="pill ${i.status}">${ST[i.status]}</span></button>`).join('')
+      + (hits.length > 8 ? `<button class="qr qr-all" data-act="q-all">عرض كل النتائج (${fmt(hits.length)})</button>` : '')
+    : '<div class="empty" style="padding:16px">لا توجد نتائج مطابقة</div>';
+  box.classList.add('show');
+}
+
+/* ---------- reminder sheet + WhatsApp hand-off ---------- */
+function waOpen(text) { window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener'); }
+async function copyText(t) { try { await navigator.clipboard.writeText(t); toast('تم النسخ'); } catch (e) { toast('تعذّر النسخ — حدّد النص يدويًا'); } }
+function showRemind(r) {
+  S.remind = r;
+  $('#sheet').innerHTML = `<div class="sheet-b"><h3>جهّزنا تذكيرًا لـ ${esc(r.to.name)}</h3><div class="item-s" style="margin-bottom:10px">${esc(r.to.role)} — سُجّل في سجل العمليات أن التذكير جُهّز.</div>
+    <div class="bub" style="margin:0 0 14px">${esc(r.text)}</div>
+    <div class="acts" style="margin:0"><button class="btn" data-act="remind-wa">افتح في واتساب</button><button class="btn alt" data-act="remind-copy">انسخ النص</button><button class="btn alt" data-act="sheet-close">إغلاق</button></div>
+    <div class="note" style="margin:12px 0 0">الإرسال التلقائي يحتاج ربط مزوّد واتساب (يُفعَّل مع العملاء التجريبيين). الآن يفتح واتساب برسالة جاهزة وتختار المستلم بنفسك.</div></div>`;
+  $('#sheet').classList.add('show');
+}
+
+/* ---------- the reveal: first thing a customer sees after uploading their own file ---------- */
+async function showReveal(res) {
+  const d = await api(`/api/orgs/${S.org}/overview`), n = d.counts, fine = d.money_at_risk === 0 && n.overdue === 0;
+  const top = d.urgent.slice(0, 3), worst = d.branches.length > 1 ? d.branches.slice().sort((a, b) => a.score - b.score)[0] : null;
+  const unread = (res.skipped_total || 0), unknown = res.missing.reduce((a, m) => a + m.count, 0);
+  $('#reveal').innerHTML = `<div class="rv">
+    <div class="k" style="--n:0">تعرّض «${esc(d.org.name)}» اليوم</div>
+    <div class="num${fine ? ' fine' : ''}" style="--n:1">${fine ? '✓' : `<span data-count="${d.money_at_risk}">0</span><small>ريال</small>`}</div>
+    <div class="line" style="--n:2">${fine ? 'لا توجد بنود متأخرة في الملف الذي رفعته.' : `في ${fmt(d.branches.length)} ${d.branches.length > 1 ? 'فروع' : 'فرع'}: <b>${fmt(n.overdue)}</b> بندًا متأخرًا و<b>${fmt(n.soon)}</b> يقترب — وخلال 30 يومًا قد يُضاف ${sar(d.exposure_30)}.`}</div>
+    ${worst ? `<div class="line" style="--n:3">الأضعف: <b>${esc(worst.name)}</b> — ${fmt(worst.score) + ' من 100'}</div>` : ''}
+    ${top.length ? `<div class="rv-f" style="--n:4">${top.map(i => `<div><span><b>${esc(title(i))}</b><em>${esc(i.branch_name)} · ${esc(i.authority)} · ${when(i)}</em></span><span class="m">${sar(i.penalty_sar)}</span></div>`).join('')}</div>` : ''}
+    <div class="btns" style="--n:5"><button class="btn" data-act="reveal-go">افتح لوحة التحكم</button><button class="btn alt" data-act="reveal-report">تقرير للمالك (PDF)</button>${unread || unknown ? `<button class="btn alt" data-act="reveal-details">ما الذي لم نقرأه؟ (${fmt(unread + unknown)})</button>` : ''}</div>
+    <div class="tiny" style="--n:6">تقديرات توضيحية مبنية على بنود المكتبة قيد المراجعة القانونية، وليست غرامات رسمية. لا نخمّن أي تاريخ لم يرد في ملفك.</div></div>`;
+  $('#reveal').classList.add('show');
+  $('#reveal').querySelectorAll('[data-count]').forEach(countUp);
+  const b = $('#reveal .btn'); if (b) b.focus();
+}
+
 /* ---------- alerts ---------- */
 async function vAlerts() {
   const d = await api(`/api/orgs/${S.org}/alerts`);
   if (S.role === 'bm') { const p = S.staff.find(x => x.branch_id === S.roleBranch) || {}, to = p.role && p.role !== 'مدير الفرع' ? p.role : p.name; d.messages = d.messages.filter(m => m.to === to); }
-  const bubbles = d.messages.map(m => `<div class="bub">${esc(m.text)}<span class="tm">${ltr('08:00')}</span></div>`).join('');
+  S.msgs = d.messages; S.digest = d.digest;
+  const bubbles = d.messages.map((m, k) => `<div class="bub">${esc(m.text)}<span class="tm">${ltr('08:00')}</span><button class="qb" style="margin-top:6px;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#E9EDEF" data-act="wa" data-i="${k}">افتح في واتساب ↗</button></div>`).join('');
   return `<div class="sec" style="margin-top:0"><div><h2>التنبيهات — ما كان سيصلك</h2>
     <div class="sub" style="margin:0">رسائل مولَّدة الآن من بيانات ${esc(S.orgs.find(o => o.id === S.org)?.name || '')}: واتساب لمدير الفرع، وملخص أسبوعي للمالك.</div></div></div>
   <div class="would"><span>لديك الآن <b>${fmt(d.summary.overdue_items)}</b> بندًا متأخرًا بتعرض تقديري <b>${sar(d.summary.penalty_sar)}</b>. كل بند منها كان سيُنبَّه عنه قبل موعده بالمدة المحددة في المكتبة.</span></div>
@@ -708,6 +1016,7 @@ async function vAlerts() {
     <div><div class="phone"><div class="hd"><span class="av"></span><span>امتثال</span></div><div class="chat">${bubbles || '<div class="empty" style="color:#9FB5AE">لا توجد تنبيهات</div>'}</div></div></div>
     <div>
       <div class="mail"><div class="mh">إلى: ${esc(d.digest.to)}<b>${esc(d.digest.subject)}</b></div><pre>${esc(d.digest.body)}</pre></div>
+      <div class="acts"><button class="btn" data-act="wa-digest">أرسل الملخص على واتساب</button><button class="btn alt" data-act="copy-digest">نسخ</button></div>
       <div class="note">هذه معاينة لما سيُرسل. الإرسال الفعلي عبر واتساب والبريد والرسائل القصيرة يحتاج ربط مزوّد خدمة وقالب رسائل معتمد، وهو أول ما نفعّله مع العملاء التجريبيين.</div>
     </div>
   </div>`;
@@ -741,7 +1050,46 @@ async function vVip() {
 
 /* ---------- import ---------- */
 S.form = {name: '', pack: 'hotel', defBranch: ''};
-async function getLookup() { if (!S.lookup) S.lookup = ImtParse.makeLookup(await api('/api/import/doc-types')); return S.lookup; }
+async function getLookup() { if (!S.lookup) { S.docTypes = await api('/api/import/doc-types'); S.lookup = ImtParse.makeLookup(S.docTypes); } return S.lookup; }
+const validIso = s => /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(utcDate(s)) && utcDate(s).toISOString().slice(0, 10) === s;
+function checkRows(rows, pack) {                   // the same rules the server applies, run BEFORE importing so the customer can fix them
+  const L = S.lookup, bad = new Map(), seen = new Set();
+  rows.forEach((r, k) => {
+    const why = [], code = L.find(r.document);
+    if (!r.branch) why.push(['branch', 'الفرع مطلوب']);
+    if (!code) why.push(['document', 'نوع الوثيقة غير معروف']);
+    else if ((L.packs[code] || []).indexOf(pack) < 0) why.push(['skip', 'غير منطبقة على القطاع المختار']);
+    if (!r.date) why.push(['date', 'التاريخ فارغ']);
+    else if (!validIso(r.date)) why.push(['date', 'تعذّرت قراءة التاريخ']);
+    if (code && L.scope[code] === 'employee' && !r.employee) why.push(['employee', 'اسم الموظف مطلوب لهذه الوثيقة']);
+    if (code && L.scope[code] === 'branch' && r.employee) why.push(['clear', 'هذا البند يخص الفرع وليس موظفًا']);
+    if (!why.length) { const key = JSON.stringify([r.branch, r.employee, r.emp_id, code]); if (seen.has(key)) why.push(['skip', 'مكرر']); else seen.add(key); }
+    if (why.length) bad.set(k, why);
+  });
+  return bad;
+}
+function applyFix(t) {
+  const r = S.pending.rows[+t.dataset.fix], v = t.value.trim(), f = t.dataset.field;
+  if (f === 'date') r.date = ImtParse.toIso(v); else r[f] = v;
+  render();
+}
+function problemsHtml(bad, rows, pack) {
+  if (!bad.size) return `<div class="glad"><span>✓ كل الصفوف الـ${fmt(rows.length)} قابلة للاستيراد.</span></div>`;
+  const opts = S.docTypes.doc_types.filter(t => t.packs.includes(pack)).map(t => `<option value="${esc(t.code)}">${esc(t.names[0])}</option>`).join('');
+  const trs = [...bad.entries()].slice(0, 12).map(([k, why]) => {
+    const r = rows[k], fields = [...new Set(why.map(w => w[0]))];
+    const fx = fields.map(f => f === 'date' ? `<input type="text" data-fix="${k}" data-field="date" placeholder="2026-10-20 أو 1448/05/12" dir="ltr" aria-label="تصحيح التاريخ">`
+      : f === 'document' ? `<select data-fix="${k}" data-field="document" aria-label="نوع الوثيقة"><option value="">اختر نوع الوثيقة…</option>${opts}</select>`
+      : f === 'employee' ? `<input type="text" data-fix="${k}" data-field="employee" placeholder="اسم الموظف" aria-label="اسم الموظف">`
+      : f === 'branch' ? `<input type="text" data-fix="${k}" data-field="branch" placeholder="اسم الفرع" aria-label="اسم الفرع">`
+      : f === 'clear' ? `<button class="qb" data-act="fix-clear" data-i="${k}">احذف اسم الموظف</button>` : '').join('');
+    return `<tr><td>${fmt(k + 1)}</td><td>${esc(r.branch || '—')}<div class="item-s">${esc(r.employee || '')}</div></td><td>${esc(S.lookup.titles[S.lookup.find(r.document)] || r.document || '—')}</td><td>${ltr(r.date || '—')}</td>
+      <td>${why.map(w => `<div><span class="pill soon">${esc(w[1])}</span></div>`).join('')}</td><td>${fx}<button class="qb" style="margin-top:4px" data-act="drop-row" data-i="${k}">تجاهل الصف</button></td></tr>`;
+  }).join('');
+  return `<div><b>${fmt(bad.size)} صفًا يحتاج مراجعة</b> <span class="item-s">— صحّحه هنا الآن، أو اتركه فيُتخطى ويظهر لك بعد الاستيراد مع السبب.</span></div>
+    <div style="overflow-x:auto"><table class="probs"><thead><tr><th>#</th><th>الفرع / الموظف</th><th>الوثيقة</th><th>التاريخ</th><th>المشكلة</th><th>تصحيح</th></tr></thead><tbody>${trs}</tbody></table></div>
+    ${bad.size > 12 ? `<div class="item-s">يظهر أول 12 من ${fmt(bad.size)}.</div>` : ''}`;
+}
 async function readTable(file) {
   if (/\.xlsx?$/i.test(file.name)) {
     if (!window.XLSX) await new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = ok; s.onerror = () => no(new Error('تعذر تحميل قارئ Excel — احفظ الملف بصيغة CSV وأعد المحاولة')); document.head.appendChild(s); });
@@ -784,6 +1132,7 @@ async function runImport(rows) {
   if (!res.org_id) { S.pending = null; S.imp = res; render(); toast('لم يُستورد أي صف — راجع أسباب التخطي'); return; }
   const o = await api('/api/orgs'); S.orgs = o.orgs; fillOrgs();
   S.pending = null; S.imp = res; S.org = res.org_id; $('#orgSel').value = String(res.org_id); await loadCat(); render(); window.scrollTo(0, 0);
+  try { await showReveal(res); } catch (e) { /* the summary page underneath is still correct */ }
 }
 async function vImport() {
   if (S.imp) {
@@ -799,7 +1148,7 @@ async function vImport() {
       <table><thead><tr><th>رقم الصف</th><th>كما ورد في ملفك</th><th>اعتبرناه</th></tr></thead><tbody>${r.fuzzy.map(f => `<tr><td>${fmt(f.row)}</td><td>${esc(f.document)}</td><td>${esc(f.matched)}</td></tr>`).join('')}</tbody></table>` : ''}
     ${r.skipped_total ? `<div class="sec"><div><h2>صفوف لم تُستورد (${fmt(r.skipped_total)})</h2></div></div><table><thead><tr><th>رقم الصف</th><th>السبب</th></tr></thead><tbody>${skip}</tbody></table>${r.skipped_total > r.skipped.length ? '<div class="sub">يظهر أول 50 فقط.</div>' : ''}` : ''}`;
   }
-  const f = S.form, pd = S.pending;
+  const f = S.form, pd = S.pending, bad = pd ? checkRows(pd.rows, f.pack) : new Map();
   const preview = pd ? (() => {
     const i = pd.info, cols = Object.entries(i.mapped).map(([k, h]) => `<span class="flag">${esc(({branch: 'الفرع', city: 'المدينة', employee: 'الموظف', role: 'الوظيفة', emp_id: 'رقم الهوية/الإقامة', document: 'الوثيقة', date: 'التاريخ'})[k] || k)} ← ${esc(h)}</span>`).join('');
     const docs = i.doc_columns.map(c => `<span class="flag ok">${esc(c.header)} ← ${esc(c.title)}</span>`).join('');
@@ -808,9 +1157,11 @@ async function vImport() {
       <div class="item-s">${pd.label ? esc(pd.label) + ' — ' : ''}${i.format === 'wide' ? 'ملف بعمود لكل وثيقة' : 'ملف بصف لكل وثيقة'} · الصف ${fmt(i.header_row)} هو صف العناوين · ${fmt(i.rows)} قيمة وثيقة</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">${cols}${docs}</div>
       ${i.ignored.length ? `<div class="item-s">أعمدة تجاهلناها: ${esc(i.ignored.join('، '))}</div>` : ''}
+      <div class="sumline"><span class="pill ok">${fmt(pd.rows.length - bad.size)} صفًا سليمًا</span>${bad.size ? `<span class="pill soon">${fmt(bad.size)} يحتاج مراجعة</span>` : ''}</div>
+      ${problemsHtml(bad, pd.rows, f.pack)}
       <table><thead><tr><th>الفرع</th><th>الموظف</th><th>الوثيقة</th><th>التاريخ</th></tr></thead><tbody>${sample}</tbody></table>
       <div class="note" style="margin:0">التواريخ بصيغة يوم/شهر/سنة، والتواريخ الهجرية (سنة 14xx) تُحوَّل إلى الميلادية تلقائيًا. ما لم نستطع قراءته سيظهر لك بعد الاستيراد مع السبب.</div>
-      <div class="acts" style="margin:0"><button class="btn" data-act="imp-go">استورد ${fmt(i.rows)} قيمة</button><button class="btn alt" data-act="imp-cancel">إلغاء</button></div></div>`;
+      <div class="acts" style="margin:0"><button class="btn" data-act="imp-go">استورد ${fmt(pd.rows.length)} قيمة</button><button class="btn alt" data-act="imp-cancel">إلغاء</button></div></div>`;
   })() : '';
   return `<div class="sec" style="margin-top:0"><div><h2>استورد بيانات منشأتك — اعرف تعرّضك في دقيقة</h2>
     <div class="sub" style="margin:0">ارفع ملف الموظفين والتراخيص الذي تستخرجه أصلًا (CSV أو Excel) — بصف لكل وثيقة أو بعمود لكل وثيقة. نتعرف على الأسماء بالعربية والإنجليزية ونحوّل التواريخ الهجرية تلقائيًا.</div></div></div>
@@ -892,7 +1243,7 @@ async function loadCat() {
 }
 function fillOrgs() { $('#orgSel').innerHTML = S.orgs.map(o => `<option value="${o.id}" ${o.id === S.org ? 'selected' : ''}>${esc(o.name)}</option>`).join(''); }
 
-const VIEWS = {overview: vOverview, branches: vBranches, employees: vEmployees, alerts: vAlerts, changes: vChanges, vip: vVip, import: vImport, audit: vAudit};
+const VIEWS = {overview: vOverview, owner: vOwner, calendar: vCalendar, branches: vBranches, employees: vEmployees, alerts: vAlerts, changes: vChanges, vip: vVip, import: vImport, audit: vAudit};
 
 function wireDrop() {
   const d = $('#drop'), f = $('#impFile'); if (!d || !f) return;
@@ -907,13 +1258,22 @@ async function render() {
   $('#roleSeg').innerHTML = Object.entries(ROLE_L).map(([k, l]) => `<button class="${S.role === k ? 'on' : ''}" data-act="role" data-r="${k}">${l}</button>`).join('');
   const rb = $('#roleBr'); rb.hidden = S.role !== 'bm';
   rb.innerHTML = S.staff.filter(p => p.branch_id).map(p => `<option value="${p.branch_id}" ${p.branch_id === S.roleBranch ? 'selected' : ''}>${esc(p.role)} — ${esc(p.name)}</option>`).join('');
-  try { $('#main').innerHTML = await VIEWS[S.view](); document.querySelectorAll('[data-count]').forEach(countUp); wireDrop(); if (S.dr && S.view === 'overview') renderDrawer(); else if (S.dr) closeDrawer(); }
+  try {
+    $('#main').innerHTML = await VIEWS[S.view](); document.querySelectorAll('#main [data-count]').forEach(countUp); wireDrop();
+    if (S.dr) {
+      if (S.dr.explain) S.dr.explain = await explainData();
+      if (S.dr.q || S.dr.day) await ensureLanes();
+      if (S.view === 'overview' || S.dr.q || S.dr.day || S.dr.explain) renderDrawer(); else closeDrawer();
+    }
+  }
   catch (e) { $('#main').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
 }
 function go(v, arg) { closeDrawer(); S.view = v; S.arg = arg ?? null; const p = render(); window.scrollTo(0, 0); return p; }
 
 /* ---------- events ---------- */
+function updBulk() { const n = document.querySelectorAll('#drawer .chk[data-sel]:checked').length, b = $('#bulkN'); if (b) b.textContent = n ? `${fmt(n)} محدد` : ''; }
 document.addEventListener('click', async ev => {
+  if (!ev.target.closest('.search')) $('#qres').classList.remove('show');
   const el = ev.target.closest('[data-act]'); if (!el) return;
   const a = el.dataset.act;
   try {
@@ -970,14 +1330,50 @@ document.addEventListener('click', async ev => {
     else if (a === 'imp-again') { S.imp = null; S.pending = null; render(); }
     else if (a === 'after-import') { S.imp = null; go('overview'); }
     else if (a === 'adv') { await api(`/api/vip/requests/${el.dataset.id}/advance`, {body: {}}); render(); }
+    else if (a === 'remind') showRemind(await api(`/api/orgs/${S.org}/remind`, {body: {item_id: el.dataset.id}}));
+    else if (a === 'remind-wa') waOpen(S.remind.text);
+    else if (a === 'remind-copy') await copyText(S.remind.text);
+    else if (a === 'sheet-close') $('#sheet').classList.remove('show');
+    else if (a === 'open-assign') { const n = el.closest('.item'); n.classList.add('open'); const o = n.querySelector('.own'); if (o) o.scrollIntoView({block: 'center', behavior: 'smooth'}); }
+    else if (a === 'explain') { S.dr = {explain: await explainData()}; renderDrawer(); }
+    else if (a === 'wa') waOpen(S.msgs[+el.dataset.i].text);
+    else if (a === 'wa-digest') waOpen(S.digest.subject + '\n\n' + S.digest.body);
+    else if (a === 'copy-digest') await copyText(S.digest.subject + '\n\n' + S.digest.body);
+    else if (a === 'cal-day') { S.dr = {day: el.dataset.day}; renderDrawer(); }
+    else if (a === 'cal-nav') { const dl = +el.dataset.d; if (!dl) S.cal = null; else { let {y, m} = S.cal; m += dl; if (m < 1) { m = 12; y--; } if (m > 12) { m = 1; y++; } S.cal = {y, m}; } closeDrawer(); render(); }
+    else if (a === 'q-open') { S.dr = {q: $('#q').value.trim(), open: el.dataset.id}; $('#qres').classList.remove('show'); renderDrawer(); }
+    else if (a === 'q-all') { S.dr = {q: $('#q').value.trim()}; $('#qres').classList.remove('show'); renderDrawer(); }
+    else if (a === 'sel') updBulk();
+    else if (a === 'sel-all') { document.querySelectorAll('#drawer .chk[data-sel]').forEach(c => { c.checked = el.checked; }); updBulk(); }
+    else if (a === 'bulk-assign') {
+      const ids = [...document.querySelectorAll('#drawer .chk[data-sel]:checked')].map(c => c.dataset.sel), ow = $('#bulkOwner');
+      if (!ids.length) { toast('حدّد بندًا واحدًا على الأقل'); return; }
+      let who = '';
+      for (const id of ids) who = (await api(`/api/orgs/${S.org}/assign`, {body: {item_id: id, owner_id: ow.value}})).owner.name;
+      toast(`أُسند ${arItems(ids.length)} إلى ${who}`); render();
+    }
+    else if (a === 'reveal-go') { $('#reveal').classList.remove('show'); S.imp = null; go('overview'); }
+    else if (a === 'reveal-report') { $('#reveal').classList.remove('show'); await openReport(); }
+    else if (a === 'reveal-details') $('#reveal').classList.remove('show');
+    else if (a === 'drop-row') { S.pending.rows.splice(+el.dataset.i, 1); S.pending.info.rows = S.pending.rows.length; render(); }
+    else if (a === 'fix-clear') { S.pending.rows[+el.dataset.i].employee = ''; render(); }
   } catch (e) { toast(e.message); }
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
-document.addEventListener('input', ev => { const t = ev.target; if (t.id === 'impName') S.form.name = t.value; else if (t.id === 'impBranch') S.form.defBranch = t.value; });
+document.addEventListener('keydown', async e => {
+  if (e.key === 'Escape') { closeDrawer(); $('#sheet').classList.remove('show'); $('#reveal').classList.remove('show'); $('#qres').classList.remove('show'); }
+  else if (e.key === 'Enter' && e.target.id === 'q' && e.target.value.trim().length > 1) { await ensureLanes(); S.dr = {q: e.target.value.trim()}; $('#qres').classList.remove('show'); renderDrawer(); }
+});
+let qTimer;
+document.addEventListener('input', ev => {
+  const t = ev.target;
+  if (t.id === 'impName') S.form.name = t.value; else if (t.id === 'impBranch') S.form.defBranch = t.value;
+  else if (t.id === 'q') { clearTimeout(qTimer); qTimer = setTimeout(() => runSearch(t.value).catch(e => toast(e.message)), 140); }
+});
 document.addEventListener('change', async ev => {
   const t = ev.target;
   if (t.id === 'impFile' && t.files[0]) { try { await stage(await readTable(t.files[0]), t.files[0].name); } catch (e) { toast(e.message); } return; }
-  if (t.id === 'impPack') S.form.pack = t.value;
+  if (t.dataset && t.dataset.fix !== undefined) { applyFix(t); return; }
+  if (t.id === 'impPack') { S.form.pack = t.value; if (S.pending) render(); }
   if (t.id === 'roleBr') { S.roleBranch = +t.value; closeDrawer(); render(); return; }
   if (t.id === 'brSel') { S.arg = +t.value; render(); }
   else if (t.id === 'eBr') { S.emp.branch = t.value; render(); }

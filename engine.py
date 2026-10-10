@@ -142,6 +142,59 @@ def by_authority(items: list[dict]) -> list[dict]:
     return rows
 
 
+def _grouped(items: list[dict]) -> list[tuple[dict, list[dict]]]:
+    """Non-ok items as (display item, member items): obligations alone, employee documents per branch + document + status."""
+    out: list[tuple[dict, list[dict]]] = []
+    groups: dict[tuple, list[dict]] = defaultdict(list)
+    for i in items:
+        if i["status"] == "ok":
+            continue
+        if i["kind"] == "obligation":
+            out.append((i, [i]))
+        else:
+            groups[(i["branch_id"], i["code"], i["status"])].append(i)
+    for g in groups.values():
+        first = min(g, key=lambda x: x["days_left"])
+        out.append((dict(first, id=f"g-{first['branch_id']}-{first['code']}-{first['status']}", kind="group", count=len(g),
+                         employee=None, penalty_sar=sum(x["penalty_sar"] for x in g), days_left=first["days_left"]), g))
+    return out
+
+
+def _as_ok(items: list[dict], ids: set[str] | None) -> list[dict]:
+    return [dict(i, status="ok") if (ids is None or i["id"] in ids) and i["status"] != "ok" else i for i in items]
+
+
+def explain_score(items: list[dict], limit: int = 6) -> dict:
+    """Why the score is what it is: the two weighted parts, the items that cost the most points (each driver's points are
+    its exact share of the deduction, so they add up to 100 - score before rounding) and what fixing them would do."""
+    groups = [(g, share, label, kind) for g, share, label, kind in (
+        ([i for i in items if i["kind"] == "obligation"], 1 - EMP_SHARE, "التزامات وتراخيص", "obligation"),
+        ([i for i in items if i["kind"] == "employee_doc"], EMP_SHARE, "وثائق الموظفين", "employee_doc")) if g]
+    w = sum(s for _, s, _, _ in groups)
+    parts, totals = [], {}
+    for g, share, label, kind in groups:
+        loss, total = _loss(g)
+        totals[kind] = (total, share / w)
+        parts.append(dict(label=label, kind=kind, weight=round(100 * share / w), score=round(100 * (1 - loss / total)),
+                          count=len(g), overdue=sum(i["status"] == "overdue" for i in g), soon=sum(i["status"] == "soon" for i in g)))
+    drivers = []
+    for shown, members in _grouped(items):
+        total, nshare = totals[members[0]["kind"]]
+        pts = sum(nshare * 100 * (m["severity"] * (1.0 if m["status"] == "overdue" else SOON_WEIGHT)) / total for m in members)
+        drivers.append((pts, shown, members))
+    drivers.sort(key=lambda d: (-d[0], priority(d[1])))
+    s = score(items)
+    top = drivers[:limit]
+    top3_ids = {m["id"] for _, _, ms in drivers[:3] for m in ms}
+    return dict(
+        score=s, band=band(s), soon_weight=SOON_WEIGHT, parts=parts,
+        drivers=[dict(id=d["id"], kind=d["kind"], title=d["title"], count=d.get("count", 1), branch_id=d["branch_id"],
+                      branch_name=d["branch_name"], status=d["status"], days_left=d["days_left"], penalty_sar=d["penalty_sar"],
+                      vip_code=d["vip_code"], points=round(p * 10) / 10) for p, d, _ in top],
+        other_points=round(sum(p for p, _, _ in drivers[limit:]) * 10) / 10,
+        scenarios=dict(fix_top3=score(_as_ok(items, top3_ids)), fix_overdue=score([dict(i, status="ok") if i["status"] == "overdue" else i for i in items])))
+
+
 def next_due(old_due: date, done: date, recurrence_months: int) -> date:
     base = old_due if done <= old_due else done
     return add_months(base, recurrence_months)

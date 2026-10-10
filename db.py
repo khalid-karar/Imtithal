@@ -48,7 +48,8 @@ CREATE TABLE IF NOT EXISTS vip_request(
   id INTEGER PRIMARY KEY, org_id INTEGER, branch_id INTEGER, service_code TEXT, item_ref TEXT, note TEXT,
   status TEXT, created_at TEXT, updated_at TEXT);
 CREATE TABLE IF NOT EXISTS assignment(org_id INTEGER, key TEXT, owner_id TEXT, due TEXT, PRIMARY KEY(org_id, key));
-CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY, org_id INTEGER, ts TEXT, action TEXT, detail TEXT);
+CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY, org_id INTEGER, ts TEXT, action TEXT, detail TEXT, amount INTEGER DEFAULT 0);
+CREATE TABLE IF NOT EXISTS score_history(org_id INTEGER, day TEXT, score INTEGER, money INTEGER, PRIMARY KEY(org_id, day));
 CREATE INDEX IF NOT EXISTS ix_inst_branch ON instance(branch_id);
 CREATE INDEX IF NOT EXISTS ix_doc_emp ON emp_doc(employee_id);
 CREATE INDEX IF NOT EXISTS ix_emp_branch ON employee(branch_id);
@@ -183,6 +184,8 @@ def _migrate(c: sqlite3.Connection) -> None:
     for col in ("verified_by", "verified_on"):          # who legally verified an obligation, and when (null = not verified)
         if col not in have_t:
             c.execute(f"ALTER TABLE template ADD COLUMN {col} TEXT")
+    if "amount" not in {r["name"] for r in c.execute("PRAGMA table_info(audit)")}:     # exposure removed by a completed item
+        c.execute("ALTER TABLE audit ADD COLUMN amount INTEGER DEFAULT 0")
     c.commit()
 
 

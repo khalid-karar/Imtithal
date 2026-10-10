@@ -60,3 +60,13 @@ the xlsx case needs `npm i xlsx` and is skipped otherwise.
 - Every item now carries a domain, an owner (default: branch manager, or HR for employee documents), an optional internal due date and a cautious, unverified "possible consequence" line. Assignment: `POST /api/orgs/{id}/assign`; roster: `GET /api/orgs/{id}/staff`.
 - "View as" switch: owner / HR manager / branch manager (client-side view; real roles and auth come later).
 - Named people exist only for the three seeded demo organisations; imported organisations get role titles.
+
+## v0.5 — first-run "wow", explainable score, one-tap fixes, owner view
+- **Reveal after import:** a full-screen "your exposure today" moment (total SAR, worst branch, top 3 items).
+- **Forgiving import:** per-row problem table with inline fixes (branch, document type, date, employee), drop-row, duplicate detection.
+- **Explainable score:** `GET /api/orgs/{id}/score-explain` — the two weighted parts, the items costing the most points (exact shares of the deduction) and "if you fix these" scenarios.
+- **One-tap actions on every red item:** remind owner (`POST /api/orgs/{id}/remind` → prepared WhatsApp text, logged as *prepared*; nothing is sent by the server), assign, resolve, bulk-assign.
+- **Owner view:** `GET /api/orgs/{id}/owner` — score, money, worst branch, top 3 actions, wins ("fixed since you started", exposure removed from the audit log), real daily score history and weekly digest.
+- Calendar with Hijri + Gregorian dates, global search, good-news/empty states.
+- Honesty: score history only contains real daily snapshots; exposure removed is the penalty of items that were overdue/soon when completed; score weights are assumptions, not legal facts.
+- Every endpoint is mirrored in `static/demo-api.js`; `scripts/parity_check.py` must report 0 mismatches.
