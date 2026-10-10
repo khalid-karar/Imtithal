@@ -193,16 +193,41 @@ td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
   .when{display:none}
   table{display:block;overflow-x:auto}
 }
+
+.cta{background:var(--brass);color:#fff;border:none;border-radius:99px;padding:7px 16px;cursor:pointer;font-weight:600;font-size:13.5px}
+.cta:hover{background:#9a7a32}
+.btn.gold{background:var(--brass);color:#fff}
+.more{display:flex;gap:6px;align-items:center;margin:-16px 0 24px;font-size:12.5px;color:var(--slate);flex-wrap:wrap}
+.more button{background:none;border:1px solid transparent;border-radius:99px;padding:3px 11px;cursor:pointer;color:var(--slate)}
+.more button:hover{border-color:var(--line)} .more button.on{background:var(--sand);color:var(--ink);font-weight:600}
+.vh{background:#fff;border:1px solid var(--line);border-radius:6px;padding:26px 30px;margin:0 0 18px;border-top:3px solid var(--brass)}
+.vh h1{font-family:var(--display);font-size:25px;line-height:1.45;margin:0 0 8px}
+.vh p{margin:0 0 18px;color:var(--ink-2);font-size:15.5px}
+.vals{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.vals div{background:var(--paper);border-radius:4px;padding:12px 14px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center}
+.vals i{grid-row:span 2;font-style:normal;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--brass-l);display:grid;place-items:center;font-weight:700}
+.vals b{font-size:15px} .vals span{font-size:13px;color:var(--slate);line-height:1.5}
+.chips2{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.chips2 .pill{font-size:13px;padding:3px 10px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:6px}
+.stp{background:#fff;border:1px solid var(--line);border-radius:5px;padding:16px 18px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:border-color .15s,box-shadow .15s}
+.stp:hover{border-color:var(--brass);box-shadow:0 4px 14px rgba(22,35,63,.08)}
+.stp i{font-style:normal;width:26px;height:26px;border-radius:50%;background:var(--brass);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+.stp h4{margin:2px 0 0;font-size:15.5px} .stp p{margin:0;font-size:13.5px;color:var(--ink-2);flex:1}
+.stp .go{color:var(--brass);font-weight:600;font-size:13.5px}
+details.auth{margin-top:26px} details.auth summary{cursor:pointer;font-family:var(--display);font-size:17px;font-weight:600;margin-bottom:12px}
+.pill.overdue{background:var(--bad-bg);color:var(--bad)} .pill.soon{background:var(--warn-bg);color:var(--warn)} .pill.ok{background:var(--ok-bg);color:var(--ok)}
+.sec{gap:12px;flex-wrap:wrap}
+@media (max-width:760px){.vals,.steps{grid-template-columns:1fr}.vh{padding:20px}.vh h1{font-size:20px}.cta{font-size:12.5px;padding:6px 12px}}
 </style>
 </head>
 <body>
-<div class="banner">نسخة تجريبية — بيانات توضيحية، والمكتبة التنظيمية قيد المراجعة القانونية، والمبالغ تقديرية</div>
 <div class="wrap">
   <div class="top">
     <div class="brand"><div class="mark"></div><b>امتثال</b></div>
-    <div class="top-r"><button class="lnk" data-act="tour">▶ جولة سريعة</button><button class="lnk" data-act="report">تقرير للمالك</button><span id="asof"></span><select id="orgSel" aria-label="المنشأة"></select></div>
+    <div class="top-r"><select id="orgSel" aria-label="المنشأة"></select><button class="lnk" data-act="tour">▶ جولة سريعة</button><button class="cta" data-act="start">ابدأ ببيانات منشأتك ←</button></div>
   </div>
-  <nav id="nav"></nav>
+  <nav id="nav"></nav><div class="more" id="more"></div>
   <main id="main"><div class="empty">جارٍ التحميل…</div></main>
   <div class="foot">
     الجداول والتواريخ تُدخل يدويًا أو تُستورد من ملفات الجهات الحكومية؛ لا يوجد ربط مباشر مع المنصات الحكومية في هذه النسخة.
@@ -225,7 +250,8 @@ td{padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
 <script src="import-parse.js"></script>
 <script>
 const S = {orgs: [], org: null, asOf: '', view: 'overview', arg: null, filt: {status: '', kind: ''}, emp: {branch: '', code: '', status: ''}, imp: null, pending: null};
-const NAV = [['overview','نظرة عامة'],['branches','الفروع'],['employees','وثائق الموظفين'],['alerts','التنبيهات'],['changes','التحديثات التنظيمية'],['vip','خدمات VIP'],['import','استيراد بياناتك'],['audit','سجل العمليات']];
+const NAV = [['overview','الرئيسية'],['branches','الفروع والبنود'],['alerts','التنبيهات'],['vip','خدمات VIP']];
+const MORE = [['employees','وثائق الموظفين'],['changes','جديد الأنظمة'],['audit','سجل الإجراءات'],['import','استيراد بياناتك']];
 const ST = {overdue: 'متأخر', soon: 'قريب', ok: 'سليم'};
 const BAND = {good: 'جاهزية جيدة', watch: 'يحتاج متابعة', risk: 'مخاطر مرتفعة'};
 const SRC = {'رسمي': 'مصدر رسمي', 'ثانوي': 'مصدر ثانوي', 'مثال': 'مثال توضيحي', 'نص ملصوق': 'نص أصلي مرفق'};
@@ -261,7 +287,6 @@ function sub(i) {
 /* ---------- item row (shared) ---------- */
 function itemRow(i) {
   const steps = i.fix_steps.map(s => `<li>${esc(s)}</li>`).join('');
-  const verif = i.verified ? '<span class="flag ok">معتمد قانونيًا</span>' : '<span class="flag rev">قيد المراجعة القانونية</span>';
   const src = i.source_url ? `<a href="${esc(i.source_url)}" target="_blank" rel="noopener">المصدر</a>` : '';
   let actions = '';
   if (i.kind === 'group') {
@@ -273,11 +298,12 @@ function itemRow(i) {
     actions = `<input type="date" data-exp="${i.id}" title="تاريخ الانتهاء الجديد (اختياري)">
       <button class="btn" data-act="done" data-id="${i.id}">تم التجديد</button>`;
   }
-  const vip = `<button class="btn alt" data-act="vip" data-code="${esc(i.vip_code || '')}" data-branch="${i.branch_id}" data-ref="${esc(title(i))}" ${i.vip_code ? '' : 'disabled'}>${i.vip_name ? 'اطلب VIP: ' + esc(i.vip_name) : 'لا توجد خدمة VIP لهذا البند'}</button>`;
+  const cv = (S.cat || {})[i.vip_code];
+  const vip = i.vip_code ? `<button class="btn gold" data-act="vip" data-code="${esc(i.vip_code)}" data-branch="${i.branch_id}" data-ref="${esc(title(i))}">عالجه لي (VIP)${cv ? ' — من ' + fmt(cv.price_from) + ' ريال · ' + fmt(cv.sla_days) + ' أيام عمل' : ''}</button>` : '';
   return `<div class="item" id="it-${esc(i.id)}">
     <div class="item-h" data-act="toggle">
       <span class="dot ${i.status}"></span>
-      <div><div class="item-t">${esc(title(i))}${verif}</div><div class="item-s">${esc(sub(i))}</div></div>
+      <div><div class="item-t">${esc(title(i))}</div><div class="item-s">${esc(sub(i))}</div></div>
       <span class="when">${when(i)}</span><span class="pill ${i.status}">${ST[i.status]}</span>
     </div>
     <div class="det">
@@ -291,7 +317,7 @@ function itemRow(i) {
           ${src}
         </div>
       </div>
-      <div class="acts">${actions}${vip}</div>
+      <div class="acts">${vip}${actions}</div>
     </div>
   </div>`;
 }
@@ -405,17 +431,29 @@ async function vOverview() {
   }).join('');
   const ledger = d.by_authority.map(a => `<tr><td>${esc(a.authority)}</td><td>${a.overdue || '—'}</td><td>${a.soon || '—'}</td><td>${a.ok}</td></tr>`).join('');
   const why = d.urgent.filter(i => i.status === 'overdue').sort((a, b) => b.penalty_sar - a.penalty_sar || a.days_left - b.days_left).slice(0, 6)
-    .map(i => `<div class="r"><div><b>${esc(title(i))}</b><div class="item-s">${esc(i.branch_name)} · ${esc(i.authority)} · ${when(i)}${i.verified ? '' : ' · قيد المراجعة'}</div></div><span>${sar(i.penalty_sar)}</span><button class="btn alt" data-act="open-item" data-id="${esc(i.id)}">كيف أعالجه</button></div>`).join('');
+    .map(i => `<div class="r"><div><b>${esc(title(i))}</b><div class="item-s">${esc(i.branch_name)} · ${esc(i.authority)} · ${when(i)}</div></div><span>${sar(i.penalty_sar)}</span><button class="btn alt" data-act="open-item" data-id="${esc(i.id)}">كيف أعالجه</button></div>`).join('');
   const tick = d.urgent.slice().sort((a, b) => a.days_left - b.days_left || b.severity - a.severity).slice(0, 10).map(i => `
     <div class="tk ${i.status}" data-act="open-item" data-id="${esc(i.id)}"><div class="n">${ltr(i.days_left < 0 ? '−' + fmt(-i.days_left) : fmt(i.days_left))}</div>
       <div class="u">${i.days_left < 0 ? 'يومًا من التأخر' : 'يومًا متبقيًا'}</div><div class="t">${esc(title(i))}</div><div class="b">${esc(i.branch_name)}</div></div>`).join('');
   const first = d.org.name;
+  const nItems = c.overdue + c.soon + c.ok, nBr = d.branches.length, nAuth = d.by_authority.length;
+  const weakest = ranked[0], top = why ? d.urgent.filter(i => i.status === 'overdue').sort((a, b) => b.penalty_sar - a.penalty_sar || a.days_left - b.days_left)[0] : null;
+  const vipMin = Object.values(S.cat || {}).reduce((m, v) => Math.min(m, v.price_from), Infinity);
   return `
+  <section class="vh">
+    <h1>كل التزامات منشأتك الحكومية في شاشة واحدة — قبل أن تتحول إلى غرامة</h1>
+    <p>يراقب امتثال <b>${fmt(nItems)}</b> التزامًا ووثيقة في <b>${fmt(nBr)}</b> ${nBr > 1 ? 'فروع' : 'فرع'} لدى <b>${fmt(nAuth)}</b> جهة حكومية، وينبّه المسؤول قبل الموعد، وينفّذ المتأخر نيابةً عنك.</p>
+    <div class="vals">
+      <div><i>1</i><b>نراقب</b><span>كل رخصة وإقامة وتأمين وشهادة بمواعيدها وجهتها</span></div>
+      <div><i>2</i><b>ننبّه</b><span>رسالة واتساب وبريد قبل الموعد، لا بعد الغرامة</span></div>
+      <div><i>3</i><b>ننفّذ عنك</b><span>فريق VIP يجدّد ويقدّم ويتابع بسعر ومدة معلنين</span></div>
+    </div>
+  </section>
   <section class="alarm" id="hero-money">
     <div style="position:relative">
-      <div class="lbl">تعرّض مالي تقديري لبنود تجاوزت موعدها اليوم — ${esc(first)}</div>
+      <div class="lbl">وضع ${esc(first)} اليوم — تعرّض مالي تقديري لبنود تجاوزت موعدها</div>
       <div class="big"><span data-count="${d.money_at_risk}">0</span><small>ريال</small></div>
-      <div class="next">وخلال الـ 30 يومًا القادمة: ${sar(d.exposure_30)} إن لم تُعالج البنود التي تقترب</div>
+      <div class="next">وخلال 30 يومًا القادمة: ${sar(d.exposure_30)} إن لم تُعالج البنود التي تقترب</div>
       <div class="btns">
         <button class="btn" data-act="why">من أين جاء هذا الرقم؟</button>
         <button class="btn alt" data-act="report">تقرير للمالك (PDF)</button>
@@ -424,21 +462,26 @@ async function vOverview() {
     </div>
     <div class="side">
       <div><div class="k">مؤشر الجاهزية</div><div class="v">${ltr(d.score + ' / 100')} — ${BAND[d.band]}</div></div>
-      <div><div class="k">بنود متأخرة / تقترب / سليمة</div><div class="v">${fmt(c.overdue)} / ${fmt(c.soon)} / ${fmt(c.ok)}</div></div>
-      <div class="k">الأرقام تقديرات توضيحية مبنية على بنود المكتبة، وليست غرامات رسمية.</div>
+      <div><div class="k">حالة البنود</div><div class="chips2"><span class="pill overdue">${fmt(c.overdue)} متأخر</span><span class="pill soon">${fmt(c.soon)} يقترب</span><span class="pill ok">${fmt(c.ok)} سليم</span></div></div>
+      <div class="k">تقديرات توضيحية مبنية على بنود المكتبة، وليست غرامات رسمية.</div>
     </div>
   </section>
   <div class="why" id="why">${why || '<div class="empty">لا توجد بنود متأخرة</div>'}</div>
-  <div class="would"><span>🔔 لو كان امتثال مفعّلًا لديك: <b>${fmt(al.summary.overdue_items)}</b> بندًا متأخرًا الآن كان سيصلك تنبيه به قبل موعده.</span>
-    <button class="btn alt" data-act="nav" data-v="alerts">شاهد التنبيهات التي كانت ستصلك</button></div>
-  <div class="sec" style="margin-top:6px"><div><h2>العدّاد — أقرب المواعيد والتأخرات</h2><div class="sub" style="margin:0">اضغط على أي بطاقة لمعرفة طريقة المعالجة</div></div></div>
-  <div class="ticker">${tick || '<div class="empty">لا توجد مواعيد قريبة</div>'}</div>
-  <div class="sec" id="leader"><div><h2>ترتيب الفروع — من الأضعف إلى الأقوى</h2><div class="sub" style="margin:0">معيار المقارنة هو متوسط فروعك أنت (${ltr(avg + ' / 100')})؛ مقارنة السوق تتطلب بيانات عملاء حقيقية وسنضيفها لاحقًا</div></div></div>
+  <div class="would"><span>🔔 <b>مع امتثال</b> كان سيصلك تنبيه بكل واحد من هذه البنود الـ${fmt(al.summary.overdue_items)} المتأخرة قبل موعده.</span>
+    <button class="btn alt" data-act="nav" data-v="alerts">شاهد الرسائل التي كانت ستصلك</button></div>
+  <div class="sec" style="margin-top:6px"><div><h2>ابدأ في 3 خطوات</h2><div class="sub" style="margin:0">من معرفة المشكلة إلى حلّها — بضغطة على كل بطاقة</div></div></div>
+  <div class="steps">
+    <div class="stp" data-act="branch" data-id="${weakest.id}"><i>1</i><h4>اعرف أين المشكلة</h4><p>${esc(weakest.name)} هو الأضعف: ${fmt(weakest.counts.overdue)} بندًا متأخرًا وتعرّض ${sar(weakest.money_at_risk)}.</p><span class="go">افتح الفرع ←</span></div>
+    <div class="stp" ${top ? `data-act="open-item" data-id="${esc(top.id)}"` : 'data-act="nav" data-v="branches"'}><i>2</i><h4>اعرف كيف تعالجها</h4><p>${top ? `أعلى بند خطورة: ${esc(title(top))} (${esc(top.branch_name)}) — خطوات المعالجة والدليل المطلوب أمامك.` : 'خطوات المعالجة والدليل المطلوب لكل بند.'}</p><span class="go">اعرض الخطوات ←</span></div>
+    <div class="stp" data-act="nav" data-v="vip"><i>3</i><h4>أو فوّضنا</h4><p>لا وقت لديك؟ فريق VIP ينفّذ نيابةً عنك${isFinite(vipMin) ? ' — ابتداءً من ' + sar(vipMin) : ''}، وتتابع الحالة حتى التسليم.</p><span class="go">شاهد الخدمات ←</span></div>
+  </div>
+  <div class="sec" id="leader"><div><h2>ترتيب الفروع — من الأضعف إلى الأقوى</h2><div class="sub" style="margin:0">المقارنة بمتوسط فروعك أنت (${ltr(avg + ' / 100')}) — مقارنة السوق تحتاج بيانات عملاء حقيقية وسنضيفها لاحقًا</div></div></div>
   <div class="cards">${cards}</div>
-  <div class="sec"><div><h2>يحتاج إجراءً الآن</h2><div class="sub" style="margin:0">مرتبة بحسب الخطورة ثم الاستعجال — اضغط على أي بند لمعرفة طريقة المعالجة</div></div></div>
-  ${itemList(d.urgent, 'لا توجد بنود عاجلة')}
-  <div class="sec"><div><h2>حسب الجهة التنظيمية</h2></div></div>
-  <table><thead><tr><th>الجهة</th><th>متأخر</th><th>قريب</th><th>سليم</th></tr></thead><tbody>${ledger}</tbody></table>`;
+  <div class="sec"><div><h2>يحتاج إجراءً الآن</h2><div class="sub" style="margin:0">أخطر 5 بنود — اضغط على أي بند لمعرفة طريقة المعالجة</div></div>
+    <button class="btn alt" data-act="branch" data-id="${weakest.id}">عرض كل البنود (${fmt(d.urgent.length)}) ←</button></div>
+  ${itemList(d.urgent.slice(0, 5), 'لا توجد بنود عاجلة')}
+  <details class="auth"><summary>حسب الجهة التنظيمية (${fmt(nAuth)} جهة)</summary>
+    <table><thead><tr><th>الجهة</th><th>متأخر</th><th>قريب</th><th>سليم</th></tr></thead><tbody>${ledger}</tbody></table></details>`;
 }
 
 /* ---------- alerts ---------- */
@@ -527,7 +570,7 @@ async function runImport(rows) {
   const res = await api('/api/import', {body: {org_name: name, pack, rows}});
   if (!res.org_id) { S.pending = null; S.imp = res; render(); toast('لم يُستورد أي صف — راجع أسباب التخطي'); return; }
   const o = await api('/api/orgs'); S.orgs = o.orgs; fillOrgs();
-  S.pending = null; S.imp = res; S.org = res.org_id; $('#orgSel').value = String(res.org_id); render(); window.scrollTo(0, 0);
+  S.pending = null; S.imp = res; S.org = res.org_id; $('#orgSel').value = String(res.org_id); await loadCat(); render(); window.scrollTo(0, 0);
 }
 async function vImport() {
   if (S.imp) {
@@ -559,6 +602,7 @@ async function vImport() {
   return `<div class="sec" style="margin-top:0"><div><h2>استورد بيانات منشأتك — اعرف تعرّضك في دقيقة</h2>
     <div class="sub" style="margin:0">ارفع ملف الموظفين والتراخيص الذي تستخرجه أصلًا (CSV أو Excel) — بصف لكل وثيقة أو بعمود لكل وثيقة. نتعرف على الأسماء بالعربية والإنجليزية ونحوّل التواريخ الهجرية تلقائيًا.</div></div></div>
   ${preview}
+  ${pd ? '' : `<div class="vh" style="padding:18px 22px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap"><div><b>لا تملك ملفًا الآن؟</b><div class="item-s">شاهد منشأة نموذجية بثلاثة فروع تُبنى أمامك في ثوانٍ، ثم جرّب ملفك لاحقًا.</div></div><button class="btn gold" data-act="imp-sample">جرّب مثالًا فوريًا ←</button></div>`}
   <div class="wiz" id="imp-form">
     <div class="two"><div><label>اسم المنشأة</label><input type="text" id="impName" value="${esc(f.name)}" placeholder="مثال: مجموعة النخيل للفنادق" maxlength="80"></div>
       <div><label>القطاع</label><select id="impPack">${Object.entries(PACKS).map(([k, v]) => `<option value="${k}" ${f.pack === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div></div>
@@ -628,6 +672,7 @@ async function tourGo(i) {
 function tourStop() { clearTimeout(T.timer); T.i = -1; $('#tour').classList.remove('show'); document.querySelectorAll('.spot').forEach(e => e.classList.remove('spot')); }
 function tourPause() { T.paused = !T.paused; $('#tourP').textContent = T.paused ? 'تشغيل' : 'إيقاف مؤقت'; tourGo(T.i); }
 function tourStart() { $('#welcome').classList.remove('show'); T.paused = false; $('#tourP').textContent = 'إيقاف مؤقت'; tourGo(0); }
+async function loadCat() { try { S.cat = Object.fromEntries((await api(`/api/orgs/${S.org}/vip`)).catalog.map(v => [v.code, v])); } catch (e) { S.cat = {}; } }
 function fillOrgs() { $('#orgSel').innerHTML = S.orgs.map(o => `<option value="${o.id}" ${o.id === S.org ? 'selected' : ''}>${esc(o.name)}</option>`).join(''); }
 
 const VIEWS = {overview: vOverview, branches: vBranches, employees: vEmployees, alerts: vAlerts, changes: vChanges, vip: vVip, import: vImport, audit: vAudit};
@@ -641,6 +686,7 @@ function wireDrop() {
 }
 async function render() {
   $('#nav').innerHTML = NAV.map(([k, l]) => `<button class="${S.view === k ? 'on' : ''}" data-act="nav" data-v="${k}">${l}</button>`).join('');
+  $('#more').innerHTML = 'المزيد:' + MORE.map(([k, l]) => `<button class="${S.view === k ? 'on' : ''}" data-act="nav" data-v="${k}">${l}</button>`).join('');
   try { $('#main').innerHTML = await VIEWS[S.view](); document.querySelectorAll('[data-count]').forEach(countUp); wireDrop(); }
   catch (e) { $('#main').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
 }
@@ -656,7 +702,9 @@ document.addEventListener('click', async ev => {
     else if (a === 'branch') go('branches', +el.dataset.id);
     else if (a === 'filt') { S.filt[el.dataset.g] = el.dataset.v; render(); }
     else if (a === 'emp') { S.emp = {branch: el.dataset.branch, code: el.dataset.code, status: el.dataset.status}; go('employees'); }
+    else if (a === 'start') { S.imp = null; go('import'); }
     else if (a === 'done') {
+      if (!el.dataset.armed) { el.dataset.armed = '1'; const t0 = el.textContent; el.textContent = 'اضغط للتأكيد'; setTimeout(() => { delete el.dataset.armed; el.textContent = t0; }, 3000); return; }
       const id = el.dataset.id;
       const body = {};
       const note = document.querySelector(`[data-note="${id}"]`); if (note) body.note = note.value;
@@ -667,7 +715,7 @@ document.addEventListener('click', async ev => {
     else if (a === 'vip') {
       if (!el.dataset.code) return;
       await api(`/api/orgs/${S.org}/vip/requests`, {body: {service_code: el.dataset.code, branch_id: el.dataset.branch ? +el.dataset.branch : null, item_ref: el.dataset.ref}});
-      toast('تم إرسال طلب VIP — ستجده في تبويب خدمات VIP');
+      toast('تم استلام طلبك — تابع حالته من تبويب «خدمات VIP»');
     }
     else if (a === 'ack') { await api(`/api/orgs/${S.org}/changes/${el.dataset.id}/acknowledge`, {body: {}}); toast('تم تسجيل الاطلاع'); render(); }
     else if (a === 'why') $('#why').classList.toggle('open');
@@ -705,14 +753,14 @@ document.addEventListener('change', async ev => {
   else if (t.id === 'eCode') { S.emp.code = t.value; render(); }
   else if (t.id === 'eSt') { S.emp.status = t.value; render(); }
 });
-$('#orgSel').addEventListener('change', e => { S.imp = null; S.org = +e.target.value; S.arg = null; S.emp = {branch: '', code: '', status: ''}; S.filt = {status: '', kind: ''}; render(); });
+$('#orgSel').addEventListener('change', async e => { S.imp = null; S.org = +e.target.value; await loadCat(); S.arg = null; S.emp = {branch: '', code: '', status: ''}; S.filt = {status: '', kind: ''}; render(); });
 
 (async () => {
   try {
     const d = await api('/api/orgs');
     S.orgs = d.orgs; S.asOf = d.as_of; S.org = d.orgs[0].id;
     fillOrgs();
-    $('#asof').innerHTML = 'بتاريخ ' + ltr(d.as_of);
+    await loadCat();
     render();
     try { if (!sessionStorage.getItem('imt-welcomed')) { $('#welcome').classList.add('show'); sessionStorage.setItem('imt-welcomed', '1'); } } catch (e) { $('#welcome').classList.add('show'); }
   } catch (e) { $('#main').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }

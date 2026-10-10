@@ -438,7 +438,8 @@
       api = createApi(snap, localStore(key));
       const bar = document.createElement('div');
       bar.style.cssText = 'background:#EFE9DC;color:#2B3B5C;font-size:12.5px;text-align:center;padding:7px 12px;border-bottom:1px solid #D8D0BE';
-      bar.innerHTML = 'نسخة عرض ثابتة: تُحفظ تغييراتك في متصفحك فقط ولا تُرسل إلى أي خادم، والتاريخ المعروض مثبّت على <bdi dir="ltr">' + snap.as_of + '</bdi>. ';
+      bar.className = 'demobar';
+      bar.innerHTML = 'نسخة تجريبية ببيانات توضيحية — المبالغ تقديرية والمكتبة التنظيمية قيد المراجعة القانونية. تغييراتك تبقى في متصفحك فقط. ';
       const btn = document.createElement('button');
       btn.textContent = 'إعادة ضبط العرض';
       btn.style.cssText = 'margin-inline-start:8px;border:1px solid #16233F;background:#fff;color:#16233F;border-radius:4px;padding:2px 10px;cursor:pointer;font:inherit';
