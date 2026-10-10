@@ -55,3 +55,10 @@ def test_owner_summary_and_wins(client):
     assert "من 100" in o["digest"]["body"] and " / 100" not in o["digest"]["body"]
     again = client.get(f"/api/orgs/{oid}/owner").json()
     assert len(again["history"]) == len(o["history"])  # one snapshot per day
+
+
+def test_version_endpoint(client):
+    v = client.get("/api/version").json()
+    assert set(v) == {"version", "as_of"}
+    assert isinstance(v["version"], str) and v["version"]
+    assert v["as_of"] == "2026-10-09"  # AS_OF from the environment

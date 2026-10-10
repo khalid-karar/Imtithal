@@ -536,6 +536,7 @@
       try {
         if (method === 'GET') {
           if (path === '/api/health') return ok({ ok: true, as_of: TODAY });
+          if (path === '/api/version') return ok({ version: '0.5.0', as_of: TODAY });
           if (path === '/api/orgs') return ok({ as_of: TODAY, orgs: orgs.map(o => ({ id: o.id, name: o.name, pack: o.pack, city: o.city })) });
           if ((m = /^\/api\/orgs\/(\d+)\/overview$/.exec(path))) return ok(overview(+m[1]));
           if ((m = /^\/api\/branches\/(\d+)\/items$/.exec(path))) return ok(branchItems(+m[1], q));

@@ -29,7 +29,7 @@ def main():
     client = TestClient(app_main.app)
 
     orgs = [o["id"] for o in snap["orgs"]]
-    reqs = [("GET", "/api/health", None), ("GET", "/api/orgs", None), ("GET", "/api/import/doc-types", None)]
+    reqs = [("GET", "/api/health", None), ("GET", "/api/version", None), ("GET", "/api/orgs", None), ("GET", "/api/import/doc-types", None)]
     for o in orgs:
         reqs += [("GET", f"/api/orgs/{o}/{p}", None) for p in ("overview", "changes", "vip", "audit", "employee-docs", "score-explain", "owner")]
         for q in ("status=overdue", "status=due_soon", "code=iqama", "status=overdue&code=iqama"):

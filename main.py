@@ -48,6 +48,11 @@ def health():
     return dict(ok=True, as_of=db.as_of().isoformat())
 
 
+@app.get("/api/version")
+def version():
+    return dict(version="0.5.0", as_of=db.as_of().isoformat())
+
+
 @app.get("/api/orgs")
 def orgs():
     c = db.conn()

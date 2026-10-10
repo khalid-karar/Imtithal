@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AS_OF: "2026-10-09"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Tests
+        run: python -m pytest -q
+
+      - name: Parity check (FastAPI vs browser engine)
+        run: |
+          set -o pipefail
+          python scripts/parity_check.py | tee parity.log
+          grep -qE "^[0-9]+ requests, 0 mismatches$" parity.log || { echo "parity mismatches found"; exit 1; }
+
+      - name: Build static demo
+        run: python scripts/build_static.py

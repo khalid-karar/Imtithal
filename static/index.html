@@ -445,6 +445,7 @@ details.auth{margin-top:28px} details.auth summary{cursor:pointer;font-size:17px
     <div class="foot">
       الجداول والتواريخ تُدخل يدويًا أو تُستورد من ملفات الجهات الحكومية؛ لا يوجد ربط مباشر مع المنصات الحكومية في هذه النسخة.
       المبالغ المعروضة تقديرات توضيحية للتعرض المالي وليست غرامات رسمية، والبنود المعلّمة "قيد المراجعة" لم يعتمدها مراجع قانوني بعد؛ ويظهر اسم المراجع وتاريخ التحقق على كل بند فور اعتماده.
+      <div id="verLine" style="margin-top:6px;font-size:11px;color:var(--slate);opacity:.8"></div>
     </div>
   </div>
 </div>
@@ -1383,6 +1384,7 @@ document.addEventListener('change', async ev => {
 $('#orgSel').addEventListener('change', async e => { S.imp = null; S.org = +e.target.value; await loadCat(); S.arg = null; S.emp = {branch: '', code: '', status: ''}; S.filt = {status: '', kind: ''}; render(); });
 
 (async () => {
+  api('/api/version').then(v => { if (v && v.version) $('#verLine').innerHTML = `الإصدار ${ltr(v.version)} · بيانات حتى ${ltr(v.as_of)}`; }).catch(() => {});
   try {
     const d = await api('/api/orgs');
     S.orgs = d.orgs; S.asOf = d.as_of; S.org = d.orgs[0].id;
